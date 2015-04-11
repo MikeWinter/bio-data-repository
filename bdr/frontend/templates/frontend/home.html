@@ -1,0 +1,78 @@
+{% extends 'frontend/base.html' %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Datasets</h2>
+        {% with categories=dataset_list.subcategories datasets=dataset_list.datasets template='frontend/fragments/category_menu_block.html' %}
+        {% if categories %}
+        {% include template with categories=categories template=template only %}
+        {% endif %}
+
+        {% if datasets %}
+        <ul class="list-group" style="margin-top: 0.33em">
+            {% for dataset in datasets %}
+            <li class="list-group-item"><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if not datasets and not categories %}
+            <p>No datasets have been added yet.</p>
+        {% endif %}
+        {% endwith %}
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Home</h1>
+    </header>
+    <h2>Recent Updates</h2>
+    {% if update_list %}
+        <table class="table table-condensed">
+            <colgroup>
+                <col span="2">
+                <col style="width: 13.5em">
+            </colgroup>
+        <thead>
+            <tr>
+                <th>Dataset</th>
+                <th>File revisions</th>
+                <th>Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for update in update_list %}
+            <tr>
+            <td><a href="{{ update.file.dataset.get_absolute_url }}">{{ update.file.dataset.name }}</a></td>
+            <td><a href="{{ update.file.get_absolute_url }}">{{ update.file.name }}</a></td>
+            <td>
+                <span title="Updated on {{ update.updated_at }}">{{ update.updated_at|naturaltime }}</span>
+                <a class="btn btn-link btn-xs" href="{{ update.get_absolute_url }}"
+                   title="Download revision {{ update.level }}">
+                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                </a>
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% else %}
+        <p class="alert alert-warning">No datasets have been updated recently.</p>
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    <div class="col-xs-3 col-xs-offset-9 text-right">
+        <span class="sr-only">In association with</span>
+        <a href="http://www.royalholloway.ac.uk/">
+            <img alt="Royal Holloway, University of London" src="{% static 'frontend/images/rhul.jpg' %}"
+                 height="110" width="220"></a><br>
+        <span class="sr-only">and</span>
+        <a href="http://www.paccanarolab.org/">
+            <img alt="Paccanaro Lab" src="{% static 'frontend/images/paccanarolab.png' %}"
+                 height="33" width="220"></a>
+    </div>
+{% endblock %}

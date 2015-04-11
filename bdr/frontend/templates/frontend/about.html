@@ -1,0 +1,41 @@
+{% extends 'frontend/base.html' %}
+{% load staticfiles %}
+
+{% block title %}About{% endblock %}
+
+{% block sidebar %}
+    <nav>
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href="{% url 'bdr.frontend:home' %}">Home</a></li>
+        <li class="active"><a href="{% url 'bdr.frontend:about' %}">About</a></li>
+        <li><a href="{% url 'bdr.frontend:legal' %}">Legal</a></li>
+    </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header col-sm-offset-0">
+        <h1>About the Biological Data Repository</h1>
+    </header>
+    <p>Research in the field of bioinformatics depends heavily upon biological data compiled in various datasets. While
+        often public, these datasets vary considerably in format, access mechanisms, release frequency, and in the
+        availability of previous releases. This latter point is of note as the ability to use old data to verify
+        predictions in light of more recent updates offers a potent way to evaluate new methods.</p>
+    <p>This repository retains prior revisions for such datasets which not only centralises these data sources, but also
+        enables verification regardless of whether historical data is maintained by the original publisher. Given the
+        variance in release schedules among datasets, updates are captured automatically to prevent the loss of
+        data.</p>
+{% endblock %}
+
+{% block footer %}
+    <div class="col-xs-3 col-xs-offset-9 text-right">
+        <span class="sr-only">In association with</span>
+        <a href="http://www.royalholloway.ac.uk/">
+            <img alt="Royal Holloway, University of London" src="{% static 'frontend/images/rhul.jpg' %}"
+                 height="110" width="220"></a><br>
+        <span class="sr-only">and</span>
+        <a href="http://www.paccanarolab.org/">
+            <img alt="Paccanaro Lab" src="{% static 'frontend/images/paccanarolab.png' %}"
+                 height="33" width="220"></a>
+    </div>
+{% endblock %}

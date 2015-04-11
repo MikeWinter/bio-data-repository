@@ -1,0 +1,501 @@
+[
+  {
+    "model": "backend.category",
+    "pk": 1,
+    "fields": {
+      "name": "Genomes",
+      "slug": "genomes",
+      "parent": null
+    }
+  },
+  {
+    "model": "backend.category",
+    "pk": 2,
+    "fields": {
+      "name": "Metabolomic",
+      "slug": "meta",
+      "parent": null
+    }
+  },
+  {
+    "model": "backend.category",
+    "pk": 3,
+    "fields": {
+      "name": "Gene Ontology",
+      "slug": "go",
+      "parent": null
+    }
+  },
+  {
+    "model": "backend.tag",
+    "pk": 1,
+    "fields": {
+      "name": "latest"
+    }
+  },
+  {
+    "model": "backend.tag",
+    "pk": 2,
+    "fields": {
+      "name": "test"
+    }
+  },
+  {
+    "model": "backend.format",
+    "pk": 2,
+    "fields": {
+      "name": "HPRD Binary Interactions",
+      "slug": "hprd",
+      "separator": "\t",
+      "module": "bdr.backend.formats.simple"
+    }
+  },
+  {
+    "model": "backend.format",
+    "pk": 3,
+    "fields": {
+      "name": "UniProt GOA",
+      "slug": "gaf20",
+      "separator": "\t",
+      "comment": "!",
+      "module": "bdr.backend.formats.simple"
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 1,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 1 gene",
+      "ordinal": 1,
+      "is_key": true
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 2,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 1 HPRD",
+      "ordinal": 2,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 3,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 1 RefSeq",
+      "ordinal": 3,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 4,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 2 gene",
+      "ordinal": 4,
+      "is_key": true
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 5,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 2 HPRD",
+      "ordinal": 5,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 6,
+    "fields": {
+      "format": 2,
+      "name": "Interactor 2 RefSeq",
+      "ordinal": 6,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 7,
+    "fields": {
+      "format": 2,
+      "name": "Experiment type",
+      "ordinal": 7,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 8,
+    "fields": {
+      "format": 2,
+      "name": "PubMed id.",
+      "ordinal": 8,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 9,
+    "fields": {
+      "format": 3,
+      "name": "Database",
+      "ordinal": 1,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 10,
+    "fields": {
+      "format": 3,
+      "name": "Object id.",
+      "ordinal": 2,
+      "is_key": true
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 11,
+    "fields": {
+      "format": 3,
+      "name": "Object symbol",
+      "ordinal": 3,
+      "is_key": true
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 12,
+    "fields": {
+      "format": 3,
+      "name": "Qualifier",
+      "ordinal": 4,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 13,
+    "fields": {
+      "format": 3,
+      "name": "Ontology id.",
+      "ordinal": 5,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 14,
+    "fields": {
+      "format": 3,
+      "name": "Reference",
+      "ordinal": 6,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 15,
+    "fields": {
+      "format": 3,
+      "name": "Evidence code",
+      "ordinal": 7,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 16,
+    "fields": {
+      "format": 3,
+      "name": "With/From",
+      "ordinal": 8,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 17,
+    "fields": {
+      "format": 3,
+      "name": "Aspect",
+      "ordinal": 9,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 18,
+    "fields": {
+      "format": 3,
+      "name": "Object name",
+      "ordinal": 10,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 19,
+    "fields": {
+      "format": 3,
+      "name": "Object synonym",
+      "ordinal": 11,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 20,
+    "fields": {
+      "format": 3,
+      "name": "Object type",
+      "ordinal": 12,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 21,
+    "fields": {
+      "format": 3,
+      "name": "Taxon",
+      "ordinal": 13,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 22,
+    "fields": {
+      "format": 3,
+      "name": "Date",
+      "ordinal": 14,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 23,
+    "fields": {
+      "format": 3,
+      "name": "Assigned by",
+      "ordinal": 15,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 24,
+    "fields": {
+      "format": 3,
+      "name": "Cross-references",
+      "ordinal": 16,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.formatfield",
+    "pk": 25,
+    "fields": {
+      "format": 3,
+      "name": "Product form id.",
+      "ordinal": 17,
+      "is_key": false
+    }
+  },
+  {
+    "model": "backend.dataset",
+    "pk": 1,
+    "fields": {
+      "name": "Human Protein Reference Database",
+      "slug": "hprd",
+      "notes": "The Human Protein Reference Database represents a centralized platform to visually depict and integrate information pertaining to domain architecture, post-translational modifications, interaction networks and disease association for each protein in the human proteome. All the information in HPRD has been manually extracted from the literature by expert biologists who read, interpret and analyze the published data.\nhttp://www.hprd.org/\n\nCite: Prasad, T. S. K. et al. (2009) Human Protein Reference Database - 2009 Update. Nucleic Acids Research. 37, D767-72.",
+      "updated_at": "2010-04-13 02:14:00+0000",
+      "categories": [
+        1
+      ],
+      "tags": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "backend.dataset",
+    "pk": 2,
+    "fields": {
+      "name": "DrugBank",
+      "slug": "drugbank",
+      "notes": "The DrugBank database is a unique bioinformatics and cheminformatics resource that combines detailed drug (i.e. chemical, pharmacological and pharmaceutical) data with comprehensive drug target (i.e. sequence, structure, and pathway) information.\nhttp://www.drugbank.ca/\n\nCite: DrugBank 4.0: shedding new light on drug metabolism. Law V, Knox C, Djoumbou Y, Jewison T, Guo AC, Liu Y, Maciejewski A, Arndt D, Wilson M, Neveu V, Tang A, Gabriel G, Ly C, Adamjee S, Dame ZT, Han B, Zhou Y, Wishart DS. Nucleic Acids Res. 2014 Jan 1;42(1):D1091-7.",
+      "updated_at": "2013-09-16 02:16:50+0000",
+      "update_uri": "http://www.drugbank.ca/system/downloads/current/drugbank.xml.zip",
+      "update_frequency": 1440,
+      "categories": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "backend.dataset",
+    "pk": 3,
+    "fields": {
+      "name": "UniProt GOA: Yeast",
+      "slug": "yeast-goa",
+      "notes": "The UniProt GO annotation program aims to provide high-quality Gene Ontology (GO) annotations to proteins in the UniProt Knowledgebase (UniProtKB). The assignment of GO terms to UniProt records is an integral part of UniProt biocuration.\nhttp://www.ebi.ac.uk/GOA\n\nCite: Barrell D, Dimmer E, Huntley RP, Binns D, O'Donovan C, Apweiler R. The GOA database in 2009—an integrated Gene Ontology Annotation resource. Nucleic Acids Res. 2008 Oct 27.",
+      "updated_at": "2014-09-08 10:46:10+0000",
+      "update_uri": "ftp://ftp.ebi.ac.uk/pub/databases/GO/goa/YEAST/gene_association.goa_yeast.gz",
+      "update_frequency": 20160,
+      "categories": [
+        3
+      ]
+    }
+  },
+  {
+    "model": "backend.file",
+    "pk": 1,
+    "fields": {
+      "name": "BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt",
+      "dataset": 1,
+      "default_format": 2
+    }
+  },
+  {
+    "model": "backend.file",
+    "pk": 2,
+    "fields": {
+      "name": "README",
+      "dataset": 1,
+      "default_format": 1
+    }
+  },
+  {
+    "model": "backend.file",
+    "pk": 3,
+    "fields": {
+      "name": "drugbank.xml",
+      "dataset": 2,
+      "default_format": 1
+    }
+  },
+  {
+    "model": "backend.file",
+    "pk": 4,
+    "fields": {
+      "name": "gene_association.goa_yeast",
+      "dataset": 3,
+      "default_format": 3
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 1,
+    "fields": {
+      "file": 2,
+      "level": 1,
+      "size": 1287,
+      "format": 1,
+      "updated_at": "2010-04-13 02:14:00+0000",
+      "tags": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 2,
+    "fields": {
+      "file": 1,
+      "level": 1,
+      "size": 2867050,
+      "format": 2,
+      "updated_at": "2014-04-14 13:15:31+0000",
+      "tags": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 3,
+    "fields": {
+      "file": 3,
+      "level": 1,
+      "size": 100121358,
+      "format": 1,
+      "updated_at": "2013-09-16 02:16:50+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 4,
+    "fields": {
+      "file": 3,
+      "level": 2,
+      "size": 233426189,
+      "format": 1,
+      "updated_at": "2014-09-08 10:46:10+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 5,
+    "fields": {
+      "file": 4,
+      "level": 1,
+      "size": 13183889,
+      "format": 3,
+      "updated_at": "2011-07-26 08:54:05+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 6,
+    "fields": {
+      "file": 4,
+      "level": 2,
+      "size": 10010145,
+      "format": 3,
+      "updated_at": "2012-05-14 10:08:49+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 7,
+    "fields": {
+      "file": 4,
+      "level": 3,
+      "size": 10439713,
+      "format": 3,
+      "updated_at": "2013-04-02 08:59:33+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 8,
+    "fields": {
+      "file": 4,
+      "level": 4,
+      "size": 10713932,
+      "format": 3,
+      "updated_at": "2014-02-17 08:56:36+0000"
+    }
+  },
+  {
+    "model": "backend.revision",
+    "pk": 9,
+    "fields": {
+      "file": 4,
+      "level": 5,
+      "size": 11502910,
+      "format": 3,
+      "updated_at": "2014-11-25 14:34:35+0000"
+    }
+  }
+]

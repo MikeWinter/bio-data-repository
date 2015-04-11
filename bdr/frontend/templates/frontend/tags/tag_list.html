@@ -1,0 +1,52 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Tags{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr.frontend:tags' %}">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr.frontend:tag-add' %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Tags</h1>
+    </header>
+    {% if tags %}
+        <table class="table table-condensed">
+            <col style="width: 15em;">
+            <col style="width: 5em;" span="3">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Datasets</th>
+                    <th>Files</th>
+                    <th>Revisions</th>
+                </tr>
+            </thead>
+        {% for tag in tags %}
+            <tbody>
+            <tr>
+                <th><a href="{% url "bdr.frontend:tag-detail" name=tag.name %}">#{{ tag.name }}</a></th>
+                <td>{{ tag.datasets.count }}</td>
+                <td>{{ tag.files.count }}</td>
+                <td>{{ tag.revisions.count }}</td>
+            </tr>
+            </tbody>
+        {% endfor %}
+        </table>
+
+        {% url 'bdr.frontend:tags' as nav_url %}
+        {% include 'frontend/fragments/pagination.html' with url=nav_url %}
+    {% else %}
+        <p class="alert alert-warning">No tags have been added yet.</p>
+    {% endif %}
+{% endblock %}

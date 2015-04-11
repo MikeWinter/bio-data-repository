@@ -1,0 +1,12 @@
+[
+  {
+    "model": "backend.format",
+    "pk": 1,
+    "fields": {
+      "name": "Raw",
+      "slug": "raw",
+      "separator": " ",
+      "module": "bdr.backend.formats.raw"
+    }
+  }
+]

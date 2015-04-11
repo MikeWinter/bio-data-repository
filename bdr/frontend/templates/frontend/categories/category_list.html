@@ -1,0 +1,56 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr.frontend:categories' %}">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr.frontend:category-add' %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Categories</h1>
+    </header>
+    {% if categories %}
+        <table class="table table-condensed">
+            <colgroup>
+                <col style="width: 15em;">
+            </colgroup>
+            <colgroup style="width: 6em" span="1"></colgroup>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Datasets</th>
+                </tr>
+            </thead>
+        {% for category in categories %}
+            <tbody>
+            <tr>
+                <th>
+                    {% with template='frontend/fragments/category_tree_indent.html' category=category.parent %}
+                    {% include template with template=template category=category only %}
+                    {% endwith %}
+                    <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+                    {% if category.parent %}<small class="sr-only">(parent: {{ category.parent.name }})</small>{% endif %}
+                </th>
+                <td>{{ category.datasets.count }}</td>
+            </tr>
+            </tbody>
+        {% endfor %}
+        </table>
+
+        {% url 'bdr.frontend:categories' as nav_url %}
+        {% include 'frontend/fragments/pagination.html' with url=nav_url %}
+    {% else %}
+        <p class="alert alert-warning">No categories have been added yet.</p>
+    {% endif %}
+{% endblock %}

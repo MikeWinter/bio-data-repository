@@ -1,0 +1,35 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Formats{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr.frontend:formats' %}">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr.frontend:format-add' %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Formats</h1>
+    </header>
+    {% if formats %}
+        <ul>
+        {% for format in formats %}
+            <li><a href="{{ format.get_absolute_url }}">{{ format.name }}</a></li>
+        {% endfor %}
+        </ul>
+
+        {% url 'bdr.frontend:formats' as url %}
+        {% include 'frontend/fragments/pagination.html' %}
+    {% else %}
+        <p class="alert alert-warning">No formats have been added yet.</p>
+    {% endif %}
+{% endblock %}

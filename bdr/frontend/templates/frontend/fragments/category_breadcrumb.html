@@ -1,0 +1,4 @@
+{% if category %}
+    {% include breadcrumb with category=category.parent %}
+    <li><a href="{{ category.get_absolute_url }}">{{ category }}</a></li>
+{% endif %}

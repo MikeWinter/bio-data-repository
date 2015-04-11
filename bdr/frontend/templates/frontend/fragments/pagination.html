@@ -1,0 +1,57 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="text-center">
+    <ul class="pagination pagination-sm">
+    {% spaceless %}
+    {% if page_obj.has_previous %}
+        <li><a href="{{ url }}?page={{ page_obj.previous_page_number }}">
+    {% else %}
+        <li class="disabled"><span>
+    {% endif %}
+            <span aria-hidden="true">&laquo;</span>
+    {% if not page_obj.has_previous %}</span>{% else %}</a>{% endif %}
+        </li>
+    {% endspaceless %}
+
+    {% for index in page_obj.leading_range %}
+    {% spaceless %}
+        <li{% if index == page_obj.number %} class="active"{% endif %}>
+            <a href="{{ url }}?page={{ index }}">{{ index }}
+                <span class="sr-only">(current)</span></a></li>
+    {% endspaceless %}
+    {% endfor %}
+    {% if page_obj.in_leading_range %}
+        <li><span>&hellip;</span></li>
+    {% endif %}
+
+    {% for index in page_obj.active_range %}
+    {% spaceless %}
+        <li{% if index == page_obj.number %} class="active"{% endif %}>
+            <a href="{{ url }}?page={{ index }}">{{ index }}
+                <span class="sr-only">(current)</span></a></li>
+    {% endspaceless %}
+    {% endfor %}
+
+    {% if page_obj.in_trailing_range %}
+        <li><span>&hellip;</span></li>
+    {% endif %}
+    {% for index in page_obj.trailing_range %}
+    {% spaceless %}
+        <li{% if index == page_obj.number %} class="active"{% endif %}>
+            <a href="{{ url }}?page={{ index }}">{{ index }}
+                <span class="sr-only">(current)</span></a></li>
+    {% endspaceless %}
+    {% endfor %}
+
+    {% spaceless %}
+    {% if page_obj.has_next %}
+        <li><a href="{{ url }}?page={{ page_obj.next_page_number }}">
+    {% else %}
+        <li class="disabled"><span>
+    {% endif %}
+            <span aria-hidden="true">&raquo;</span>
+    {% if not page_obj.has_next %}</span>{% else %}</a>{% endif %}
+        </li>
+    {% endspaceless %}
+    </ul>
+</nav>
+{% endif %}

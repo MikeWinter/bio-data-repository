@@ -1,0 +1,125 @@
+{% extends 'frontend/base.html' %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Search</h1>
+    </header>
+    {% if datasets or files or revisions %}
+    <div id="results" class="panel-group" role="tablist" aria-multiselectable="true">
+        {% if datasets %}
+        <div class="panel panel-default">
+            <div id="dataset" class="panel-heading" role="tab">
+                <h2 class="panel-title">
+                    <a href="#dataset-list" data-toggle="collapse" data-parent="#results" aria-expanded="true"
+                       aria-controls="dataset-list">Datasets <span class="badge">{{ datasets.count }}</span></a>
+                </h2>
+            </div>
+            <div id="dataset-list" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="dataset">
+                <table class="panel-body table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>Files</th>
+                        <th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for dataset in datasets %}
+                    <tr>
+                        <td><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></td>
+                        <td>{{ dataset.num_files }}</td>
+                        <td>{{ dataset.latest_revision|naturaltime }}</td>
+                    </tr>
+            {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if files %}
+        <div class="panel panel-default">
+            <div id="file" class="panel-heading" role="tab">
+                <h2 class="panel-title">
+                    <a href="#file-list" data-toggle="collapse" data-parent="#results" aria-expanded="true"
+                       aria-controls="file-list">Files <span class="badge">{{ files.count }}</span></a>
+                </h2>
+            </div>
+            <div id="file-list" class="panel-collapse collapse {% if not datasets %}in{% endif %}" role="tabpanel"
+                 aria-labelledby="file">
+                <table class="panel-body table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>File</th>
+                        <th>Revisions</th>
+                        <th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for file in files %}
+                    <tr>
+                        <td><a href="{{ file.dataset.get_absolute_url }}">{{ file.dataset.name }}</a></td>
+                        <td><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></td>
+                        <td>{{ file.revisions.count }}</td>
+                        <td>{{ file.revisions.first.updated_at|naturaltime }}</td>
+                    </tr>
+            {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if revisions %}
+        <div class="panel panel-default">
+            <div id="revision" class="panel-heading" role="tab">
+                <h2 class="panel-title">
+                    <a href="#revision-list" data-toggle="collapse" data-parent="#results" aria-expanded="true"
+                       aria-controls="revision-list">Revisions <span class="badge">{{ revisions.count }}</span></a>
+                </h2>
+            </div>
+            <div id="revision-list" class="panel-collapse collapse {% if not datasets and not files %}in{% endif %}"
+                 role="tabpanel" aria-labelledby="revision">
+                <table class="panel-body table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>File</th>
+                        <th>Revision</th>
+                        <th>Updated</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for revision in revisions %}
+                    <tr>
+                        <td>
+                            <a href="{{ revision.file.dataset.get_absolute_url }}">{{ revision.file.dataset.name }}</a>
+                        </td>
+                        <td><a href="{{ revision.file.get_absolute_url }}">{{ revision.file.name }}</a></td>
+                        <td>{{ revision.level }}</td>
+                        <td title="Updated on {{ revision.updated_at }}">{{ revision.updated_at|naturaltime }}</td>
+                        <td>
+                            {{ revision.size|filesizeformat }}
+                            <a class="btn btn-link btn-xs" href="{{ revision.get_absolute_url }}"
+                               title="Download revision">
+                                <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                            </a>
+                        </td>
+                    </tr>
+            {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+        <p class="alert alert-info">Nothing could be found that matched your query for <em>{{ query }}</em>.</p>
+    {% endif %}
+{% endblock %}
