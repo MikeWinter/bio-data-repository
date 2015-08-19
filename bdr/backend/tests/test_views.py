@@ -19,13 +19,11 @@ __license__ = """
 
 from datetime import datetime
 import json
-
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-
-from . import models
-from ..utils import utc
+from bdr.backend import models
+from bdr.utils import utc
 
 
 class TagDetailViewTest(TestCase):
@@ -47,10 +45,11 @@ class TagDetailViewTest(TestCase):
 
     def test_head_returns_200(self):
         """Ensure that a request for a matched identifier returns a 200 HTTP response code."""
-        pk, name = 1, 'test'
-        models.Tag.objects.create(id=pk, name=name)
-
-        response = self.client.head(reverse('bdr.backend:tag-detail', kwargs={'pk': pk}))
+        # Prepare
+        tag = self.create_anonymous_tag()
+        # Exercise
+        response = self.client.head(self.get_url(tag))
+        # Verify
         self.assertEqual(200, response.status_code)
 
     def test_get_returns_basic_data(self):
@@ -158,6 +157,83 @@ class TagDetailViewTest(TestCase):
                                              'size': self.REVISION.size,
                                              'updated_at': self.ENCODER.default(self.REVISION.updated_at),
                                              'tags': [{'name': name, 'href': tag.get_absolute_url()}]}]})
+
+    def test_put_fails_for_nonexistent_tag(self):
+        # Prepare
+        tag, name = 1, 'missing-test'
+        # Exercise
+        response = self.update_tag(tag, name)
+        # Verify
+        self.assertEquals(404, response.status_code)
+
+    def test_put_returns_200(self):
+        # Prepare
+        tag = self.create_anonymous_tag()
+        new_name = '200-test'
+        # Exercise
+        response = self.update_tag(tag, new_name)
+        # Verify
+        self.assertEquals(200, response.status_code)
+
+    def test_put_updates_existing_tag(self):
+        pk, name, new_name = 1, 'test', 'another test'
+        models.Tag.objects.create(id=pk, name=name)
+
+        url = self.get_url(pk)
+        response = self.client.put(url, json.dumps({'name': new_name}), 'application/json')
+        self.assertJSONEqual(response.content,
+                             {'name': new_name,
+                              'href': url,
+                              'datasets': [],
+                              'files': [],
+                              'revisions': []})
+
+    def test_delete_fails_for_nonexistent_tag(self):
+        # Prepare
+        tag = 1
+        # Exercise
+        response = self.delete_tag(tag)
+        # Verify
+        self.assertEquals(404, response.status_code)
+
+    def test_delete_returns_200(self):
+        # TODO: Change response to 204
+        # Prepare
+        tag = self.create_anonymous_tag()
+        # Exercise
+        response = self.delete_tag(tag)
+        # Verify
+        self.assertEquals(200, response.status_code)
+
+    def test_delete_removes_existing_tag(self):
+        # Prepare
+        tag = self.create_anonymous_tag()
+        # Exercise
+        self.delete_tag(tag)
+        # Verify
+        response = self.get_response(tag)
+        self.assertEquals(404, response.status_code)
+
+    def create_anonymous_tag(self):
+        last = models.Tag.objects.last()
+        new_id = (last.id + 1) if last else 1
+        models.Tag.objects.create(id=new_id, name='test{0}'.format(new_id))
+        return new_id
+
+    def get_url(self, tag):
+        return reverse('bdr.backend:tag-detail', kwargs={'pk': tag})
+
+    def get_response(self, tag):
+        url = self.get_url(tag)
+        return self.client.get(url)
+
+    def delete_tag(self, tag):
+        url = self.get_url(tag)
+        return self.client.delete(url)
+
+    def update_tag(self, tag, new_name):
+        url = self.get_url(tag)
+        return self.client.put(url, json.dumps({'name': new_name}), 'application/json')
 
 
 class TagCollectionViewTest(TestCase):

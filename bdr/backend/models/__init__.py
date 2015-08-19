@@ -17,13 +17,16 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-import os.path
-import shutil
-
 from django.core.urlresolvers import reverse
 from django.db import models
+from hashlib import md5 as hash_algorithm
+import io
+import os.path
+import shutil
+import tempfile
+import xdelta
 
-from . import app_settings
+from .. import app_settings
 
 
 class Category(models.Model):
@@ -36,7 +39,8 @@ class Category(models.Model):
     """The name of this category."""
     slug = models.SlugField(unique=True)
     """A unique keyword identifier for this category."""
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='subcategories', related_query_name='subcategory')
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='subcategories',
+                               related_query_name='subcategory')
     """The parent of this instance in the category hierarchy, or None if it is a top-level category."""
 
     def __str__(self):
@@ -102,18 +106,6 @@ class Format(models.Model):
 
 class FormatField(models.Model):
     """Represents a field within a file format."""
-    STRING = 1
-    INTEGER = 2
-    DECIMAL = 3
-    BOOLEAN = 4
-
-    _TYPE_CHOICES = (
-        (STRING, 'string'),
-        (INTEGER, 'integer'),
-        (DECIMAL, 'decimal'),
-        (BOOLEAN, 'boolean'),
-    )
-
     format = models.ForeignKey(Format, related_name='fields', related_query_name='field')
     """The format in which this field is used."""
     name = models.CharField(max_length=50)
@@ -122,8 +114,6 @@ class FormatField(models.Model):
     """The order of this field within the format."""
     is_key = models.BooleanField()
     """Specifies whether this field is a record key."""
-    type = models.PositiveSmallIntegerField(choices=_TYPE_CHOICES, default=STRING)
-    """The type of this field."""
 
     class Meta(object):
         """Metadata options for the FormatField model class."""
@@ -135,7 +125,7 @@ class FormatField(models.Model):
 
 class Dataset(models.Model):
     """
-    Represents datasets maintained by this repository.
+    Represents datasets (collections of related files) maintained by this repository.
 
     This class overrides the get_absolute_url method of the Django Model class.
     """
@@ -165,14 +155,17 @@ class Dataset(models.Model):
     """The tags used to annotate this dataset."""
 
     def delete(self, using=None):
-        slug = self.slug
+        path = self.get_storage_path()
+        if os.path.exists(path):
+            shutil.rmtree(path)
         super(Dataset, self).delete(using=using)
-        path = os.path.join(app_settings.STORAGE_ROOT, slug)
-        shutil.rmtree(path, ignore_errors=True)
 
     def get_absolute_url(self):
         """Return a URL that can be used to obtain more details about this dataset."""
         return reverse('bdr.backend:dataset-detail', kwargs={'slug': self.slug})
+
+    def get_storage_path(self):
+        return os.path.join(app_settings.STORAGE_ROOT, self.slug)
 
     def __str__(self):
         return str(self.name)
@@ -183,9 +176,31 @@ class Dataset(models.Model):
         """Order results lexicographically by name."""
 
 
+class Source(models.Model):
+    """
+    Represents a remote location that can be used to update one or more files within a dataset.
+    """
+    url = models.URLField(blank=True)
+    """A URL specifying the update source for files in this dataset."""
+    dataset = models.ForeignKey(Dataset, related_name='datasets', related_query_name='dataset')
+    """The dataset to which this update source relates."""
+    username = models.CharField(max_length=50, blank=True)
+    """An optional user name for authentication."""
+    password = models.CharField(max_length=64, blank=True)
+    """An optional password for authentication."""
+    frequency = models.PositiveIntegerField(default=0)
+    """How often (in hours) this source should be checked for updates; skipped if zero (0)."""
+    checked_at = models.DateTimeField(null=True, blank=True)
+    """Records the last time this source was checked for updates."""
+
+    class Meta(object):
+        unique_together = (('url', 'dataset'),)
+        """Require that datasets do not have duplicate source locations."""
+
+
 class File(models.Model):
     """
-    Represents files maintained by this repository.
+    Represents the files that constitute each dataset maintained by this repository.
 
     This class overrides the get_absolute_url method of the Django Model class.
     """
@@ -197,6 +212,11 @@ class File(models.Model):
     """The format of this file."""
     tags = models.ManyToManyField(Tag, blank=True, related_name='files', related_query_name='file')
     """The tags used to annotate this file."""
+
+    def delete(self, using=None):
+        for revision in self.revisions.order_by('level'):
+            revision.delete(using=using)
+        super(File, self).delete(using=using)
 
     def get_absolute_url(self):
         """Return a URL that can be used to obtain more details about this file."""
@@ -214,11 +234,30 @@ class File(models.Model):
 
 
 class Revision(models.Model):
+    def __init__(self, *args, **kwargs):
+        self._data = None
+        super(Revision, self).__init__(*args, **kwargs)
+
     """
     Represents revisions of files maintained by this repository.
 
     This class overrides the get_absolute_url method of the Django Model class.
     """
+    @staticmethod
+    def _get_path(instance, filename):
+        """
+        Compute the path name for a revision based on the dataset identifier, file name and revision level.
+
+        :param instance: An instance of the model.
+        :type instance:  Revision
+        :type filename:  str
+        :return: The path name for a revision.
+        :rtype:  str
+        """
+        base = hash_algorithm(instance.file.name).hexdigest()
+        name = "{0}.{1}.diff".format(base, instance.level)
+        return os.path.join("", [instance.file.dataset.slug, name])
+
     file = models.ForeignKey(File, related_name='revisions', related_query_name='revision')
     """The file of which this revision is a part."""
     level = models.PositiveIntegerField(editable=False)
@@ -232,16 +271,122 @@ class Revision(models.Model):
     tags = models.ManyToManyField(Tag, blank=True, related_name='revisions', related_query_name='revision')
     """The tags used to annotate this revision."""
 
+    @property
+    def data(self):
+        if self._data is None:
+            path = self._get_pathname()
+            if not os.path.exists(path):
+                raise Exception
+            file_ = io.open(path, 'rb')
+            self._data = xdelta.DeltaFile(file_)
+            self._data.source = self._decode_chain(self.get_previous())
+        self._data.open('rb')
+        return self._data
+
+    @data.setter
+    def data(self, file_):
+        # TODO: get_next()/get_previous() are reversed: the next revision should be the next higher revision number and
+        # TODO: it is this which is the source while writing. These methods need to be fixed and the uses below swapped.
+        # TODO: However, current use elsewhere needs to be changed, too.
+        # Decode the revision that precedes this one in the chain
+        next_revision = self.get_previous()
+        next_data = self._decode_chain(next_revision)
+
+        # Decode previous revision using current data
+        previous_revision = self.get_next()
+        if os.path.exists(self._get_pathname()):
+            chain_start = (next_data, next_revision)
+        else:
+            # If this revision has no data file, the previous revision is standalone
+            chain_start = (None, previous_revision)
+        previous_data = self._decode_chain(previous_revision, chain_start)
+
+        if self._data is None:
+            self._data = self._create_file_object()
+            self._data.source = next_data
+        self._data.open('wb')
+
+        source = self._make_seekable(file_)
+        # Encode new data
+        with self._data as stream:
+            while True:
+                chunk = source.read(io.DEFAULT_BUFFER_SIZE)
+                if not chunk:
+                    break
+                stream.write(chunk)
+            source.seek(0)
+
+        # Recode previous revision
+        if previous_data:
+            with previous_revision._create_file_object() as delta:
+                delta.source = source
+                delta.open('wb')
+                while True:
+                    chunk = previous_data.read(io.DEFAULT_BUFFER_SIZE)
+                    if not chunk:
+                        break
+                    delta.write(chunk)
+
     def get_absolute_url(self):
         """Return a URL that can be used to obtain more details about this revision."""
         return reverse('bdr.backend:revision-detail',
                        kwargs={'ds': self.file.dataset.slug, 'fn': self.file.name, 'rev': self.level})
 
     def get_next(self):
-        return self._default_manager.filter(file=self.file, level__lt=self.level).first()
+        return type(self).objects.filter(file=self.file, level__lt=self.level).first()
 
     def get_previous(self):
-        return self._default_manager.filter(file=self.file, level__gt=self.level).last()
+        return type(self).objects.filter(file=self.file, level__gt=self.level).last()
+
+    @classmethod
+    def _decode_chain(cls, to, from_=None):
+        if not to:
+            return None
+
+        revisions = cls.objects.filter(file=to.file).order_by('level')
+        if from_ is None:
+            from_ = None, revisions.last()
+        file_, revision = from_
+
+        for current in revisions.filter(level__range=(revision.level, to.level)).reverse():
+            with xdelta.DeltaFile(io.open(current._get_pathname(), 'rb')) as source:
+                source.source = file_
+                target = tempfile.TemporaryFile()
+                for chunk in source.chunks():
+                    target.write(chunk)
+            file_ = target
+            file_.seek(0)
+        return file_
+
+    @classmethod
+    def _make_seekable(cls, file_):
+        if hasattr(file_, 'seekable') and file_.seekable():
+            return file_
+
+        temp = tempfile.TemporaryFile()
+        while True:
+            chunk = file_.read(io.DEFAULT_BUFFER_SIZE)
+            if not chunk:
+                break
+            temp.write(chunk)
+        temp.flush()
+        temp.seek(0)
+        return temp
+
+    def _create_file_object(self):
+        path = self._get_pathname()
+        parent = os.path.dirname(path)
+        if not os.path.exists(parent):
+            os.makedirs(parent, app_settings.STORAGE_MODE)
+
+        file_ = io.open(path, 'wb')
+        delta = xdelta.DeltaFile(file_)
+        return delta
+
+    def _get_pathname(self):
+        from hashlib import sha224 as hash_algorithm
+        filename = '{:s}.{:05x}.diff'.format(hash_algorithm(self.file.name).hexdigest(), self.level)
+        return os.path.join(app_settings.STORAGE_ROOT, self.file.dataset.slug, filename)
 
     class Meta(object):
         """Metadata options for the Revision model class."""

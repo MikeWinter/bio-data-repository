@@ -20,6 +20,8 @@
 
         {% if not datasets and not categories %}
             <p>No datasets have been added yet.</p>
+            <p>To <a href="{% url "bdr.frontend:dataset-add" %}">add a dataset</a>, go to the
+                <a href="{% url "bdr.frontend:datasets" %}">datasets management page</a>.</p>
         {% endif %}
         {% endwith %}
     </nav>
@@ -28,7 +30,12 @@
 {% block content %}
     <header class="page-header">
         <h1>Home</h1>
+        <p>The Biological Dataset Repository is an archive and centralised access point for research-related data. Each
+            dataset can be configured to automatically update with the history of each file retained over time. A
+            summary of recent repository activity is listed below.</p>
+        {# <p>For more information about the organisation of the repository and its use, please see the <a href="{% url "bdr.frontend:help" %}">documentation</a>.</p> #}
     </header>
+
     <h2>Recent Updates</h2>
     {% if update_list %}
         <table class="table table-condensed">
