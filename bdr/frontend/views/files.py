@@ -106,7 +106,7 @@ class FileAddView(SessionWizardView):
         response, content = httplib2.Http().request(url, method='POST',
                                                     body=json.dumps(body, cls=DjangoJSONEncoder),
                                                     headers={'Content-Type': 'application/json'})
-        httplib2.Http().request(response['location'] + '/data', method='PUT', body=member.data,
+        httplib2.Http().request(response['location'] + '/data', method='PUT', body=member.file,
                                 headers={'Content-Type': 'application/octet-stream',
                                          'Content-Length': str(member.size)})
 

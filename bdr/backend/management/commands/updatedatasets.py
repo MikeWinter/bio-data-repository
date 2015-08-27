@@ -109,7 +109,7 @@ class Command(NoArgsCommand):
                             os.makedirs(path)
 
                         # Decode previous file to raw
-                        fp = member.data
+                        fp = member.file
                         preceding_revision = new_revision.get_previous()
                         if preceding_revision:
                             preceding_file = self._decode_chain(preceding_revision)
@@ -137,7 +137,7 @@ class Command(NoArgsCommand):
                                 fp.seek(0)
                             else:
                                 member = archive[member_name]
-                                fp = member.data
+                                fp = member.file
                             # Delete next raw
                             del next_file
 
