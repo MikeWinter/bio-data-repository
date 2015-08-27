@@ -1,18 +1,13 @@
 """
-This package contains the Biological Dataset Repository Django Web application.
-
-The application is composed of the following modules:
-    admin: Defines the administrative representations of model classes defined
-           in the models subpackage.
-    urls:  Specifies the URL structure for the application.
-
-The application also includes the following subpackages:
-    models: Contains definitions of classes in the domain model of this
-            application.
-    views:  Defines the views used to control interaction with the application.
-            Associated templates are located in the templates directory.
+Defines the administrative representations of model classes defined in the
+models subpackage.
 """
 
+from django.contrib import admin
+
+from .models import Category, Dataset, Tag
+
+__all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -31,3 +26,15 @@ __license__ = """
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
+
+admin.site.register(Category)
+admin.site.register(Tag)
+
+
+class DatasetAdmin(admin.ModelAdmin):
+    """
+    Administrative options for the Dataset model class.
+    """
+    prepopulated_fields = {"slug": ("name",)}
+
+admin.site.register(Dataset, DatasetAdmin)

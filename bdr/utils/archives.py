@@ -1,11 +1,26 @@
 """
-A set of tools for accessing archive formats. The archive types supported out-of-the-box are those read by the gzip,
-zipfile and tarfile modules.
+A set of tools for accessing archive formats. The archive types supported
+out-of-the-box are those read by the gzip, zipfile and tarfile modules.
 
-Additional archive formats can be supported by subclassing Archive and adding the fully-qualified class name of the new
-type to the ARCHIVE_READERS list setting.
+Additional archive formats can be supported by subclassing Archive and adding
+the fully-qualified class name of the new type to the ARCHIVE_READERS list
+setting.
 """
 
+from datetime import datetime
+import gzip
+import importlib
+import os
+import re
+import tarfile
+import tempfile
+from UserDict import DictMixin
+import zipfile
+
+from .. import app_settings
+from . import utc
+
+__all__ = ["Archive", "Member"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -25,26 +40,14 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from datetime import datetime
-from UserDict import DictMixin
-import gzip
-import os
-import re
-import tarfile
-import tempfile
-import zipfile
-import importlib
-
-from . import app_settings
-from . import utc
-
 
 class Archive(DictMixin, object):
     """
     An adaptor for handling archive formats.
 
-    Archives are map-like: iteration is supported and returns the names of each member of the archive, which can in
-    turn be used to index the archive in order to retrieve that member.
+    Archives are map-like: iteration is supported and returns the names of each
+    member of the archive, which can in turn be used to index the archive in
+    order to retrieve that member.
     """
     @classmethod
     def instance(cls, file_, path=None):
@@ -54,6 +57,7 @@ class Archive(DictMixin, object):
         :param file_: A file-like object containing the archive.
         :type  file_: file
         :param path: The path to the archive.
+        :rtype: Archive
         """
         file_.seek(0)
         for reader in app_settings.ARCHIVE_READERS:
@@ -102,7 +106,8 @@ class Archive(DictMixin, object):
 
     def can_read(self):
         """
-        Return True if this instance can be used to read the archive; otherwise False.
+        Return True if this instance can be used to read the archive; otherwise
+        False.
 
         :return: True if this instance can be used to read the archive.
         :rtype:  bool
@@ -181,7 +186,10 @@ class GzipArchive(Archive):
         return GzipMember(self._name, 0, None, self._zip)
 
     def can_read(self):
-        """Return True if this instance can be used to read the archive; otherwise False."""
+        """
+        Return True if this instance can be used to read the archive; otherwise
+        False.
+        """
         if self._zip is None:
             try:
                 self._zip = gzip.GzipFile(fileobj=self._file, mode='rb')
@@ -213,7 +221,9 @@ class GzipMember(Member):
 
     @property
     def mtime(self):
-        """A datetime instance representing the modification time of this member."""
+        """
+        A datetime instance representing the modification time of this member.
+        """
         return datetime.fromtimestamp(self._member.mtime, utc)
 
     @property
@@ -231,7 +241,10 @@ class GzipMember(Member):
 
 
 class MockArchive(Archive):
-    """An adaptor that imitates reading from an archive when dealing with single files."""
+    """
+    An adaptor that imitates reading from an archive when dealing with single
+    files.
+    """
 
     def __init__(self, file_, path=None):
         """
@@ -253,7 +266,8 @@ class MockArchive(Archive):
 
     def can_read(self):
         """
-        Return True if this instance can be used to read the archive; otherwise False.
+        Return True if this instance can be used to read the archive; otherwise
+        False.
 
         This implementation always returns True.
         """
@@ -279,7 +293,10 @@ class TarArchive(Archive):
         return Member(info.name, info.size, info.mtime, self._tar.extractfile(info))
 
     def can_read(self):
-        """Return True if this instance can be used to read the archive; otherwise False."""
+        """
+        Return True if this instance can be used to read the archive; otherwise
+        False.
+        """
         if self._tar is None:
             try:
                 self._tar = tarfile.open(fileobj=self._file)
@@ -308,10 +325,14 @@ class ZipArchive(Archive):
         if key not in self.keys():
             raise KeyError('%s not found.' % key)
         info = self._zip.getinfo(key)
-        return Member(info.filename, info.file_size, datetime(*info.date_time, tzinfo=utc), self._zip.open(info))
+        return Member(info.filename, info.file_size, datetime(*info.date_time, tzinfo=utc),
+                      self._zip.open(info))
 
     def can_read(self):
-        """Return True if this instance can be used to read the archive; otherwise False."""
+        """
+        Return True if this instance can be used to read the archive; otherwise
+        False.
+        """
         readable = zipfile.is_zipfile(self._file)
         self._file.seek(0)
         return readable

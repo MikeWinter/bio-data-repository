@@ -29,13 +29,17 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.formtools',
     'django.contrib.humanize',
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
+    'bootstrap3',
     'restless',
+    'bdr',
     'bdr.frontend',
     'bdr.backend',
     'bdr.utils',
@@ -45,6 +49,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
 )
@@ -54,6 +59,8 @@ ROOT_URLCONF = 'explorer.urls'
 WSGI_APPLICATION = 'explorer.wsgi.application'
 
 BDR_STORAGE_URL = 'http://127.0.0.1:8000/backend/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'data')
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -86,9 +93,3 @@ USE_ETAGS = True
 
 STATIC_URL = '/explorer/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'bdr/frontend/static')
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'tmp')
-
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR,  'templates'),
-)

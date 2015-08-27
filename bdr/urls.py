@@ -1,10 +1,17 @@
 """
-Defines the URL structure for the front-end web server application.
+Defines the URL structure for the Biological Data Repository Web application.
 
 For more information, see
 https://docs.djangoproject.com/en/1.6/topics/http/urls/
 """
 
+from django.conf.urls import patterns, url
+
+import bdr.views
+from bdr.frontend import views
+from bdr.frontend.views import categories, datasets, files, formats, revisions, tags
+
+__all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -24,18 +31,12 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from django.conf.urls import patterns, url
-
-from . import views
-from .views import categories, datasets, files, formats, revisions, tags
-
-
 urlpatterns = patterns(
     '',
     url(r'^$', views.HomePageView.as_view(), name='home'),
     url(r'^search$', views.SearchView.as_view(), name='search'),
-    url(r'^about$', views.AboutView.as_view(), name='about'),
-    url(r'^legal$', views.LegalView.as_view(), name='legal'),
+    url(r'^about$', bdr.views.AboutView.as_view(), name='about'),
+    url(r'^legal$', bdr.views.LegalView.as_view(), name='legal'),
 
     url(r'^categories/$', categories.CategoryListView.as_view(), name='categories'),
     url(r'^datasets/$', datasets.DatasetListView.as_view(), name='datasets'),

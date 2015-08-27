@@ -1,15 +1,33 @@
 """
-A set of classes for abstracting communication with remote servers. While the urllib-family of modules provides similar
-functionality, they not provide for querying the source for its metadata (size and modification date, in this case)
+A set of classes for abstracting communication with remote servers. While the
+urllib-family of modules provides similar functionality, they not provide for
+querying the source for its metadata (size and modification date, in this case)
 prior to fetching the resource itself.
 
 All exceptions raised by these types inherit from the TransportError class.
 
-Support for the FTP and HTTP protocols are included by default. This can be extended to any communications protocol,
-however, by subclassing Transport and adding the fully-qualified class name for the new type to the REMOTE_TRANSPORTS
+Support for the FTP and HTTP protocols are included by default. This can be
+extended to any communications protocol, however, by subclassing Transport and
+adding the fully-qualified class name for the new type to the REMOTE_TRANSPORTS
 settings list.
 """
 
+from datetime import datetime
+import ftplib
+import importlib
+import os.path
+import re
+import socket
+import tempfile
+import urlparse
+
+from django.utils.http import parse_http_date_safe
+import httplib2
+
+from .. import app_settings
+from . import utc
+
+__all__ = ["Transport", "TransportError"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -29,21 +47,6 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from datetime import datetime
-import ftplib
-import importlib
-import os.path
-import re
-import socket
-import tempfile
-import urlparse
-
-from django.utils.http import parse_http_date_safe
-import httplib2
-
-from . import app_settings
-from . import utc
-
 
 class TransportError(IOError):
     """Base class for all transport-related errors."""
@@ -51,21 +54,26 @@ class TransportError(IOError):
 
 
 class Transport(object):
-    """An abstraction for retrieving resources, and their metadata, from remote sources."""
+    """
+    An abstraction for retrieving resources, and their metadata, from remote
+    sources.
+    """
     @classmethod
     def instance(cls, url, user='', password=''):
         """
-        Create an instance of a data transport mechanism. The transport type returned is determined by the scheme
-        component given by `url`.
+        Create an instance of a data transport mechanism. The transport type
+        returned is determined by the scheme component given by `url`.
 
         :param url: The URL of the resource to be obtained.
-        :type  url: str
-        :param user: The user name required to access the resource specified in `url` (optional).
-        :type  user: str
-        :param password: The password required to access the resource specified in `url` (optional).
-        :type  password: str
-        :return: A transport mechanism capable of accessing the specified resource, or None if no matching transport
-                 type can be found.
+        :type  url: basestring
+        :param user: The user name required to access the resource specified in
+                     `url` (optional).
+        :type  user: basestring
+        :param password: The password required to access the resource specified
+                         in `url` (optional).
+        :type  password: basestring
+        :return: A transport mechanism capable of accessing the specified
+                 resource, or None if no matching transport type can be found.
         :rtype:  Transport | None
         """
         scheme, _, _, _, _ = urlparse.urlsplit(url)
@@ -83,9 +91,11 @@ class Transport(object):
 
         :param url: The URL of the resource to be obtained.
         :type  url: str
-        :param user: The user name required to access the resource specified in `url` (optional).
+        :param user: The user name required to access the resource specified in
+                     `url` (optional).
         :type  user: str
-        :param password: The password required to access the resource specified in `url` (optional).
+        :param password: The password required to access the resource specified
+                         in `url` (optional).
         :type  password: str
         """
         self._content = None
@@ -95,8 +105,8 @@ class Transport(object):
 
     def get_content(self):
         """
-        Return a temporary file containing the requested resource. This data will be lost if the content object is
-        closed.
+        Return a temporary file containing the requested resource. This data
+        will be lost if the content object is closed.
 
         :return: A file-like object containing the requested resource.
         :rtype:  file
@@ -109,11 +119,13 @@ class Transport(object):
 
     def get_modification_date(self):
         """
-        Return the date and time of the last modification to this resource as reported by the remote source.
+        Return the date and time of the last modification to this resource as
+        reported by the remote source.
 
         :return: The modification date and time, or None if unknown.
         :rtype:  datetime | None
-        :raises TransportError: If an error occurs while communicating with the server.
+        :raises TransportError: If an error occurs while communicating with the
+                                server.
         """
         raise NotImplementedError
 
@@ -123,17 +135,24 @@ class Transport(object):
 
         :return: The size (in bytes) of this resource, or -1 if unknown.
         :rtype:  int
-        :raises TransportError: If an error occurs while communicating with the server.
+        :raises TransportError: If an error occurs while communicating with the
+                                server.
         """
         raise NotImplementedError
 
     def _do_get_content(self):
-        """Retrieve the resource, writing it to `_content`. Subclasses must override this method."""
+        """
+        Retrieve the resource, writing it to `_content`. Subclasses must
+        override this method.
+        """
         raise NotImplementedError
 
 
 class FtpTransport(Transport):
-    """An abstraction for retrieving resources, and their metadata, from FTP servers."""
+    """
+    An abstraction for retrieving resources, and their metadata, from FTP
+    servers.
+    """
     _DEFAULT_TIMEOUT = 30
     _date_reply = None
     _feat_reply = None
@@ -145,9 +164,11 @@ class FtpTransport(Transport):
 
         :param url: The URL of the resource to be obtained.
         :type  url: str
-        :param user: The user name required to access the resource specified in `url` (optional).
+        :param user: The user name required to access the resource specified in
+                     `url` (optional).
         :type  user: str
-        :param password: The password required to access the resource specified in `url` (optional).
+        :param password: The password required to access the resource specified
+                         in `url` (optional).
         :type  password: str
         """
         super(FtpTransport, self).__init__(*args, **kwargs)
@@ -162,13 +183,16 @@ class FtpTransport(Transport):
     @property
     def features(self):
         """
-        A list of feature strings representing FTP extensions supported by the server.
+        A list of feature strings representing FTP extensions supported by the
+        server.
 
-        See RFC 5797 for a summary of these feature strings and RFC 2389 for a description of the FEAT command.
+        See RFC 5797 for a summary of these feature strings and RFC 2389 for a
+        description of the FEAT command.
 
         :return: A list of feature strings that indicated supported commands.
         :rtype:  list
-        :raises TransportError: If an error occurs while communicating with the server.
+        :raises TransportError: If an error occurs while communicating with the
+                                server.
         """
         if self._features is None:
             if self._feat_reply is None:
@@ -190,11 +214,13 @@ class FtpTransport(Transport):
 
     def get_modification_date(self):
         """
-        Return the date and time of the last modification to this resource as reported by the remote source.
+        Return the date and time of the last modification to this resource as
+        reported by the remote source.
 
         :return: The modification date and time, or None if unknown.
         :rtype:  datetime | None
-        :raises TransportError: If an error occurs while communicating with the server.
+        :raises TransportError: If an error occurs while communicating with the
+                                server.
         """
         if self._modification_date is None and 'mdtm' in self.features:
             if self._date_reply is None:
@@ -205,7 +231,8 @@ class FtpTransport(Transport):
             except (ftplib.Error, socket.error) as error:
                 raise TransportError(error.message)
             match = self._date_reply.match(reply)
-            self._modification_date = datetime.strptime(match.group(1)[:14], '%Y%m%d%H%M%S') if match else None
+            self._modification_date = datetime.strptime(
+                match.group(1)[:14], '%Y%m%d%H%M%S').replace(tzinfo=utc) if match else None
         return self._modification_date
 
     def get_size(self):
@@ -214,7 +241,8 @@ class FtpTransport(Transport):
 
         :return: The size (in bytes) of this resource, or -1 if unknown.
         :rtype:  int
-        :raises TransportError: If an error occurs while communicating with the server.
+        :raises TransportError: If an error occurs while communicating with the
+                                server.
         """
         if self._size == -1 and 'size' in self.features:
             if self._size_reply is None:
@@ -249,16 +277,21 @@ class FtpTransport(Transport):
 
 
 class HttpTransport(Transport):
-    """An abstraction for retrieving resources, and their metadata, from HTTP servers."""
+    """
+    An abstraction for retrieving resources, and their metadata, from HTTP
+    servers.
+    """
     def __init__(self, *args, **kwargs):
         """
         Create an instance of the HTTP transport mechanism.
 
         :param url: The URL of the resource to be obtained.
         :type  url: str
-        :param user: The user name required to access the resource specified in `url` (optional).
+        :param user: The user name required to access the resource specified in
+                     `url` (optional).
         :type  user: str
-        :param password: The password required to access the resource specified in `url` (optional).
+        :param password: The password required to access the resource specified
+                         in `url` (optional).
         :type  password: str
         """
         super(HttpTransport, self).__init__(*args, **kwargs)
@@ -270,7 +303,8 @@ class HttpTransport(Transport):
 
     def get_modification_date(self):
         """
-        Return the date and time of the last modification to this resource as reported by the remote source.
+        Return the date and time of the last modification to this resource as
+        reported by the remote source.
 
         :return: The modification date and time, or None if unknown.
         :rtype:  datetime | None

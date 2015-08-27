@@ -110,11 +110,3 @@ class SearchView(TemplateView):
                 context['files'] = files
                 context['revisions'] = revisions if found_tag else []
         return context
-
-
-class AboutView(TemplateView):
-    template_name = 'frontend/about.html'
-
-
-class LegalView(TemplateView):
-    template_name = 'frontend/legal.html'
