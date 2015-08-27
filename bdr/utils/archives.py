@@ -131,7 +131,7 @@ class Member(object):
         self._name, self._size, self._mtime, self._member = name, size, mtime, member
 
     @property
-    def data(self):
+    def file(self):
         """
         A read-only, file-like object containing the data for this member.
 
@@ -215,7 +215,7 @@ class GzipMember(Member):
         self._data = self._unpack(self._member)
 
     @property
-    def data(self):
+    def file(self):
         """A file-like object containing the data for this member."""
         return self._data
 
