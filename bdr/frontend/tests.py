@@ -33,8 +33,8 @@ from django.core.urlresolvers import reverse
 
 from . import app_settings
 from . import models as frontend
-from ..backend import models as backend
-from ..utils import utc
+from bdr.backend import models as backend
+from bdr.utils import utc
 
 
 class ServerTestMixin(object):
@@ -48,116 +48,6 @@ class ServerTestMixin(object):
     def tearDown(self):
         with io.BytesIO() as f:
             management.call_command('clearapicache', stdout=f)
-
-
-class HomePageViewTest(ServerTestMixin, LiveServerTestCase):
-    def test_http_ok(self):
-        """Check that the URL route is configured correctly and a 200 response code is received."""
-        with atomic():
-            response = self.client.get(reverse('bdr.frontend:home'))
-        self.assertEqual(200, response.status_code)
-
-    def test_empty(self):
-        """
-        Ensure that a user is presented with an informative message, rather than an empty page, if there are no
-        datasets.
-        """
-        with atomic():
-            response = self.client.get(reverse('bdr.frontend:home'))
-        self.assertContains(response, 'No datasets have been added')
-
-    def test_lists_datasets(self):
-        """Ensure that an uncatalogued dataset can be displayed in the menu."""
-        title = 'DrugBank'
-        with atomic():
-            dataset = backend.Dataset.objects.create(name=title, slug='drugbank')
-            response = self.client.get(reverse('bdr.frontend:home'))
-            local = frontend.Dataset.objects.get(href=dataset.get_absolute_url())
-        expected = '<a href="{url}">{title}</a>'.format(title=title, url=local.get_absolute_url())
-        self.assertInHTML(expected, response.content)
-
-    def test_lists_category(self):
-        """Ensure that categories are listed in the menu."""
-        title = 'Genomics'
-        slug = 'genomics'
-        with atomic():
-            category = backend.Category.objects.create(name=title, slug=slug)
-            response = self.client.get(reverse('bdr.frontend:home'))
-        expected = '''
-        <a data-toggle="collapse" data-parent="#group-{slug}" href="#child-{slug}" aria-controls="child-{slug}">
-            {title} <span class="caret"></span>
-        </a>
-        '''.format(title=title, slug=slug)
-        self.assertInHTML(expected, response.content)
-
-    def test_lists_categorised_dataset(self):
-        """Examine output for the correct grouping of datasets and their parent categories."""
-        category_title = 'Genomics'
-        category_slug = 'genomics'
-        dataset_title = 'HPRD'
-        dataset_slug = 'hprd'
-        with atomic():
-            category = backend.Category.objects.create(name=category_title, slug=category_slug)
-            dataset = backend.Dataset.objects.create(name=dataset_title, slug=dataset_slug)
-            dataset.categories.add(category)
-            response = self.client.get(reverse('bdr.frontend:home'))
-            local = frontend.Dataset.objects.get(href=dataset.get_absolute_url())
-        expected = '''
-        <li id="group-{category_slug}" class="panel panel-default" role="tablist" aria-multiselectable="true">
-            <div id="tab-{category_slug}" class="panel-heading" role="tab">
-                <div class="panel-title">
-                    <a data-toggle="collapse" data-parent="#group-{category_slug}" href="#child-{category_slug}"
-                       aria-controls="child-{category_slug}">{category} <span class="caret"></span></a>
-                </div>
-            </div>
-            <div id="child-{category_slug}" class="panel-collapse collapse" role="tabpanel"
-                 aria-labelledby="group-{category_slug}">
-                <ul class="list-group">
-                    <li class="list-group-item"><a href="{url}">{dataset}</a></li>
-                </ul>
-            </div>
-        </li>'''.format(category=category_title, category_slug=category_slug, dataset=dataset_title,
-                        url=local.get_absolute_url())
-        self.assertInHTML(expected, response.content)
-
-        # Subcategories have been disabled.
-        # def test_lists_subcategory(self):
-        # """Examine output for the correct grouping of subcategories with their parents."""
-        #     category_title = 'Genomics'
-        #     category_slug = 'genomics'
-        #     subcategory_title = 'Human'
-        #     subcategory_slug = 'human'
-        #     with atomic():
-        #         category = backend.Category.objects.create(name=category_title, slug=category_slug)
-        #         backend.Category.objects.create(name=subcategory_title, slug=subcategory_slug, parent=category)
-        #         response = self.client.get(reverse('bdr.frontend:home'))
-        #     expected = '''
-        #     <li id="group-{parent_slug}" class="panel panel-default" role="tablist" aria-multiselectable="true">
-        #         <div id="tab-{parent_slug}" class="panel-heading" role="tab">
-        #             <div class="panel-title">
-        #                 <a data-toggle="collapse" data-parent="#group-{parent_slug}" href="#child-{parent_slug}" aria-controls="child-{parent_slug}">{parent} <span class="caret"></span></a>
-        #             </div>
-        #         </div>
-        #         <div id="child-{parent_slug}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="group-{parent_slug}">
-        #             <div class="panel-body" style="padding: 0.5em 0.5em 0.5em 1em">
-        #             <ul class="panel-group list-unstyled" style="margin-bottom: 0">
-        #                 <li id="group-{child_slug}" class="panel panel-default" role="tablist" aria-multiselectable="true">
-        #                 <div id="tab-{child_slug}" class="panel-heading" role="tab">
-        #                     <div class="panel-title">
-        #                         <a data-toggle="collapse" data-parent="#group-{child_slug}" href="#child-{child_slug}" aria-controls="child-{child_slug}">{child} <span class="caret"></span></a>
-        #                     </div>
-        #                 </div>
-        #                 <div id="child-{child_slug}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="group-{child_slug}">
-        #                     Empty
-        #                 </div>
-        #                 </li>
-        #             </ul>
-        #             </div>
-        #             Empty
-        #         </div>
-        #     </li>'''.format(parent=category_title, parent_slug=category_slug, child=subcategory_title,
-        #                     child_slug=subcategory_slug)
-        #     self.assertInHTML(expected, response.content)
 
 
 class DatasetListViewTest(ServerTestMixin, LiveServerTestCase):

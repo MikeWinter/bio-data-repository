@@ -1,4 +1,5 @@
-{% extends 'frontend/base.html' %}
+{% extends 'bdr/base.html' %}
+{% load bootstrap3 %}
 {% load staticfiles %}
 
 {% block title %}Legal{% endblock %}
@@ -6,7 +7,7 @@
 {% block sidebar %}
     <nav>
     <ul class="nav nav-pills nav-stacked">
-        <li><a href="{% url 'bdr.frontend:home' %}">Home</a></li>
+        <li><a href="{% url 'bdr:home' %}">Home</a></li>
         <li><a href="{% url 'bdr:about' %}">About</a></li>
         <li class="active"><a href="{% url 'bdr:legal' %}">Legal</a></li>
     </ul>
@@ -55,8 +56,15 @@
             licensed under the <a href="https://www.python.org/psf/license">Python License</a>.</li>
         <li>The <a href="http://www.royalholloway.ac.uk/">Royal Holloway, University of London</a> logo is a trademark
             of Royal Holloway, University of London.</li>
+        <li>The <a href="https://github.com/adobe-fonts/source-sans-pro">Source Sans Pro</a> font is
+            Copyright &copy; 2010, 2012, 2014 Adobe Systems Incorporated and licensed under the
+            <a href="http://scripts.sil.org/OFL">SIL Open Font License version 1.1</a>.</li>
         <li><a href="https://github.com/twitter/typeahead.js">typeahead.js</a> is Copyright &copy; 2013–2014 Twitter,
             Inc and licensed under the <a href="https://github.com/twitter/typeahead.js/blob/master/LICENSE">MIT
+            License</a>.</li>
+        <li>The <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less">typeahead.js
+            compatibility stylesheet for Bootstrap 3</a> is Copyright &copy; 2014 Shawn Zhou and
+            licensed under the <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less/blob/master/LICENSE">MIT
             License</a>.</li>
         <li><a href="http://xdelta.org/">xdelta3</a> is Copyright &copy; 2001–07 Joshua Macdonald and licensed under
 			the <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html">GNU General Public License
@@ -68,11 +76,11 @@
     <div class="col-xs-3 col-xs-offset-9 text-right">
         <span class="sr-only">In association with</span>
         <a href="http://www.royalholloway.ac.uk/">
-            <img alt="Royal Holloway, University of London" src="{% static 'frontend/images/rhul.jpg' %}"
+            <img alt="Royal Holloway, University of London" src="{% static "bdr/images/rhul.jpg" %}"
                  height="110" width="220"></a><br>
         <span class="sr-only">and</span>
         <a href="http://www.paccanarolab.org/">
-            <img alt="Paccanaro Lab" src="{% static 'frontend/images/paccanarolab.png' %}"
+            <img alt="Paccanaro Lab" src="{% static "bdr/images/paccanarolab.png" %}"
                  height="33" width="220"></a>
     </div>
 {% endblock %}

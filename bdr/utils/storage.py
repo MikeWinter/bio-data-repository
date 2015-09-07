@@ -44,8 +44,8 @@ def upload_path(instance, filename):
     :return: The relative path to this revision.
     :rtype: str
     """
-    path = "{0:06x}".format(instance.datafile.dataset.id)
-    basename = hash_algorithm(instance.datafile.name).hexdigest()
+    path = "{0:06x}".format(instance.file.dataset.id)
+    basename = hash_algorithm(instance.file.name).hexdigest()
     name = "{0:s}.{1:06x}".format(basename, instance.number)
     return os.path.join(path, name)
 

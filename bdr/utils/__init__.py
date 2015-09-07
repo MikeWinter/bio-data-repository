@@ -29,9 +29,11 @@ class DownloadedFile(File):
     """
 
     # noinspection PyShadowingBuiltins
-    def __init__(self, file, name=None, modified_time=None):
+    def __init__(self, file, name=None, size=-1, modified_time=None):
         super(DownloadedFile, self).__init__(file, name)
         self._modified_time = modified_time
+        if size != -1:
+            self.size = size
 
     def _get_modified_time(self):
         if self._modified_time is None:

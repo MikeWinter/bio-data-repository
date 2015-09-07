@@ -43,7 +43,7 @@ __license__ = """
 
 class Archive(DictMixin, object):
     """
-    An adaptor for handling archive formats.
+    An adapter for handling archive formats.
 
     Archives are map-like: iteration is supported and returns the names of each
     member of the archive, which can in turn be used to index the archive in

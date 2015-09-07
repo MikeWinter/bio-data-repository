@@ -1,0 +1,40 @@
+@import "typeahead.css";
+
+#page-footer {
+    margin-top: 1em;
+    min-height: 5.5em;
+    position: relative;
+}
+
+#footer-links {
+    position: absolute;
+    bottom: 19px;
+}
+
+a.dropdown-toggle {
+    cursor: pointer;
+}
+
+.navbar-brand>img {
+    display: inline;
+}
+
+nav .panel,
+nav .panel-group {
+    margin-bottom: 0;
+}
+
+nav .panel+.panel,
+nav>ul {
+    margin-top: 5px;
+}
+
+.page-header h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+h1 .tag.label {
+    font-size: 40%;
+    vertical-align: middle;
+}

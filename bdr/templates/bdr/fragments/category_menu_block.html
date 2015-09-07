@@ -1,0 +1,31 @@
+{% if categories %}
+<ul id="category-list" class="panel-group list-unstyled" role="tablist">
+{% for category in categories %}
+    <li id="group-{{ category.id }}" class="panel panel-default">
+    <div id="tab-{{ category.id }}" class="panel-heading" role="tab">
+        <div class="panel-title">
+            {# TODO: Replace href attribute value with category.get_absolute_url once implemented. #}
+            <a href="/" data-toggle="collapse" data-target="#child-{{ category.id }}" aria-controls="child-{{ category.id }}"
+               aria-expanded="false">{{ category.name }} <span class="caret"></span></a>
+        </div>
+    </div>
+    <div id="child-{{ category.id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="group-{{ category.id }}">
+        {% include "bdr/fragments/dataset_menu_block.html" with datasets=category.datasets.all only %}
+    </div>
+    </li>
+{% endfor %}
+</ul>
+<script type="text/javascript">
+    (function ($) {
+        var controllers = $('[data-toggle="collapse"]', '#category-list');
+        if (controllers && controllers.click) {
+            controllers.click(function (evt) {
+                if (evt.preventDefault) {
+                    evt.preventDefault();
+                }
+            });
+            controllers = null;
+        }
+    })(jQuery);
+</script>
+{% endif %}

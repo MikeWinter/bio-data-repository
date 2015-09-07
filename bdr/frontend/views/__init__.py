@@ -39,30 +39,6 @@ from django.views.generic import TemplateView
 from .. import models
 
 
-class HomePageView(TemplateView):
-    """
-    This view displays a list of recently updated files, and a categorised list of the datasets stored in the
-    repository.
-
-    This class extends the get_context_data method of the Django TemplateView class from which it inherits. For more
-    information, see https://docs.djangoproject.com/en/1.6/ref/class-based-views/base/
-    """
-    template_name = 'frontend/home.html'
-    """Defines the template file used to present the view."""
-
-    def get_context_data(self, **kwargs):
-        """Set up and return variables for use in the template for this view."""
-        revisions = models.Revision.objects.fetch_all()
-        datasets = models.Dataset.objects.filter(categories=None)
-        context = super(HomePageView, self).get_context_data(**kwargs)
-        context['dataset_list'] = {
-            'subcategories': models.Category.objects.fetch_all().filter(parent=None),
-            'datasets': datasets,
-        }
-        context['update_list'] = revisions.order_by('-updated_at')[:10]
-        return context
-
-
 class SearchView(TemplateView):
     """
     This view displays search results for datasets, files and revisions that match queried names and tags.

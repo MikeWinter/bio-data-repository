@@ -1,11 +1,12 @@
 """
-This package contains class definitions for the domain model of this
+This module contains class definitions for the domain model of this
 application.
 
 The classes exported by this
 """
 
 from datetime import datetime, timedelta
+from urlparse import urlsplit
 import re
 
 # from django.core.urlresolvers import reverse
@@ -15,11 +16,12 @@ from django.db.models.fields import files, related
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
-from ..utils import utc
-# from ..utils.archives import Archive
-from ..utils.storage import delta_storage, upload_path
+from .utils import utc, DownloadedFile
+from .utils.archives import Archive
+from .utils.storage import delta_storage, upload_path
+from .utils.transports import Transport
 
-__all__ = ["Category", "Dataset", "DataFile", "Filter", "Revision", "Source", "Tag"]
+__all__ = ["Category", "Dataset", "File", "Filter", "Revision", "Source", "Tag"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -140,7 +142,7 @@ class Dataset(Model):
     #     for source in [src for src in self.sources.all() if src.has_update_elapsed()]:
     #         with transaction.atomic():
     #             source.checked()
-    #             if source.has_changed():
+    #             if source._has_changed():
     #                 for file_ in source.files():
     #                     self.add_file(file_)
     #                 source.changed()
@@ -204,7 +206,7 @@ class Dataset(Model):
         """Order results lexicographically by name."""
 
 
-class DataFile(Model):
+class File(Model):
     """
     Represents the files that constitute each dataset maintained by this
     repository.
@@ -234,67 +236,11 @@ class DataFile(Model):
         raise NotImplementedError
 
     class Meta(object):
-        """Metadata options for the DataFile model class."""
+        """Metadata options for the File model class."""
         ordering = ["name"]
         """Place results in ascending order by name."""
         unique_together = (("dataset", "name"),)
         """Require that file names are unique within a given dataset."""
-
-
-class Revision(Model):
-    """
-    Represents revisions of files maintained by this repository.
-
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
-    """
-
-    datafile = related.ForeignKey(DataFile, related_name='revisions', related_query_name='revision')
-    """The file of which this revision is a part."""
-    number = fields.PositiveIntegerField(editable=False)
-    """The revision number of this revision."""
-    data = files.FileField(upload_to=upload_path, storage=delta_storage)
-    """The data contained within this file."""
-    size = fields.BigIntegerField(editable=False)
-    """The size, in bytes, of this revision."""
-    updated_at = fields.DateTimeField(editable=False)
-    """The modification date and time for this revision."""
-    # format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision')
-    """The format of this file."""
-    tags = related.ManyToManyField(Tag, blank=True, related_name='revisions',
-                                   related_query_name='revision')
-    """The tags used to annotate this revision."""
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialise a new revision instance.
-
-        If a revision number is not given, the next available sequence number
-        is used.
-
-        :keyword number: The revision number for this instance.
-        :type number: int
-        """
-        if kwargs and "number" not in kwargs:
-            parent = kwargs["datafile"]
-            last_revision = parent.revisions.order_by("number").last()
-            kwargs["number"] = last_revision.number + 1 if last_revision else 1
-        super(Revision, self).__init__(*args, **kwargs)
-
-    def get_absolute_url(self):
-        """
-        Return a URL that can be used to obtain more details about this revision.
-        """
-        # TODO: Implement
-        # return reverse('bdr.backend:revision-detail',
-        #                kwargs={'ds': self.datafile.dataset.slug, 'fn': self.datafile.name,
-        #                        'rev': self.level})
-        raise NotImplementedError
-
-    class Meta(object):
-        """Metadata options for the Revision model class."""
-        unique_together = (('datafile', 'number'),)
-        """Require that each revision number is unique for revisions of any given file."""
 
 
 class Source(Model):
@@ -318,95 +264,60 @@ class Source(Model):
     """
     checked_at = fields.DateTimeField(blank=True, null=True, editable=False)
     """The last time this source was checked for updates."""
-    size = fields.BigIntegerField(default=-1, editable=False)
-    """The size of the resource as reported by this data source."""
-    updated_at = fields.DateTimeField(blank=True, null=True, editable=False)
+    transport_provider_factory = Transport.instance
     """
-    The modification date of the resource as reported by this data source; None
-    if this metadata is unavailable.
+    A callable that returns Transport instances. The factory must accept three
+    parameters: url, user, and password.
+    """
+    archive_factory = Archive.instance
+    """
+    A callable that returns Archive instances. The factory must accept two
+    parameters: archive_file and path.
     """
 
     def __init__(self, *args, **kwargs):
         super(Source, self).__init__(*args, **kwargs)
-        # self.__connection = None
+        self._provider = None
 
     def files(self):
         """
         Fetch the files obtainable from this data source.
-        """
-        pass
 
-    # @property
-    # def filename(self):
-    #     """
-    #     Return the name of the file referenced by this data source.
-    #
-    #     :return: The file name of the resource.
-    #     :rtype:  basestring
-    #     """
-    #     path = urlsplit(self.url).path
-    #     return os.path.basename(path)
-    #
-    # def changed(self, timestamp=None, size=-1):
-    #     """
-    #     Mark this source as changed.
-    #
-    #     If the timestamp or size is omitted, the metadata reported by the data
-    #     source is used.
-    #
-    #     :param timestamp: An optional timestamp denoting when the resource was
-    #                       updated.
-    #     :type  timestamp: datetime | None
-    #     :param size: The updated size of the resource (optional).
-    #     :type  size: int
-    #     """
-    #     if timestamp is None:
-    #         timestamp = self._connection.get_modification_date()
-    #     if size == -1:
-    #         size = self._connection.get_size()
-    #     self.updated_at = timestamp
-    #     self.size = size
-    #     self.save(update_fields=("updated_at", "size"))
-    #
-    # def checked(self, timestamp=None):
-    #     """
-    #     Mark this source as checked.
-    #
-    #     If the timestamp is omitted, the current time is used.
-    #
-    #     :param timestamp: An optional timestamp denoting when this source was
-    #                       checked.
-    #     :type  timestamp: datetime | None
-    #     """
-    #     if timestamp is None:
-    #         timestamp = datetime.now(utc)
-    #     self.checked_at = timestamp
-    #     self.save(update_fields=("checked_at",))
-    #
-    # def fetch(self):
-    #     """
-    #     Retrieve the resource from this data source.
-    #
-    #     :return: The resource referenced by this data source.
-    #     :rtype:  file
-    #     """
-    #     return self._connection.get_content()
-    #
-    # def has_changed(self):
-    #     """
-    #     Query the remote data source to determine whether the resource has
-    #     changed and return True if so.
-    #
-    #     :return: True if the resource has changed; otherwise False.
-    #     :rtype:  bool
-    #     """
-    #     size = self._connection.get_size()
-    #     if size != self.size:
-    #         return True
-    #     updated_at = self._connection.get_modification_date()
-    #     if updated_at is not None and (self.updated_at is None or updated_at > self.updated_at):
-    #         return True
-    #     return False
+        The files returned will consist of only those that pass the filters
+        applicable to this data source.
+
+        :return: A filtered list of `DownloadedFile` instances obtained from this data source.
+        :rtype: list of DownloadedFile
+        """
+        provider = self._get_transport_provider()
+        archive = self._get_archive(provider.get_content())
+        filters = self._get_filters()
+        file_list = []
+        for file_name in archive:  # type: str
+            try:
+                mapped_name = self._get_mapping(file_name, filters)
+            except self.FileRejected:
+                pass  # If a file is rejected, skip it.
+            else:
+                member = archive[file_name]
+                new_file = DownloadedFile(member.file, mapped_name, member.mtime)
+                file_list.append(new_file)
+        return file_list
+
+    def checked(self, timestamp=None):
+        """
+        Mark this source as checked.
+
+        If the timestamp is omitted, the current time is used.
+
+        :param timestamp: An optional timestamp denoting when this source was
+                          checked.
+        :type  timestamp: datetime | None
+        """
+        if timestamp is None:
+            timestamp = datetime.now(utc)
+        self.checked_at = timestamp
+        self.save(update_fields=("checked_at",))
 
     def has_update_elapsed(self):
         """
@@ -420,14 +331,91 @@ class Source(Model):
         """
         if not self.frequency:
             return False
+        if not self.checked_at:
+            return True
         delta = timedelta(hours=self.frequency)
         return self.checked_at + delta <= datetime.now(utc)
 
-    # @property
-    # def _connection(self):
-    #     if self.__connection is None:
-    #         self.__connection = Transport.instance(self.url, self.username, self.password)
-    #     return self.__connection
+    def has_changed(self):
+        """
+        Determine whether the resource at this source has changed.
+
+        :return: True if the resource has changed; otherwise False.
+        :rtype:  bool
+        """
+        changed = False
+        try:
+            latest_update = self.updates.latest()
+        except self.updates.model.DoesNotExist:
+            changed = True
+        else:
+            provider = self._get_transport_provider()
+            if provider.get_size() != latest_update.size:
+                changed = True
+            else:
+                updated_at = provider.get_modification_date()
+                if (updated_at is None or latest_update.modified_at is None or
+                        updated_at > latest_update.modified_at):
+                    changed = True
+        return changed
+
+    @classmethod
+    def _get_mapping(cls, file_name, filters):
+        """
+        Return the mapped name of a file based on the given filter list.
+
+        :param file_name: The original file name.
+        :type file_name: str
+        :param filters: A list of filters to check the name against.
+        :type filters: list of Filter
+        :return: The mapped file name.
+        :rtype: str
+        :raises FileRejected: if the file is rejected by the filter list.
+        """
+        if not filters:
+            return file_name
+        for source_filter in filters:
+            if source_filter.match(file_name):
+                return source_filter.map(file_name)
+        raise cls.FileRejected(file_name)
+
+    def _get_archive(self, data):
+        """
+        Return an archive read from `data`.
+
+        :param data: A file-like object containing the data of an archive.
+        :type data: file
+        :return: The archive.
+        :rtype: Archive
+        """
+        path = urlsplit(self.url).path
+        return self.archive_factory(data, path)
+
+    def _get_filters(self):
+        """
+        Return a list of filters (possibly empty) associated with this data
+        source.
+
+        :return: The list of filters.
+        :rtype: list of Filter
+        """
+        return [self.filters.get(pk=pk) for pk in self.get_filter_order()]
+
+    def _get_transport_provider(self):
+        """
+        Return a transport provider that can connect to this source.
+
+        :return: The transport provider.
+        :rtype: Transport
+        """
+        if self._provider is None:
+            self._provider = self.transport_provider_factory(url=self.url, user=self.username,
+                                                             password=self.password)
+        return self._provider
+
+    class FileRejected(Exception):
+        """Raised when a file is not matched by any filter."""
+        pass
 
     class Meta(object):
         """Metadata options for the Source model class."""
@@ -513,7 +501,97 @@ class Filter(Model):
         order_with_respect_to = "source"
 
 
+class Update(Model):
+    """
+    Records updates made to the repository for each dataset.
+    """
+
+    dataset = related.ForeignKey(Dataset, related_name="updates", related_query_name="update")
+    """The updated dataset."""
+    source = related.ForeignKey(Source, blank=True, null=True, related_name="updates",
+                                related_query_name="update")
+    """
+    The data source used to update the dataset.
+
+    If None, the update was initiated with user-supplied data.
+    """
+    timestamp = fields.DateTimeField(auto_now_add=True, editable=False)
+    """The date and time when this update occurred."""
+    size = fields.BigIntegerField(default=-1, editable=False)
+    """
+    The size of the resource as reported by the data source, or -1 if this
+    metadata is unavailable.
+    """
+    modified_at = fields.DateTimeField(blank=True, null=True, editable=False)
+    """
+    The modification date of the resource as reported by the data source, or
+    None if this metadata is unavailable.
+    """
+
+    class Meta(object):
+        get_latest_by = "timestamp"
+        unique_together = ["dataset", "source", "timestamp"]
+
+
+class Revision(Model):
+    """
+    Represents revisions of files maintained by this repository.
+
+    This class overrides the `~Model.get_absolute_url` method of the `Model`
+    class.
+    """
+
+    file = related.ForeignKey(File, related_name='revisions', related_query_name='revision')
+    """The file of which this revision is a part."""
+    number = fields.PositiveIntegerField(editable=False)
+    """The revision number of this revision."""
+    data = files.FileField(upload_to=upload_path, storage=delta_storage)
+    """The data contained within this file."""
+    size = fields.BigIntegerField(editable=False)
+    """The size, in bytes, of this revision."""
+    update = related.ForeignKey(Update, related_name="revisions", related_query_name="revision")
+    """The update that caused the addition of this revision."""
+    # format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision')
+    # """The format of this file."""
+    tags = related.ManyToManyField(Tag, blank=True, related_name='revisions',
+                                   related_query_name='revision')
+    """The tags used to annotate this revision."""
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialise a new revision instance.
+
+        If a revision number is not given, the next available sequence number
+        is used.
+
+        :keyword number: The revision number for this instance.
+        :type number: int
+        """
+        if kwargs and "number" not in kwargs:
+            parent = kwargs["file"]
+            last_revision = parent.revisions.order_by("number").last()
+            kwargs["number"] = last_revision.number + 1 if last_revision else 1
+        super(Revision, self).__init__(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """
+        Return a URL that can be used to obtain more details about this revision.
+        """
+        # TODO: Implement
+        # return reverse('bdr.backend:revision-detail',
+        #                kwargs={'ds': self.datafile.dataset.slug, 'fn': self.datafile.name,
+        #                        'rev': self.level})
+        raise NotImplementedError
+
+    class Meta(object):
+        """Metadata options for the Revision model class."""
+        unique_together = (('file', 'number'),)
+        """Require that each revision number is unique for revisions of any given file."""
+
+
 # noinspection PyUnusedLocal
+# The sender parameter is unnecessary as the instance is guaranteed to be a
+# Revision
 @receiver(post_delete, sender=Revision)
 def _remove_orphaned_files(sender, instance, **kwargs):
     instance.data.delete(save=False)

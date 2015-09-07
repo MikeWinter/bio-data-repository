@@ -1,19 +1,16 @@
 <!DOCTYPE html>
+{% load bootstrap3 %}
 {% load staticfiles %}
 <html lang="en">
 <head>
     <title>{% block title %}Home{% endblock %} – Biological Dataset Repository</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'frontend/css/theme.css' %}" />
+    <link href="{% static "bdr/favicon.ico" %}" type="image/x-icon" rel="shortcut icon" />
+    {% bootstrap_css %}
+    {{ search_form.media.css }}
     {% block stylesheets %}{% endblock %}
 
-    <script type="text/javascript" src="{% static 'frontend/js/jquery.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'frontend/js/bootstrap.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'frontend/js/typeahead.bundle.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'frontend/js/search.js' %}"></script>
-    <script type="text/javascript">
-        var searchUri = '{% url 'bdr.frontend:search' %}';
-        var tagsUri = '{% url 'bdr.frontend:tags' %}';
-    </script>
+    {% bootstrap_javascript %}
+    {{ search_form.media.js }}
     {% block scripts %}{% endblock %}
 </head>
 <body class="container">
@@ -28,15 +25,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url 'bdr.frontend:about' %}">
-                    <img alt="" src="{% static 'frontend/images/logo.png' %}" height="21" width="21"
-                         style="display: inline">
+                <a class="navbar-brand" href="{% url 'bdr:about' %}">
+                    <img alt="" src="{% static "bdr/images/logo.png" %}" height="21" width="21">
                     Biological Dataset Repository
                 </a>
             </div>
             <div id="main-navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{% url 'bdr.frontend:home' %}">Home</a></li>
+                    <li><a href="{% url 'bdr:home' %}">Home</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             Manage <span class="caret"></span>
@@ -49,18 +45,13 @@
                         </ul>
                     </li>
                 </ul>
-                <form id="dataset-search" class="navbar-form navbar-right" action="{% url 'bdr.frontend:search' %}"
+                {# TODO: Remove this condition once all views have been updated. #}
+                {% if form %}
+                <form class=".repository-search navbar-form navbar-right" action="{% url 'bdr:search' %}"
                       method="get" role="search">
-                    <div class="input-group">
-                    <input name="query" type="text" placeholder="Search..." value="{{ query }}" class="form-control">
-                    <span class="input-group-btn">
-                        <button type="submit" class="btn btn-default">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            <span class="sr-only">Search</span>
-                        </button>
-                    </span>
-                    </div>
+                    {% bootstrap_form search_form layout="inline" show_label=False %}
                 </form>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -73,8 +64,8 @@
 
     <footer id="page-footer" class="row well">
         <ul id="footer-links" class="list-inline col-xs-9">
-            <li><a href="{% url 'bdr.frontend:about' %}">About</a></li>
-            <li><a href="{% url 'bdr.frontend:legal' %}">Legal</a></li>
+            <li><a href="{% url 'bdr:about' %}">About</a></li>
+            <li><a href="{% url 'bdr:legal' %}">Legal</a></li>
             <li>&copy; 2015 Michael Winter</li>
         </ul>
         {% block footer %}{% endblock %}

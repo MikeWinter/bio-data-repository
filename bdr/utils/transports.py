@@ -14,6 +14,7 @@ settings list.
 
 from datetime import datetime
 import ftplib
+import httplib
 import importlib
 import os.path
 import re
@@ -50,6 +51,21 @@ __license__ = """
 
 class TransportError(IOError):
     """Base class for all transport-related errors."""
+    pass
+
+
+class AuthenticationError(TransportError):
+    """Authentication credentials are missing or incorrect."""
+    pass
+
+
+class ConnectionError(TransportError):
+    """Could not establish a connection."""
+    pass
+
+
+class NotFoundError(TransportError):
+    """The requested resource could not be found remotely."""
     pass
 
 
@@ -204,8 +220,6 @@ class FtpTransport(Transport):
                 reply = self._connection.sendcmd('FEAT')
             except ftplib.error_perm:
                 self._features = []
-            except (ftplib.Error, socket.error) as error:
-                raise TransportError(error.message)
             else:
                 match = self._feat_reply.match(reply)
                 self._features = (re.split(r'[\n\r]+ ', match.group(2).lstrip().lower())
@@ -228,8 +242,8 @@ class FtpTransport(Transport):
 
             try:
                 reply = self._connection.sendcmd('MDTM ' + self._name)
-            except (ftplib.Error, socket.error) as error:
-                raise TransportError(error.message)
+            except ftplib.error_perm as error:
+                raise NotFoundError(error)
             match = self._date_reply.match(reply)
             self._modification_date = datetime.strptime(
                 match.group(1)[:14], '%Y%m%d%H%M%S').replace(tzinfo=utc) if match else None
@@ -248,11 +262,11 @@ class FtpTransport(Transport):
             if self._size_reply is None:
                 self._size_reply = re.compile(r'^213 (\d+)[\n\r]*')
 
+            self._connection.voidcmd('TYPE I')
             try:
-                self._connection.voidcmd('TYPE I')
                 reply = self._connection.sendcmd('SIZE ' + self._name)
-            except (ftplib.Error, socket.error) as error:
-                raise TransportError(error.message)
+            except ftplib.error_perm as error:
+                raise NotFoundError(error)
             match = self._size_reply.match(reply)
             self._size = int(match.group(1)) if match else -1
         return self._size
@@ -264,9 +278,17 @@ class FtpTransport(Transport):
             try:
                 self.__connection.connect(self._host, self._port)
                 self.__connection.login(self._user, self._password)
+            except socket.gaierror as error:
+                raise ConnectionError(error)
+            except ftplib.error_reply as error:
+                raise AuthenticationError(error)
+            except ftplib.all_errors + (socket.error,) as error:
+                raise TransportError(error)
+
+            try:
                 self.__connection.cwd(self._path)
-            except (ftplib.error_reply, socket.error) as error:
-                raise TransportError(error.message)
+            except ftplib.error_reply as error:
+                raise NotFoundError(error)
         return self.__connection
 
     def _do_get_content(self):
@@ -311,7 +333,7 @@ class HttpTransport(Transport):
         """
         if self._modification_date is None:
             metadata = self._get_metadata()
-            timestamp = parse_http_date_safe(metadata.get('last-modified'))
+            timestamp = parse_http_date_safe(metadata.get("last-modified"))
             if timestamp:
                 self._modification_date = datetime.fromtimestamp(timestamp, utc)
         return self._modification_date
@@ -325,19 +347,33 @@ class HttpTransport(Transport):
         """
         if self._size == -1:
             metadata = self._get_metadata()
-            self._size = int(metadata.get('content-length', -1))
+            self._size = int(metadata.get("content-length", -1))
         return self._size
 
     def _get_metadata(self):
         if self._metadata is None:
-            try:
-                self._metadata, _ = self._client.request(self._url, "HEAD")
-            except socket.error as error:
-                raise TransportError(error.message)
+            self._metadata, _ = self._do_request("HEAD")
         return self._metadata
 
+    def _do_request(self, method="GET"):
+        try:
+            response, content = self._client.request(self._url, method)
+        except httplib2.ServerNotFoundError as error:
+            raise NotFoundError(error)
+        except (httplib.HTTPException, httplib2.HttpLib2Error, socket.error) as error:
+            raise ConnectionError(error)
+
+        if response == 401:
+            raise AuthenticationError()
+        elif 400 >= response < 500:
+            raise NotFoundError()
+        elif 500 >= response:
+            raise ConnectionError()
+
+        return response, content
+
     def _do_get_content(self):
-        response, content = self._client.request(self._url)
+        response, content = self._do_request()
         if response.status != 200:
             raise TransportError(response.reason)
         self._content.write(content)

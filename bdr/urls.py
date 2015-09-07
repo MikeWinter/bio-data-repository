@@ -7,8 +7,8 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 
 from django.conf.urls import patterns, url
 
-import bdr.views
-from bdr.frontend import views
+from views import HomeView, AboutView, LegalView, search_script
+from bdr.frontend import views as old_views
 from bdr.frontend.views import categories, datasets, files, formats, revisions, tags
 
 __all__ = []
@@ -33,10 +33,11 @@ __license__ = """
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.HomePageView.as_view(), name='home'),
-    url(r'^search$', views.SearchView.as_view(), name='search'),
-    url(r'^about$', bdr.views.AboutView.as_view(), name='about'),
-    url(r'^legal$', bdr.views.LegalView.as_view(), name='legal'),
+    url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^about$', AboutView.as_view(), name='about'),
+    url(r'^legal$', LegalView.as_view(), name='legal'),
+    url(r'^search$', old_views.SearchView.as_view(), name='search'),
+    url(r'^search.js$', search_script, name='search.js'),
 
     url(r'^categories/$', categories.CategoryListView.as_view(), name='categories'),
     url(r'^datasets/$', datasets.DatasetListView.as_view(), name='datasets'),

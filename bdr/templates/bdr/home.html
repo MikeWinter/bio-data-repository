@@ -1,0 +1,76 @@
+{% extends "bdr/base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Datasets</h2>
+        {% include "bdr/fragments/category_menu_block.html" with categories=category_list only %}
+        {% include "bdr/fragments/dataset_menu_block.html" with datasets=dataset_list only %}
+
+        {% if not category_list and not dataset_list %}
+        <p>No datasets have been added yet.</p>
+        <p>To <a href="{% url "bdr.frontend:dataset-add" %}">add a dataset</a>, go to the
+            <a href="{% url "bdr.frontend:datasets" %}">datasets management page</a>.</p>
+        {% endif %}
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <h1>Home</h1>
+        <p>The Biological Dataset Repository is an archive and centralised access point for
+            research-related data. Each dataset can be configured to automatically update with the
+            history of each file retained over time. A summary of recent repository activity is
+            listed below.</p>
+        {# <p>For more information about the organisation of the repository and its use, please see the <a href="{% url "bdr.frontend:help" %}">documentation</a>.</p> #}
+    </header>
+
+    <h2>Recent Updates</h2>
+    {% if update_list %}
+    <table class="table table-condensed">
+        <colgroup>
+            <col span="2">
+            <col style="width: 13.5em">
+        </colgroup>
+    <thead>
+        <tr>
+            <th>Dataset</th>
+            <th># Revisions</th>
+            <th>Updated</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for update in update_list %}
+        <tr>
+        <td><a href="{{ update.dataset.get_absolute_url }}">{{ update.dataset.name }}</a></td>
+        <td><a href="{{ update.get_absolute_url }}">{{ update.revisions.count }}</a></td>
+        <td>
+            <span title="Updated on {{ update.updated_at }}">{{ update.updated_at|naturaltime }}</span>
+{# TODO: Move to update detail view #}
+{#            <a class="btn btn-link btn-xs" href="{{ update.get_absolute_url }}"#}
+{#               title="Download revision {{ update.level }}">#}
+{#                <span class="glyphicon glyphicon-download" aria-hidden="true"></span>#}
+{#            </a>#}
+        </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-warning">No datasets have been updated recently.</p>
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    <div class="col-xs-3 col-xs-offset-9 text-right">
+        <span class="sr-only">In association with</span>
+        <a href="http://www.royalholloway.ac.uk/">
+            <img alt="Royal Holloway, University of London" src="{% static 'bdr/images/rhul.jpg' %}"
+                 height="110" width="220"></a><br>
+        <span class="sr-only">and</span>
+        <a href="http://www.paccanarolab.org/">
+            <img alt="Paccanaro Lab" src="{% static 'bdr/images/paccanarolab.png' %}"
+                 height="33" width="220"></a>
+    </div>
+{% endblock %}
