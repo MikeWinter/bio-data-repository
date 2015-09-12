@@ -10,6 +10,7 @@
             <li class="active" role="presentation"><a href="{% url 'bdr:datasets' %}">
                 {% bootstrap_icon "th-list" %} List
             </a></li>
+            {# TODO: Change route #}
             <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:dataset-add' %}{% endcomment %}">
                 {% bootstrap_icon "plus" %} Add
             </a></li>
@@ -59,8 +60,9 @@
                     {% if dataset.tags.exists %}
                         <ul class="list-inline">
                         {% for tag in dataset.tags.all %}
+                            {# TODO: Change route #}
                             <li><a class="label label-default"
-                                   href="{% url 'bdr.frontend:tag-detail' name=tag.name %}">{{ tag.name }}</a></li>
+                                   href="{% url 'bdr.frontend:tag-detail' name=tag.name %}">#{{ tag.name }}</a></li>
                         {% endfor %}
                         </ul>
                     {% endif %}
@@ -72,7 +74,7 @@
 
         {% bootstrap_pagination page_obj size="small" %}
     {% else %}
-        <p class="text-info">No datasets have been added yet.</p>
+        <p>No datasets have been added yet.</p>
     {% endif %}
     </section>
 {% endblock %}

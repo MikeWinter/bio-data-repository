@@ -10,8 +10,9 @@
 
         {% if not category_list and not dataset_list %}
         <p>No datasets have been added yet.</p>
+        {# TODO: Change route #}
         <p>To <a href="{% url "bdr.frontend:dataset-add" %}">add a dataset</a>, go to the
-            <a href="{% url "bdr.frontend:datasets" %}">datasets management page</a>.</p>
+            <a href="{% url "bdr:datasets" %}">datasets management page</a>.</p>
         {% endif %}
     </nav>
 {% endblock %}
@@ -61,7 +62,7 @@
             </tbody>
         </table>
         {% else %}
-        <p class="text-info">No datasets have been updated recently.</p>
+        <p>No datasets have been updated recently.</p>
         {% endif %}
     </section>
 {% endblock %}

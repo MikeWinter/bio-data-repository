@@ -26,8 +26,6 @@
     </header>
 
     <section>
-        {% bootstrap_messages %}
-
         <form class="form-horizontal" action="{% url 'bdr:edit-category' pk=category.pk name=category.name|slugify %}" method="post">
             {% csrf_token %}
             {% bootstrap_form form layout="horizontal" %}

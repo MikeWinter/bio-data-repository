@@ -94,7 +94,7 @@ class Category(Model):
         Return a URL that can be used to obtain more details about this
         category.
         """
-        return reverse("bdr:category", kwargs={"pk": self.pk, "name": slugify(self.name)})
+        return reverse("bdr:category", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
 
     def __str__(self):
         return self.name
@@ -181,7 +181,7 @@ class Dataset(Model):
         Return a URL that can be used to obtain more details about this
         dataset.
         """
-        return reverse("bdr:dataset", kwargs={"pk": self.pk, "name": slugify(self.name)})
+        return reverse("bdr:dataset", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
 
     # def _map(self, filename):
     #     """
