@@ -1,8 +1,7 @@
 {% if datasets %}
 <ul class="list-group">
     {% for dataset in datasets %}
-    {# TODO: Replace href attribute value with dataset.get_absolute_url once implemented. #}
-    <li class="list-group-item"><a href="/">{{ dataset.name }}</a></li>
+    <li class="list-group-item"><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
     {% endfor %}
 </ul>
 {% endif %}

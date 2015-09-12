@@ -4,8 +4,7 @@
     <li id="group-{{ category.id }}" class="panel panel-default">
     <div id="tab-{{ category.id }}" class="panel-heading" role="tab">
         <div class="panel-title">
-            {# TODO: Replace href attribute value with category.get_absolute_url once implemented. #}
-            <a href="/" data-toggle="collapse" data-target="#child-{{ category.id }}" aria-controls="child-{{ category.id }}"
+            <a href="{{ category.get_absolute_url }}" data-toggle="collapse" data-target="#child-{{ category.id }}" aria-controls="child-{{ category.id }}"
                aria-expanded="false">{{ category.name }} <span class="caret"></span></a>
         </div>
     </div>

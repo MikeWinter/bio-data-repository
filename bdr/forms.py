@@ -1,9 +1,11 @@
-from django.forms import Form
-from django.forms.fields import CharField
+from django.forms import Form, ModelForm
+from django.forms.fields import BooleanField, CharField
 from django.forms.widgets import TextInput
 from django.core.urlresolvers import reverse_lazy
 
-__all__ = ["SearchForm"]
+from .models import Category
+
+__all__ = ["CategoryForm", "CategoryDeletionForm", "SearchForm"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -22,6 +24,17 @@ __license__ = """
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
+
+
+class CategoryForm(ModelForm):
+    class Meta(object):
+        model = Category
+        fields = "__all__"
+
+
+class CategoryDeletionForm(Form):
+    delete = BooleanField(label="Confirm deletion",
+                          help_text="Are you sure you want to delete this category?")
 
 
 class SearchForm(Form):

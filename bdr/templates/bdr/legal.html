@@ -2,74 +2,90 @@
 {% load bootstrap3 %}
 {% load staticfiles %}
 
-{% block title %}Legal{% endblock %}
+{% block title %}Legal Information{% endblock %}
 
-{% block sidebar %}
+{% block main_content %}
     <nav>
-    <ul class="nav nav-pills nav-stacked">
-        <li><a href="{% url 'bdr:home' %}">Home</a></li>
-        <li><a href="{% url 'bdr:about' %}">About</a></li>
-        <li class="active"><a href="{% url 'bdr:legal' %}">Legal</a></li>
-    </ul>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li class="active">Legal Information</li>
+        </ol>
     </nav>
-{% endblock %}
 
-{% block content %}
     <header class="page-header col-sm-offset-0">
         <h1>Legal Information</h1>
     </header>
-    <h2>Copyright</h2>
-    <p>The Biological Data Repository is Copyright &copy; 2015 Michael Winter. It is licensed under the terms of the
-        <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html">GNU General Public License version
-		2 (or later)</a>.</p>
-    <p>The data maintained herein remains the intellectual property (<abbr class="initialism">IP</abbr>) of the
-		original authors and must be used in accordance with the applicable terms and conditions of each dataset.</p>
 
-    <h2>Warranty</h2>
-    <p>This program is distributed in the hope that it will be useful, but <em>without any warranty</em>; without even
-        the implied warranty of <em>merchantability</em> or <em>fitness for a particular purpose</em>. See the GNU
-        General Public License for more details.</p>
+    <section>
+        <h2>Copyright</h2>
+        <p>The Biological Data Repository is Copyright &copy; 2015 Michael Winter. It is licensed
+            under the terms of the
+            <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html">GNU General
+                Public License version 2 (or later)</a>.</p>
+        <p>The data maintained herein remains the intellectual property
+            (<abbr class="initialism">IP</abbr>) of the original authors and must be used in
+            accordance with the applicable terms and conditions of each dataset.</p>
 
-    <h2>Acknowledgements</h2>
-    <p>This software uses the following <abbr class="initialism">IP</abbr> under license:</p>
-    <ul>
-        <li><a href="http://getbootstrap.com/">Bootstrap</a> is Copyright &copy; 2011–2015 Twitter, Inc and licensed
-            under the <a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">MIT License</a>.</li>
-        <li>The Flatly <a href="https://bootswatch.com/">Bootswatch</a> theme is Copyright &copy; 2014 Thomas Park and
-            licensed under the <a href="https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE">MIT
-            License</a>.</li>
-        <li><a href="https://www.djangoproject.com/">Django</a> is a trademark of the Django Software Foundation and
-            licensed under the <a href="https://github.com/django/django/blob/master/LICENSE">BSD license</a>.</li>
-		<li><a href="http://django-restless.rtfd.org/">Django Restless</a> is Copyright &copy; 2012–14 Django Restless
-			contributors and licensed under the
-			<a href="https://github.com/dobarkod/django-restless/blob/master/README.md">MIT License</a>.</li>
-		<li><a href="https://github.com/jcgregorio/httplib2">httplib2</a> is Copyright &copy; 2006 Joe Gregorio and
-			licensed under the <a href="https://github.com/jcgregorio/httplib2/blob/master/LICENSE">MIT
-			License</a>.</li>
-		<li><a href="http://jquery.com/">jQuery</a> is Copyright &copy; 2015 The jQuery Foundation and licensed under
-			the <a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">MIT License</a>.</li>
-        <li>The <a href="http://www.latofonts.com/">Lato</a> font is Copyright &copy; 2010–14 &Lstrok;ukasz Dziedzic
-			and licensed under the <a href="http://scripts.sil.org/OFL">SIL Open Font License version 1.1</a>.</li>
-        <li>The logo for this website is a derivative work of an image released into the public domain by
-            <a href="http://pixabay.com/">pixabay</a>.</li>
-        <li><a href="https://www.python.org/">Python</a> is a trademark of the Python Software Foundation and
-            licensed under the <a href="https://www.python.org/psf/license">Python License</a>.</li>
-        <li>The <a href="http://www.royalholloway.ac.uk/">Royal Holloway, University of London</a> logo is a trademark
-            of Royal Holloway, University of London.</li>
-        <li>The <a href="https://github.com/adobe-fonts/source-sans-pro">Source Sans Pro</a> font is
-            Copyright &copy; 2010, 2012, 2014 Adobe Systems Incorporated and licensed under the
-            <a href="http://scripts.sil.org/OFL">SIL Open Font License version 1.1</a>.</li>
-        <li><a href="https://github.com/twitter/typeahead.js">typeahead.js</a> is Copyright &copy; 2013–2014 Twitter,
-            Inc and licensed under the <a href="https://github.com/twitter/typeahead.js/blob/master/LICENSE">MIT
-            License</a>.</li>
-        <li>The <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less">typeahead.js
-            compatibility stylesheet for Bootstrap 3</a> is Copyright &copy; 2014 Shawn Zhou and
-            licensed under the <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less/blob/master/LICENSE">MIT
-            License</a>.</li>
-        <li><a href="http://xdelta.org/">xdelta3</a> is Copyright &copy; 2001–07 Joshua Macdonald and licensed under
-			the <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html">GNU General Public License
-            version 2 (or later)</a>.</li>
-    </ul>
+        <h2>Warranty</h2>
+        <p>This program is distributed in the hope that it will be useful, but <em>without any
+            warranty</em>; without even the implied warranty of <em>merchantability</em> or
+            <em>fitness for a particular purpose</em>. See the GNU General Public License for more
+            details.</p>
+
+        <h2>Acknowledgements</h2>
+        <p>This software uses the following <abbr class="initialism">IP</abbr> under license:</p>
+        <ul>
+            <li><a href="http://getbootstrap.com/">Bootstrap</a> is Copyright &copy; 2011–2015
+                Twitter, Inc and licensed under the
+                <a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">MIT
+                License</a>.</li>
+            <li>The Flatly <a href="https://bootswatch.com/">Bootswatch</a> theme is Copyright
+                &copy; 2014 Thomas Park and licensed under the
+                <a href="https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE">MIT
+                License</a>.</li>
+            <li><a href="https://www.djangoproject.com/">Django</a> is a trademark of the Django
+                Software Foundation and licensed under the
+                <a href="https://github.com/django/django/blob/master/LICENSE">BSD license</a>.</li>
+            <li><a href="http://django-restless.rtfd.org/">Django Restless</a> is Copyright &copy;
+                2012–14 Django Restless contributors and licensed under the
+                <a href="https://github.com/dobarkod/django-restless/blob/master/README.md">MIT
+                License</a>.</li>
+            <li><a href="https://github.com/jcgregorio/httplib2">httplib2</a> is Copyright &copy;
+                2006 Joe Gregorio and licensed under the
+                <a href="https://github.com/jcgregorio/httplib2/blob/master/LICENSE">MIT
+                License</a>.</li>
+            <li><a href="http://jquery.com/">jQuery</a> is Copyright &copy; 2015 The jQuery
+                Foundation and licensed under the
+                <a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">MIT
+                License</a>.</li>
+            <li>The <a href="http://www.latofonts.com/">Lato</a> font is Copyright &copy; 2010–14
+                &Lstrok;ukasz Dziedzic and licensed under the
+                <a href="http://scripts.sil.org/OFL">SIL Open Font License version 1.1</a>.</li>
+            <li>The logo for this website is a derivative work of an image released into the public
+                domain by <a href="http://pixabay.com/">pixabay</a>.</li>
+            <li><a href="https://www.python.org/">Python</a> is a trademark of the Python Software
+                Foundation and licensed under the
+                <a href="https://www.python.org/psf/license">Python License</a>.</li>
+            <li>The <a href="http://www.royalholloway.ac.uk/">Royal Holloway, University of
+                London</a> logo is a trademark of Royal Holloway, University of London.</li>
+            <li>The <a href="https://github.com/adobe-fonts/source-sans-pro">Source Sans Pro</a>
+                font is Copyright &copy; 2010, 2012, 2014 Adobe Systems Incorporated and licensed
+                under the <a href="http://scripts.sil.org/OFL">SIL Open Font License version
+                1.1</a>.</li>
+            <li><a href="https://github.com/twitter/typeahead.js">typeahead.js</a> is Copyright
+                &copy; 2013–2014 Twitter, Inc and licensed under the
+                <a href="https://github.com/twitter/typeahead.js/blob/master/LICENSE">MIT
+                License</a>.</li>
+            <li>The <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less">typeahead.js
+                compatibility stylesheet for Bootstrap 3</a> is Copyright &copy; 2014 Shawn Zhou and
+                licensed under the <a href="https://github.com/hyspace/typeahead.js-bootstrap3.less/blob/master/LICENSE">MIT
+                License</a>.</li>
+            <li><a href="http://xdelta.org/">xdelta3</a> is Copyright &copy; 2001–07 Joshua
+                Macdonald and licensed under the
+                <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html">GNU
+                General Public License version 2 (or later)</a>.</li>
+        </ul>
+    </section>
 {% endblock %}
 
 {% block footer %}

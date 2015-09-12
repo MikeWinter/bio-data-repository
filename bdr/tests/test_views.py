@@ -46,8 +46,7 @@ class HomePageViewTest(ServerTestMixin, LiveServerTestCase):
         """Ensure that an uncatalogued dataset can be displayed in the menu."""
         name = _get_random_text()
         dataset = Dataset.objects.create(name=name, slug=name)
-        # TODO: Replace with dataset.get_absolute_url() once implemented
-        url = '/'
+        url = dataset.get_absolute_url()
         response = self.client.get(reverse('bdr:home'))
         expected = '<a href="{url}">{title}</a>'.format(title=name, url=url)
         self.assertInHTML(expected, response.content)
@@ -76,11 +75,9 @@ class HomePageViewTest(ServerTestMixin, LiveServerTestCase):
         dataset_name = _get_random_text()
         category = Category.objects.create(name=category_name)
         category_id = category.id
-        # TODO: Replace with category.get_absolute_url() once implemented
-        category_url = "/"
+        category_url = category.get_absolute_url()
         dataset = Dataset.objects.create(name=dataset_name, slug=dataset_name)
-        # TODO: Replace with dataset.get_absolute_url() once implemented
-        dataset_url = "/"
+        dataset_url = dataset.get_absolute_url()
         dataset.categories.add(category)
         response = self.client.get(reverse('bdr:home'))
         expected = '''

@@ -1,6 +1,6 @@
 """
 Defines the administrative representations of model classes defined in the
-models subpackage.
+models module.
 """
 
 from django.contrib import admin
@@ -26,15 +26,3 @@ __license__ = """
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
-
-admin.site.register(Category)
-admin.site.register(Tag)
-
-
-class DatasetAdmin(admin.ModelAdmin):
-    """
-    Administrative options for the Dataset model class.
-    """
-    prepopulated_fields = {"slug": ("name",)}
-
-admin.site.register(Dataset, DatasetAdmin)

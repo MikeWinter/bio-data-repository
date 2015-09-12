@@ -30,15 +30,6 @@ class ArchiveMemberForm(forms.Form):
     selected = fields.BooleanField(initial=False, required=False)
 
 
-class CategoryForm(ModelForm):
-    class Meta(object):
-        model = models.Category
-        fields = ['name', 'slug']
-        widgets = {'name': widgets.TextInput(attrs={'class': 'form-control'}),
-                   'slug': widgets.TextInput(attrs={'class': 'form-control'}),
-                   'parent': widgets.Select(attrs={'class': 'form-control'})}
-
-
 class FileEditForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(FileEditForm, self).__init__(*args, **kwargs)

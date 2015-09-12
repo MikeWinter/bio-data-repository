@@ -1,0 +1,78 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Datasets{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr:datasets' %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:dataset-add' %}{% endcomment %}">
+                {% bootstrap_icon "plus" %} Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li class="active">Datasets</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Datasets</h1>
+    </header>
+
+    <section>
+    {% if datasets %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-8">Name</th>
+                    <th class="col-xs-4">Files</th>
+                </tr>
+            </thead>
+        {% for dataset in datasets %}
+            <tbody>
+                <tr>
+                    <th><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></th>
+                    <td>{{ dataset.files.count }}</td>
+                </tr>
+                <tr class="small">
+                    <td>
+                        <span class="pull-left">Categories:&nbsp;</span>
+                        <ul class="list-inline">
+                        {% for category in dataset.categories.all %}
+                            <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+                        {% empty %}
+                            <li>None</li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td class="text-right">
+                    {% if dataset.tags.exists %}
+                        <ul class="list-inline">
+                        {% for tag in dataset.tags.all %}
+                            <li><a class="label label-default"
+                                   href="{% url 'bdr.frontend:tag-detail' name=tag.name %}">{{ tag.name }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        {% endfor %}
+        </table>
+
+        {% bootstrap_pagination page_obj size="small" %}
+    {% else %}
+        <p class="text-info">No datasets have been added yet.</p>
+    {% endif %}
+    </section>
+{% endblock %}

@@ -1,5 +1,10 @@
 @import "typeahead.css";
 
+#sidebar>nav>:first-child {
+    font-size: 200%;
+    margin-top: 0;
+}
+
 #page-footer {
     margin-top: 1em;
     min-height: 5.5em;

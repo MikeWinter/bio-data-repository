@@ -14,7 +14,7 @@ The following public classes are defined herein:
 A single view function is exported:
 
     search_script
-        Returns a script for use with repository search forms
+        Returns a script for use with repository search forms.
 
 The following mixin is also provided:
 

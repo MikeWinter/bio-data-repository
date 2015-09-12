@@ -51,7 +51,7 @@ def create_dataset(cls=Dataset):
     """
     name = _get_random_text()
     text = _get_random_text()
-    return cls.objects.create(name=name, slug=name, notes=text)
+    return cls.objects.create(name=name, notes=text)
 
 
 def create_file(cls=File, dataset=None):

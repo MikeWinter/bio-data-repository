@@ -1,0 +1,56 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Categories{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr:categories' %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:add-category' %}">
+                {% bootstrap_icon "plus" %} Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li class="active">Categories</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Categories</h1>
+    </header>
+
+    <section>
+    {% if categories %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-8">Name</th>
+                    <th class="col-xs-4">Datasets</th>
+                </tr>
+            </thead>
+        {% for category in categories %}
+            <tbody>
+                <tr>
+                    <th><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></th>
+                    <td>{{ category.datasets.count }}</td>
+                </tr>
+            </tbody>
+        {% endfor %}
+        </table>
+
+        {% bootstrap_pagination page_obj size="small" %}
+    {% else %}
+        <p class="text-info">No categories have been added yet.</p>
+    {% endif %}
+    </section>
+{% endblock %}

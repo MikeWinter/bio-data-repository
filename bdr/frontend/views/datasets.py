@@ -21,12 +21,10 @@ import json
 import urlparse
 
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView, ListView
-from django.views.generic.list import MultipleObjectMixin
+from django.views.generic import CreateView, DeleteView, UpdateView
 import httplib2
 
 from .. import app_settings, forms, models
-from ..paginator import Paginator
 
 
 class DatasetAddView(CreateView):
@@ -68,28 +66,6 @@ class DatasetDeleteView(DeleteView):
         return super(DatasetDeleteView, self).delete(request, *args, **kwargs)
 
 
-class DatasetDetailView(MultipleObjectMixin, DetailView):
-    """
-    This view displays the details of a dataset, including a list of its files and links to the most recent revision of
-    each file.
-    """
-    model = models.Dataset
-    """Designate the model class used for obtaining data."""
-    object_list = None
-    paginate_by = 10
-    paginate_orphans = 2
-    paginator_class = Paginator
-    template_name = 'frontend/datasets/dataset_detail.html'
-
-    def get_object(self, queryset=None):
-        obj = super(DatasetDetailView, self).get_object(queryset).fetch()
-        self.object_list = obj.files.fetch_all()
-        return obj
-
-    def get_queryset(self):
-        return self.model.objects.fetch_all()
-
-
 class DatasetEditView(UpdateView):
     model = models.Dataset
     form_class = forms.DatasetForm
@@ -110,16 +86,3 @@ class DatasetEditView(UpdateView):
         return context
 
 
-class DatasetListView(ListView):
-    """This view displays a list of datasets stored in the repository."""
-    model = models.Dataset
-    paginate_by = 10
-    paginate_orphans = 2
-    paginator_class = Paginator
-    template_name = 'frontend/datasets/dataset_list.html'
-
-    context_object_name = 'datasets'
-    """Set the template variable name used to access the QuerySet result during rendering."""
-
-    def get_queryset(self):
-        return self.model.objects.fetch_all()

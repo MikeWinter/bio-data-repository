@@ -4,13 +4,19 @@ jQuery(function ($) {
     "use strict";
     // Load the search engines used for matching query terms.
     var engine = new Bloodhound({
-        remote: '{% url "bdr:search" %}?query=%QUERY',
+        remote: {
+            url: '{% url "bdr:search" %}?query=%QUERY',
+            wildcard: '%QUERY'
+        },
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace
     });
     engine.initialize();
     var tags = new Bloodhound({
-        remote: '{% url "bdr.frontend:tags" %}?filter=%QUERY',
+        remote: {
+            url: '{% url "bdr.frontend:tags" %}?filter=%QUERY',
+            wildcard: '%QUERY'
+        },
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace
     });
@@ -24,7 +30,8 @@ jQuery(function ($) {
      */
     form.find('.form-control').typeahead({
         highlight: true,
-        hint: true
+        hint: true,
+        minLength: 2
     }, {
         source: engine.ttAdapter(),
         name: 'datasets',

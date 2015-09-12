@@ -2,26 +2,46 @@
 This module contains class definitions for the domain model of this
 application.
 
-The classes exported by this
+The classes exported by this module include:
+
+    Category
+        Groups datasets into a hierarchical structure.
+    Dataset
+        A collection of data files maintained by the repository.
+    File
+        Represents the files that constitute each dataset.
+    Filter
+        Analyses (and optionally transforms) the names of files retrieved from
+        data sources.
+    Revision
+        Represents revisions of files maintained by this repository.
+    Source
+        Represents a remote location that can be used to update one or more
+        files within a dataset.
+    Tag
+        Annotate datasets, data files and revisions.
+    Update
+        Records updates made to the repository for each dataset.
 """
 
 from datetime import datetime, timedelta
 from urlparse import urlsplit
 import re
 
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Model, fields
 from django.db.models.fields import files, related
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils.text import slugify
 
 from .utils import utc, DownloadedFile
 from .utils.archives import Archive
 from .utils.storage import delta_storage, upload_path
 from .utils.transports import Transport
 
-__all__ = ["Category", "Dataset", "File", "Filter", "Revision", "Source", "Tag"]
+__all__ = ["Category", "Dataset", "File", "Filter", "Revision", "Source", "Tag", "Update"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -74,13 +94,15 @@ class Category(Model):
         Return a URL that can be used to obtain more details about this
         category.
         """
-        # TODO: Implement
-        # return reverse("bdr:tag-detail", kwargs={"pk": self.pk})
-        raise NotImplementedError
+        return reverse("bdr:category", kwargs={"pk": self.pk, "name": slugify(self.name)})
+
+    def __str__(self):
+        return self.name
 
     class Meta(object):
         """Metadata options for the Category model class."""
         ordering = ["name"]
+        verbose_name_plural = "categories"
 
 
 class Tag(Model):
@@ -105,6 +127,9 @@ class Tag(Model):
         # return reverse('bdr.backend:tag-detail', kwargs={'pk': self.pk})
         raise NotImplementedError
 
+    def __str__(self):
+        return self.name
+
     class Meta(object):
         """Metadata options for the Tag model class."""
         ordering = ["name"]
@@ -123,8 +148,6 @@ class Dataset(Model):
 
     name = fields.CharField(max_length=100)
     """The name of this dataset."""
-    slug = fields.SlugField(unique=True)
-    """A unique, keyword identifier for this dataset."""
     notes = fields.TextField(blank=True)
     """Custom notes and annotations for this dataset."""
     categories = related.ManyToManyField(Category, blank=True, related_name="datasets",
@@ -158,9 +181,7 @@ class Dataset(Model):
         Return a URL that can be used to obtain more details about this
         dataset.
         """
-        # TODO: Implement
-        # return reverse('bdr.backend:dataset-detail', kwargs={'slug': self.slug})
-        raise NotImplementedError
+        return reverse("bdr:dataset", kwargs={"pk": self.pk, "name": slugify(self.name)})
 
     # def _map(self, filename):
     #     """
@@ -200,6 +221,9 @@ class Dataset(Model):
     #             # noinspection PyTypeChecker
     #             file_.add_revision(archive[member_name])
 
+    def __str__(self):
+        return self.name
+
     class Meta(object):
         """Metadata options for the Dataset model class."""
         ordering = ["name"]
@@ -217,14 +241,14 @@ class File(Model):
 
     name = fields.CharField(max_length=100, blank=False, editable=False)
     """The name of this file."""
-    dataset = related.ForeignKey(Dataset, related_name='datafiles', related_query_name='datafile')
+    dataset = related.ForeignKey(Dataset, related_name="files", related_query_name="file")
     """The dataset to which this file belongs."""
     # TODO: Enable default format
     # default_format = related.ForeignKey(Format, related_name='datafiles',
     #                                     related_query_name='datafile')
     """The format of this file."""
-    tags = related.ManyToManyField(Tag, blank=True, related_name='datafiles',
-                                   related_query_name='datafile')
+    tags = related.ManyToManyField(Tag, blank=True, related_name="files",
+                                   related_query_name="file")
     """The tags used to annotate this file."""
 
     def get_absolute_url(self):
@@ -234,6 +258,9 @@ class File(Model):
         # TODO: Implement
         # return reverse('bdr.backend:file-detail', kwargs={'ds': self.dataset.slug, 'fn': self.name})
         raise NotImplementedError
+
+    def __str__(self):
+        return self.name
 
     class Meta(object):
         """Metadata options for the File model class."""
@@ -247,7 +274,11 @@ class Source(Model):
     """
     Represents a remote location that can be used to update one or more files
     within a dataset.
+
+    This class overrides the `~Model.get_absolute_url` method of the `Model`
+    class.
     """
+
     url = fields.URLField()
     """A URL specifying the update source for files in this dataset."""
     dataset = related.ForeignKey(Dataset, editable=False, related_name='sources',
@@ -413,6 +444,9 @@ class Source(Model):
                                                              password=self.password)
         return self._provider
 
+    def __str__(self):
+        return self.url
+
     class FileRejected(Exception):
         """Raised when a file is not matched by any filter."""
         pass
@@ -428,6 +462,9 @@ class Filter(Model):
     Analyses (and optionally transforms) the names of files retrieved from data
     sources to determine whether they should be added to the dataset associated
     with that source.
+
+    This class overrides the `~Model.get_absolute_url` method of the `Model`
+    class.
     """
 
     pattern = fields.CharField(max_length=100, validators=[_validate_regex])
@@ -496,6 +533,9 @@ class Filter(Model):
                     raise ValidationError("The mapping contains a reference to a pattern group "
                                           "that does not exist")
 
+    def __str__(self):
+        return self.pattern
+
     class Meta(object):
         """Metadata options for the Filter model class."""
         order_with_respect_to = "source"
@@ -504,6 +544,9 @@ class Filter(Model):
 class Update(Model):
     """
     Records updates made to the repository for each dataset.
+
+    This class overrides the `~Model.get_absolute_url` method of the `Model`
+    class.
     """
 
     dataset = related.ForeignKey(Dataset, related_name="updates", related_query_name="update")
