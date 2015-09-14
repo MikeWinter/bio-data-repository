@@ -1,0 +1,139 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}#{{ tag.name }}{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{{ tag.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-tag' pk=tag.pk name=tag.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:delete-tag' pk=tag.pk name=tag.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:tags' %}">Tags</a></li>
+            <li class="active">#{{ tag.name }}</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>#{{ tag.name }}</h1>
+    </header>
+
+    <section>
+        <h2>Datasets</h2>
+    {% if tag.datasets.exists %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-6">Dataset</th>
+                    <th class="col-xs-2">Files</th>
+                    <th class="col-xs-4">Updated</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for dataset in tag.datasets.all %}
+                <tr>
+                    <td><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></td>
+                    <td>{{ dataset.files.count }}</td>
+                    {% if dataset.updates.exists %}
+                        <td title="Updated on {{ dataset.updates.latest.timestamp }}">{{ dataset.updates.latest.timestamp|naturaltime }}</td>
+                    {% else %}
+                        <td>n/a</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No datasets have this tag.</p>
+    {% endif %}
+    </section>
+
+    <section>
+        <h2>Files</h2>
+    {% if tag.files.exists %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Dataset</th>
+                    <th>File</th>
+                    <th>Revisions</th>
+                    <th>Updated</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for file in tag.files.all %}
+                <tr>
+                    <td><a href="{{ file.dataset.get_absolute_url }}">{{ file.dataset.name }}</a></td>
+                    {# TODO: Update route for file details #}
+                    <td><a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a></td>
+                    <td>{{ file.revisions.count }}</td>
+                    {% if file.revisions.exists %}
+                        <td title="Updated on {{ file.revisions.last.update.timestamp }}">{{ file.revisions.last.update.timestamp|naturaltime }}</td>
+                    {% else %}
+                        <td>n/a</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No files have this tag.</p>
+    {% endif %}
+    </section>
+
+    <section>
+        <h2>Revisions</h2>
+    {% if tag.revisions.exists %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Dataset</th>
+                    <th>File</th>
+                    <th>Revision</th>
+                    <th>Updated</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for revision in tag.revisions.all %}
+                <tr>
+                    <td><a href="{{ revision.file.dataset.get_absolute_url }}">{{ revision.file.dataset.name }}</a></td>
+                    <td><a href="{{ revision.file.get_absolute_url }}">{{ revision.file.name }}</a></td>
+                    <td>{{ revision.number }}</td>
+                    <td title="Updated on {{ revision.update.timestamp }}">{{ revision.update.timestamp|naturaltime }}</td>
+                    <td>
+                        {{ revision.size|filesizeformat }}
+                        {# TODO: Update route for revision details #}
+                        <a class="btn btn-link btn-xs" href="{% comment %}{{ revision.get_absolute_url }}{% endcomment %}"
+                           title="Download revision">
+                            <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No revisions have this tag.</p>
+    {% endif %}
+    </section>
+{% endblock %}

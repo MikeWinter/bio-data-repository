@@ -234,12 +234,13 @@ class DatasetListViewTest(TransactionTestCase):
             <td class="text-right">
                 <ul class="list-inline">
                     <li><a class="label label-default"
-                           href="/explorer/tags/{tag}">#{tag}</a></li>
+                           href="{tag_uri}">#{tag}</a></li>
                 </ul>
             </td>
         </tr>
         </tbody>
-        '''.format(dataset=dataset_title, dataset_uri=dataset.get_absolute_url(), tag=tag_title)
+        '''.format(dataset=dataset_title, dataset_uri=dataset.get_absolute_url(), tag=tag_title,
+                   tag_uri=tag.get_absolute_url())
 
         response = self.client.get(reverse('bdr:datasets'))
 
@@ -288,9 +289,9 @@ class DatasetDetailViewTest(TransactionTestCase):
         expected = '''
         <h1>
             {dataset}
-            <a class="label label-default tag" href="/explorer/search?query={tag}">#{tag}</a>
+            <a class="label label-default tag" href="{url}">#{tag}</a>
         </h1>
-        '''.format(dataset=dataset_title, tag=tag_title)
+        '''.format(dataset=dataset_title, tag=tag_title, url=tag.get_absolute_url())
 
         response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
                                                                   'name': dataset_title}))

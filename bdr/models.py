@@ -101,6 +101,7 @@ class Category(Model):
 
     class Meta(object):
         """Metadata options for the Category model class."""
+
         ordering = ["name"]
         verbose_name_plural = "categories"
 
@@ -123,15 +124,14 @@ class Tag(Model):
         """
         Return a URL that can be used to obtain more details about this tag.
         """
-        # TODO: Implement
-        # return reverse('bdr.backend:tag-detail', kwargs={'pk': self.pk})
-        raise NotImplementedError
+        return reverse("bdr:tag", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
 
     def __str__(self):
         return self.name
 
     class Meta(object):
         """Metadata options for the Tag model class."""
+
         ordering = ["name"]
 
 
@@ -226,6 +226,7 @@ class Dataset(Model):
 
     class Meta(object):
         """Metadata options for the Dataset model class."""
+
         ordering = ["name"]
         """Order results lexicographically by name."""
 
@@ -256,7 +257,8 @@ class File(Model):
         Return a URL that can be used to obtain more details about this file.
         """
         # TODO: Implement
-        # return reverse('bdr.backend:file-detail', kwargs={'ds': self.dataset.slug, 'fn': self.name})
+        # return reverse('bdr.backend:file-detail', kwargs={'ds': self.dataset.slug,
+        #                                                   'fn': self.name})
         raise NotImplementedError
 
     def __str__(self):
@@ -264,6 +266,7 @@ class File(Model):
 
     class Meta(object):
         """Metadata options for the File model class."""
+
         ordering = ["name"]
         """Place results in ascending order by name."""
         unique_together = (("dataset", "name"),)
@@ -448,10 +451,12 @@ class Source(Model):
 
     class FileRejected(Exception):
         """Raised when a file is not matched by any filter."""
+
         pass
 
     class Meta(object):
         """Metadata options for the Source model class."""
+
         unique_together = (("dataset", "url"),)
         """Require that datasets do not have duplicate source locations."""
 
@@ -537,6 +542,7 @@ class Filter(Model):
 
     class Meta(object):
         """Metadata options for the Filter model class."""
+
         order_with_respect_to = "source"
 
 
@@ -627,6 +633,7 @@ class Revision(Model):
 
     class Meta(object):
         """Metadata options for the Revision model class."""
+
         unique_together = (('file', 'number'),)
         """Require that each revision number is unique for revisions of any given file."""
 

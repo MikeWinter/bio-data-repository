@@ -41,11 +41,9 @@
     <header class="page-header">
         <h1>
             {{ dataset.name }}
-            {% for tag in dataset.tags.all %}
-                {# TODO: Change route for tag details #}
-                <a class="label label-default tag"
-                   href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">#{{ tag }}</a>
-            {% endfor %}
+        {% for tag in dataset.tags.all %}
+            <a class="label label-default tag" href="{{ tag.get_absolute_url }}">#{{ tag }}</a>
+        {% endfor %}
         </h1>
     </header>
 
@@ -92,7 +90,7 @@
                 <tr>
                     <td class="truncated">{{ source.url }}</td>
                     <td>{{ source.period }}</td>
-                    <td title="{{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>
+                    <td title="Checked at {{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>
                     <td></td>
                 </tr>
             {% endfor %}
@@ -144,33 +142,30 @@
                     <td></td>
                 </tr>
             </thead>
-            {% for file in page_obj.object_list %}
+
             <tbody>
-            <tr>
-                <th>
-                    {# TODO: Change route for file details #}
-                    <a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a>
-                {% if file.revisions.exists %}
-                    {# TODO: Change route for exporting latest revision #}
-                    <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
-                       title="Download latest revision">
-                        {% bootstrap_icon "download" %}
-                    </a>
-                {% endif %}
-                </th>
-                <td>{{ file.revisions.count }}</td>
-                <td class="text-right">
-            {% if file.tags.exists %}
-                {% for tag in file.tags.all %}
-                    {# TODO: Change route #}
-                    <a class="small label label-default"
-                       href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">{{ tag }}</a>
-                {% endfor %}
-            {% endif %}
-                </td>
-            </tr>
-            </tbody>
+            {% for file in page_obj.object_list %}
+                <tr>
+                    <th>
+                        {# TODO: Change route for file details #}
+                        <a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a>
+                    {% if file.revisions.exists %}
+                        {# TODO: Change route for exporting latest revision #}
+                        <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
+                           title="Download latest revision">
+                            {% bootstrap_icon "download" %}
+                        </a>
+                    {% endif %}
+                    </th>
+                    <td>{{ file.revisions.count }}</td>
+                    <td class="text-right">
+                    {% for tag in file.tags.all %}
+                        <a class="small label label-default" href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a>
+                    {% endfor %}
+                    </td>
+                </tr>
             {% endfor %}
+            </tbody>
         </table>
 
         {% bootstrap_pagination page_obj size="small" %}

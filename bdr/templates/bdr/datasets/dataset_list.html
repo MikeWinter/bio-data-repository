@@ -59,9 +59,7 @@
                     {% if dataset.tags.exists %}
                         <ul class="list-inline">
                         {% for tag in dataset.tags.all %}
-                            {# TODO: Change route #}
-                            <li><a class="label label-default"
-                                   href="{% url 'bdr.frontend:tag-detail' name=tag.name %}">#{{ tag.name }}</a></li>
+                            <li><a class="label label-default" href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a></li>
                         {% endfor %}
                         </ul>
                     {% endif %}

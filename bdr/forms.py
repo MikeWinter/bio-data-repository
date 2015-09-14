@@ -6,6 +6,7 @@ This following classes are exported:
 
     CategoryForm
     DatasetForm
+    TagForm
     SearchForm
 """
 
@@ -14,9 +15,9 @@ from django.forms.fields import CharField
 from django.forms.widgets import Textarea, TextInput
 from django.core.urlresolvers import reverse_lazy
 
-from .models import Category, Dataset
+from .models import Category, Dataset, Tag
 
-__all__ = ["CategoryForm", "DatasetForm", "SearchForm"]
+__all__ = ["CategoryForm", "DatasetForm", "TagForm", "SearchForm"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -66,14 +67,39 @@ class DatasetForm(ModelForm):
         }
 
 
+class TagForm(ModelForm):
+    """
+    Displays the properties of a category to facilitate creating new, and
+    editing existing, tags.
+    """
+
+    class Meta(object):
+        """Configuration options for the tag form."""
+
+        model = Tag
+        fields = "__all__"
+        widgets = {
+            "name": TextInput(attrs=dict(addon_before="#"))
+        }
+
+
 class SearchForm(Form):
+    """
+    Provides a text box and submission button for searching for entities by
+    name and tag.
+    """
+
     query = CharField(
         label="",
         widget=TextInput(
-            attrs=dict(placeholder="Search the repository...", button_addon_after={
+            attrs=dict(type="search", placeholder="Search the repository...", button_addon_after={
                 "content": '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>'
                            '<span class="sr-only">Search</span>'})))
 
     class Media(object):
+        """
+        Declares resources that should be included when this form is displayed.
+        """
+
         js = ("//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js",
               reverse_lazy("bdr:search.js"))

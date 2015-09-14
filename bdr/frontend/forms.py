@@ -83,13 +83,6 @@ class FormatFieldForm(ModelForm):
         widgets = {'name': widgets.TextInput(attrs={'class': 'form-control'})}
 
 
-class TagForm(ModelForm):
-    class Meta(object):
-        model = models.Tag
-        fields = ['name']
-        widgets = {'name': widgets.TextInput(attrs={'class': 'form-control'})}
-
-
 class FormatFieldSelectionForm(ModelForm):
     selected = fields.BooleanField(initial=False, required=False)
 

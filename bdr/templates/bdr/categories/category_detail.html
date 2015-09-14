@@ -44,22 +44,19 @@
                     <td></td>
                 </tr>
             </thead>
+
             <tbody>
-        {% for dataset in category.datasets.all %}
+            {% for dataset in category.datasets.all %}
                 <tr>
                     <th><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></th>
                     <td>{{ dataset.files.count }}</td>
                     <td class="text-right">
-                {% if dataset.tags.exists %}
                     {% for tag in dataset.tags.all %}
-                        <a class="small label label-default"
-                           {# TODO: Change route #}
-                           href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">{{ tag }}</a>
+                        <a class="small label label-default" href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a>
                     {% endfor %}
-                {% endif %}
                     </td>
                 </tr>
-        {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     {% else %}

@@ -1,0 +1,61 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Tags{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr:tags' %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:add-tag' %}">
+                {% bootstrap_icon "plus" %} Add
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li class="active">Tags</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Tags</h1>
+    </header>
+
+    <section>
+    {% if tags %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-6">Name</th>
+                    <th class="col-xs-2">Datasets</th>
+                    <th class="col-xs-2">Files</th>
+                    <th class="col-xs-2">Revisions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for tag in tags %}
+                <tr>
+                    <th><a href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a></th>
+                    <td>{{ tag.datasets.count }}</td>
+                    <td>{{ tag.files.count }}</td>
+                    <td>{{ tag.revisions.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% bootstrap_pagination page_obj size="small" %}
+    {% else %}
+        <p>No tags have been added yet.</p>
+    {% endif %}
+    </section>
+{% endblock %}

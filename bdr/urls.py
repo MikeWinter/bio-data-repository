@@ -8,13 +8,14 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 from django.conf.urls import patterns, url
 
 from bdr.frontend import views as old_views
-from bdr.frontend.views import files, formats, revisions, tags
+from bdr.frontend.views import files, formats, revisions
 
 from views import HomeView, AboutView, LegalView, search_script
 from views.categories import (CategoryListView, CategoryDetailView, CategoryAddView,
                               CategoryEditView, CategoryDeleteView)
-from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView,
-                            DatasetEditView, DatasetDeleteView)
+from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView, DatasetEditView,
+                            DatasetDeleteView)
+from views.tags import TagListView, TagDetailView, TagAddView, TagEditView, TagDeleteView
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -43,11 +44,11 @@ urlpatterns = patterns(
     url(r'^legal$', LegalView.as_view(), name='legal'),
     url(r'^search$', old_views.SearchView.as_view(), name='search'),
 
-    url(r'^categories/$', CategoryListView.as_view(), name='categories'),
-    url(r'^datasets/$', DatasetListView.as_view(), name='datasets'),
-    url(r'^formats/$', formats.FormatListView.as_view(), name='formats'),
-    url(r'^tags/$', tags.TagListView.as_view(), name='tags'),
+    url(r'^js/search.js$', search_script, name='search.js'),
 
+    # Categories
+    url(r'^categories/$', CategoryListView.as_view(),
+        name='categories'),
     url(r'^categories/(?P<name>[\w_-]+)-(?P<pk>\d+)$', CategoryDetailView.as_view(),
         name='category'),
     url(r'^categories/add$', CategoryAddView.as_view(),
@@ -57,6 +58,21 @@ urlpatterns = patterns(
     url(r'^categories/(?P<name>[\w_-]+)-(?P<pk>\d+)/delete$', CategoryDeleteView.as_view(),
         name='delete-category'),
 
+    # Tags
+    url(r'^tags/$', TagListView.as_view(),
+        name='tags'),
+    url(r'^tags/(?P<name>[\w_-]+)-(?P<pk>\d+)$', TagDetailView.as_view(),
+        name='tag'),
+    url(r'^tags/add$', TagAddView.as_view(),
+        name='add-tag'),
+    url(r'^tags/(?P<name>[\w_-]+)-(?P<pk>\d+)/edit$', TagEditView.as_view(),
+        name='edit-tag'),
+    url(r'^tags/(?P<name>[\w_-]+)-(?P<pk>\d+)/delete$', TagDeleteView.as_view(),
+        name='delete-tag'),
+
+    # Datasets
+    url(r'^datasets/$', DatasetListView.as_view(),
+        name='datasets'),
     url(r'^datasets/(?P<name>[\w_-]+)-(?P<pk>\d+)$', DatasetDetailView.as_view(),
         name='dataset'),
     url(r'^datasets/add$', DatasetAddView.as_view(),
@@ -66,6 +82,7 @@ urlpatterns = patterns(
     url(r'^datasets/(?P<name>[\w_-]+)-(?P<pk>\d+)/delete$', DatasetDeleteView.as_view(),
         name='delete-dataset'),
 
+    url(r'^formats/$', formats.FormatListView.as_view(), name='formats'),
     url(r'^formats/add$', formats.FormatAddView.as_view(), name='format-add'),
     url(r'^formats/(?P<slug>[\w-]+)$', formats.FormatDetailView.as_view(), name='format-detail'),
     url(r'^formats/(?P<slug>[\w-]+)/edit$', formats.FormatEditView.as_view(), name='format-edit'),
@@ -77,11 +94,4 @@ urlpatterns = patterns(
 
     url(r'^datasets/(?P<slug>[\w-]+)/add$', files.FileAddView.as_view(), name='file-add'),
     url(r'^datasets/(?P<ds>[\w-]+)/(?P<fn>[\w .()/-]+)/$', files.FileDetailView.as_view(), name='file-detail'),
-
-    url(r'^tags/add$', tags.TagAddView.as_view(), name='tag-add'),
-    url(r'^tags/(?P<name>[\w-]+)$', tags.TagDetailView.as_view(), name='tag-detail'),
-    url(r'^tags/(?P<name>[\w-]+)/edit$', tags.TagEditView.as_view(), name='tag-edit'),
-    url(r'^tags/(?P<name>[\w-]+)/delete$', tags.TagDeleteView.as_view(), name='tag-delete'),
-
-    url(r'^js/search.js$', search_script, name='search.js'),
 )
