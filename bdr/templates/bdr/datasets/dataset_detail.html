@@ -1,6 +1,6 @@
 {% extends "bdr/base-sidebar.html" %}
 {% load bootstrap3 %}
-{% load webdesign %}
+{% load humanize %}
 
 {% block title %}{{ dataset.name }}{% endblock %}
 
@@ -11,17 +11,19 @@
             <li class="active" role="presentation"><a href="{{ dataset.get_absolute_url }}">
                 {% bootstrap_icon "file" %} View
             </a></li>
-            {# TODO: Change route #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:dataset-edit' slug=object.slug %}{% endcomment %}">
+            <li role="presentation"><a href="{% url 'bdr:edit-dataset' pk=dataset.pk name=dataset.name|slugify %}">
                 {% bootstrap_icon "pencil" %} Edit
             </a></li>
-            {# TODO: Change route #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:dataset-delete' slug=object.slug %}{% endcomment %}">
+            <li role="presentation"><a href="{% url 'bdr:delete-dataset' pk=dataset.pk name=dataset.name|slugify %}">
                 {% bootstrap_icon "remove" %} Delete
             </a></li>
-            {# TODO: Change route #}
+            {# TODO: Change route for adding sources #}
             <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
-                {% bootstrap_icon "plus" %} Add file
+                {% bootstrap_icon "plus" %} Add source
+            </a></li>
+            {# TODO: Change route for file upload #}
+            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
+                {% bootstrap_icon "upload" %} Upload file
             </a></li>
         </ul>
     </nav>
@@ -40,7 +42,7 @@
         <h1>
             {{ dataset.name }}
             {% for tag in dataset.tags.all %}
-                {# TODO: Change route #}
+                {# TODO: Change route for tag details #}
                 <a class="label label-default tag"
                    href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">#{{ tag }}</a>
             {% endfor %}
@@ -74,6 +76,32 @@
 
 
         <h2>Sources</h2>
+    {% if dataset.sources.exists %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Update period (h)</th>
+                    <th>Last checked</th>
+                    <td class="sr-only">Operations</td>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for source in dataset.sources %}
+                <tr>
+                    <td class="truncated">{{ source.url }}</td>
+                    <td>{{ source.period }}</td>
+                    <td title="{{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {# TODO: Change route for adding sources #}
+        <p>No sources have been added to this dataset. <a href="{% comment %}{% url 'bdr:add-source' %}{% endcomment %}">Add a source</a> to enable automatic updates.</p>
+    {% endif %}
 {#        <div class="panel panel-default">#}
 {#            <div class="panel-heading" data-toggle="collapse" data-target="#source" aria-controls="source"#}
 {#                 aria-expanded="{% if dataset.update_uri %}true{% else %}false{% endif %}">Source <span#}
@@ -94,7 +122,7 @@
 {#                    </div>#}
 {#                </div>#}
 {#                <div class="form-group row">#}
-{#                    <label class="control-label col-sm-3">Update frequency:</label>#}
+{#                    <label class="control-label col-sm-3">Update period:</label>#}
 {#                    <div class="col-sm-9">#}
 {#                        <p class="form-control-static">#}
 {#                            {% if object.update_frequency %}{{ object.update_frequency }} minutes{% else %}#}
@@ -107,47 +135,48 @@
 
 
         <h2>Files</h2>
-        {% if page_obj.object_list %}
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Revisions</th>
-                        <td></td>
-                    </tr>
-                </thead>
-            {% for file in page_obj.object_list %}
-                <tbody>
+    {% if page_obj.object_list %}
+        <table class="table table-condensed">
+            <thead>
                 <tr>
-                    <th>
-                        {# TODO: Change route #}
-                        <a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a>
-                    {% if file.revisions.exists %}
-                        {# TODO: Change route #}
-                        <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
-                           title="Download latest revision">
-                            {% bootstrap_icon "download" %}
-                        </a>
-                    {% endif %}
-                    </th>
-                    <td>{{ file.revisions.count }}</td>
-                    <td class="text-right">
-                {% if file.tags.exists %}
-                    {% for tag in file.tags.all %}
-                        {# TODO: Change route #}
-                        <a class="small label label-default"
-                           href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">{{ tag }}</a>
-                    {% endfor %}
-                {% endif %}
-                    </td>
+                    <th>Name</th>
+                    <th>Revisions</th>
+                    <td></td>
                 </tr>
-                </tbody>
+            </thead>
+            {% for file in page_obj.object_list %}
+            <tbody>
+            <tr>
+                <th>
+                    {# TODO: Change route for file details #}
+                    <a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a>
+                {% if file.revisions.exists %}
+                    {# TODO: Change route for exporting latest revision #}
+                    <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
+                       title="Download latest revision">
+                        {% bootstrap_icon "download" %}
+                    </a>
+                {% endif %}
+                </th>
+                <td>{{ file.revisions.count }}</td>
+                <td class="text-right">
+            {% if file.tags.exists %}
+                {% for tag in file.tags.all %}
+                    {# TODO: Change route #}
+                    <a class="small label label-default"
+                       href="{% url 'bdr.frontend:search' %}?query={{ tag|urlencode }}">{{ tag }}</a>
+                {% endfor %}
+            {% endif %}
+                </td>
+            </tr>
+            </tbody>
             {% endfor %}
-            </table>
+        </table>
 
-            {% bootstrap_pagination page_obj size="small" %}
-        {% else %}
-            <p>There are no files in this dataset.</p>
-        {% endif %}
+        {% bootstrap_pagination page_obj size="small" %}
+    {% else %}
+        {# TODO: Change route for file upload #}
+        <p>There are no files in this dataset. <a href="{% comment %}{% url 'bdr:add-file' %}{% endcomment %}">Upload a file</a> to manually add its contents to the repository.</p>
+    {% endif %}
     </section>
 {% endblock %}

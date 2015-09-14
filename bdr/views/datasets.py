@@ -2,10 +2,12 @@
 This module defines classes for displaying and editing datasets.
 """
 
-from django.views.generic import ListView
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 
 from . import SearchableViewMixin
+from ..forms import DatasetForm
 from ..models import Dataset
 
 __all__ = []
@@ -33,8 +35,12 @@ class DatasetDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     """
     This view displays the details of a dataset, including a list of its files
     and links to the most recent revision of each file.
+
+    This class overrides the get and get_queryset methods of the `~ListView`
+    and `~SingleObjectMixin` classes, respectively.
     """
 
+    model = Dataset
     paginate_by = 10
     paginate_orphans = 2
     template_name = "bdr/datasets/dataset_detail.html"
@@ -44,13 +50,8 @@ class DatasetDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         self.object = None
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Dataset.objects.all())
+        self.object = self.get_object(queryset=self.model.objects.all())
         return super(DatasetDetailView, self).get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(DatasetDetailView, self).get_context_data(**kwargs)
-        context["dataset"] = self.object
-        return context
 
     def get_queryset(self):
         return self.object.files.all()
@@ -59,8 +60,32 @@ class DatasetDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
 class DatasetListView(SearchableViewMixin, ListView):
     """This view displays a list of datasets stored in the repository."""
 
+    context_object_name = "datasets"
     model = Dataset
     paginate_by = 10
     paginate_orphans = 2
     template_name = "bdr/datasets/dataset_list.html"
-    context_object_name = "datasets"
+
+
+class DatasetEditView(SearchableViewMixin, UpdateView):
+    """This view is used to edit existing datasets."""
+
+    model = Dataset
+    form_class = DatasetForm
+    template_name = "bdr/datasets/dataset_edit.html"
+
+
+class DatasetAddView(SearchableViewMixin, CreateView):
+    """Used to create a new dataset."""
+
+    model = Dataset
+    form_class = DatasetForm
+    template_name = "bdr/datasets/dataset_add.html"
+
+
+class DatasetDeleteView(SearchableViewMixin, DeleteView):
+    """This view is used to confirm deletion of an existing dataset."""
+
+    model = Dataset
+    success_url = reverse_lazy('bdr:datasets')
+    template_name = "bdr/datasets/dataset_confirm_delete.html"

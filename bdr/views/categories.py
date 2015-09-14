@@ -63,19 +63,9 @@ class CategoryDeleteView(SearchableViewMixin, DeleteView):
     template_name = "bdr/categories/category_confirm_delete.html"
 
 
-class CategoryAddView(CreateView):
+class CategoryAddView(SearchableViewMixin, CreateView):
     """Creates a new category."""
 
     model = Category
     form_class = CategoryForm
     template_name = "bdr/categories/category_add.html"
-
-    # def form_valid(self, form):
-    #     url = urlparse.urljoin(app_settings.STORAGE_URL, 'categories/')
-    #     body = serialize(form.cleaned_data, exclude=['parent', 'href'])
-    #     response, content = httplib2.Http().request(url, method='POST', body=json.dumps(body),
-    #                                                 headers={'Content-Type': 'application/json'})
-    #     if response.status != 201:
-    #         details = json.loads(content)
-    #         return self.render_to_response(self.get_context_data(form=form, remote_errors=details['errors']))
-    #     return super(CategoryAddView, self).form_valid(form)

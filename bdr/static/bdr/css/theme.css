@@ -43,3 +43,9 @@ h1 .tag.label {
     font-size: 40%;
     vertical-align: middle;
 }
+
+.truncated {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

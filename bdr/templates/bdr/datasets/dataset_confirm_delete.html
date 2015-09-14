@@ -1,0 +1,49 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete {{ dataset.name }}?{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ dataset.get_absolute_url }}">
+                {% bootstrap_icon "th-list" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-dataset' pk=dataset.pk name=dataset.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li class="active" role="presentation"><a href="{% url 'bdr:delete-dataset' pk=dataset.pk name=dataset.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li class="active">Delete</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Delete {{ dataset.name }}?</h1>
+    </header>
+
+    <section>
+        <form action="{% url 'bdr:delete-dataset' pk=dataset.pk name=dataset.name|slugify %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the <em>{{ dataset.name }}</em> dataset?</p>
+            <p class="text-danger help-block">This action is irreversible!</p>
+
+            <div class="form-group">
+                {% bootstrap_button button_type="submit" content="Delete" button_class="btn-danger" %}
+                {% bootstrap_button content="Cancel" button_class="btn-default" href=dataset.get_absolute_url %}
+            </div>
+        </form>
+    </section>
+{% endblock %}

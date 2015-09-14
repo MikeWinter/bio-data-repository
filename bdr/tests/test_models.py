@@ -104,13 +104,13 @@ def create_revisions(cls=Revision, datafile=None, count=0, data=None):
             for datum in data]
 
 
-def create_source(cls=Source, dataset=None, url=None, frequency=0, checked_at=None):
+def create_source(cls=Source, dataset=None, url=None, period=0, checked_at=None):
     if dataset is None:
         dataset = create_dataset()
     if url is None:
         url = "http://example.local/{}".format(_get_random_text())
     return cls.objects.create(dataset=dataset, url=url, checked_at=checked_at,
-                              frequency=frequency)
+                              period=period)
 
 
 def create_filter(pattern, cls=Filter, source=None, inverted=False, mapping=""):
@@ -269,24 +269,24 @@ class SourceTest(TestCase):
         self.assertFalse(source.has_update_elapsed())
 
     def test_update_check_succeeds_if_never_checked(self):
-        source = create_source(frequency=1)
+        source = create_source(period=1)
 
         self.assertTrue(source.has_update_elapsed())
 
     def test_update_check_fails_if_recent(self):
         timestamp = datetime.now(utc) - timedelta(minutes=59)
-        source = create_source(checked_at=timestamp, frequency=1)
+        source = create_source(checked_at=timestamp, period=1)
 
         self.assertFalse(source.has_update_elapsed())
 
     def test_update_check_succeeds_if_stale(self):
         timestamp = datetime.now(utc) - timedelta(minutes=60)
-        source = create_source(checked_at=timestamp, frequency=1)
+        source = create_source(checked_at=timestamp, period=1)
 
         self.assertTrue(source.has_update_elapsed())
 
     def test_update_check_fails_after_checked(self):
-        source = create_source(frequency=1)
+        source = create_source(period=1)
 
         source.checked()
 

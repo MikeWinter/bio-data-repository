@@ -8,12 +8,13 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 from django.conf.urls import patterns, url
 
 from bdr.frontend import views as old_views
-from bdr.frontend.views import datasets, files, formats, revisions, tags
+from bdr.frontend.views import files, formats, revisions, tags
 
 from views import HomeView, AboutView, LegalView, search_script
 from views.categories import (CategoryListView, CategoryDetailView, CategoryAddView,
                               CategoryEditView, CategoryDeleteView)
-from views.datasets import DatasetDetailView, DatasetListView
+from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView,
+                            DatasetEditView, DatasetDeleteView)
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -58,9 +59,12 @@ urlpatterns = patterns(
 
     url(r'^datasets/(?P<name>[\w_-]+)-(?P<pk>\d+)$', DatasetDetailView.as_view(),
         name='dataset'),
-    url(r'^datasets/add$', datasets.DatasetAddView.as_view(), name='dataset-add'),
-    url(r'^datasets/(?P<slug>[\w-]+)/edit$', datasets.DatasetEditView.as_view(), name='dataset-edit'),
-    url(r'^datasets/(?P<slug>[\w-]+)/delete$', datasets.DatasetDeleteView.as_view(), name='dataset-delete'),
+    url(r'^datasets/add$', DatasetAddView.as_view(),
+        name='add-dataset'),
+    url(r'^datasets/(?P<name>[\w_-]+)-(?P<pk>\d+)/edit$', DatasetEditView.as_view(),
+        name='edit-dataset'),
+    url(r'^datasets/(?P<name>[\w_-]+)-(?P<pk>\d+)/delete$', DatasetDeleteView.as_view(),
+        name='delete-dataset'),
 
     url(r'^formats/add$', formats.FormatAddView.as_view(), name='format-add'),
     url(r'^formats/(?P<slug>[\w-]+)$', formats.FormatDetailView.as_view(), name='format-detail'),

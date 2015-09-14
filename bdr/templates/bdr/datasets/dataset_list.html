@@ -10,8 +10,7 @@
             <li class="active" role="presentation"><a href="{% url 'bdr:datasets' %}">
                 {% bootstrap_icon "th-list" %} List
             </a></li>
-            {# TODO: Change route #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:dataset-add' %}{% endcomment %}">
+            <li role="presentation"><a href="{% url 'bdr:add-dataset' %}">
                 {% bootstrap_icon "plus" %} Add
             </a></li>
         </ul>

@@ -288,10 +288,9 @@ class Source(Model):
     """An optional user name for authentication."""
     password = fields.CharField(max_length=64, blank=True)
     """An optional password for authentication."""
-    frequency = fields.PositiveSmallIntegerField(default=0)
+    period = fields.PositiveSmallIntegerField(default=0)
     """
-    How often, in hours, this source should be checked for updates; skipped if
-    zero (0).
+    The time, in hours, between updates using this source; skipped if zero (0).
     """
     checked_at = fields.DateTimeField(blank=True, null=True, editable=False)
     """The last time this source was checked for updates."""
@@ -354,17 +353,17 @@ class Source(Model):
         """
         Return True if this data source is due to be checked.
 
-        If the update frequency is zero, this method returns False.
+        If the update period is zero, this method returns False.
 
         :return: True if this data source should be checked for updates; false
                  otherwise.
         :rtype:  bool
         """
-        if not self.frequency:
+        if not self.period:
             return False
         if not self.checked_at:
             return True
-        delta = timedelta(hours=self.frequency)
+        delta = timedelta(hours=self.period)
         return self.checked_at + delta <= datetime.now(utc)
 
     def has_changed(self):

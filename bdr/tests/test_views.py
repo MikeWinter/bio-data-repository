@@ -58,8 +58,7 @@ class HomePageViewTest(TransactionTestCase):
     #     name = _get_random_text()
     #     category = Category.objects.create(name=name)
     #     category_id = category.id
-    #     # TODO: Replace with category.get_absolute_url() once implemented
-    #     category_url = "/"
+    #     category_url = category.get_absolute_url()
     #     response = self.client.get(reverse('bdr:home'))
     #     expected = '''
     #     <a data-toggle="collapse" data-target="#child-{id}" href="{url}" aria-controls="child-{id}"
@@ -344,8 +343,7 @@ class DatasetDetailViewTest(TransactionTestCase):
 
         response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
                                                                   'name': dataset.name}))
-
-        self.assertInHTML('<p>There are no files in this dataset.</p>', response.content)
+        self.assertContains(response, 'There are no files in this dataset.')
 
     def test_lists_files(self):
         """Check that a correct list of files, including their links, are displayed in the response."""

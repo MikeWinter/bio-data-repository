@@ -79,10 +79,9 @@ class ButtonAddonMixin(object):
         # therefore we must be prepared to accept them, also.
         super(ButtonAddonMixin, self).__init__(*args, **kwargs)
         self.button_addon_before = kwargs.get("button_addon_before",
-                                              self.initial_attrs.pop("button_addon_before", {}))
-        """:type: dict"""
+                                              self.initial_attrs.get("button_addon_before", {}))
         self.button_addon_after = kwargs.get("button_addon_after",
-                                             self.initial_attrs.pop("button_addon_after", {}))
+                                             self.initial_attrs.get("button_addon_after", {}))
 
         # Remove the add-on specifications so that they aren't rendered out.
         if "addon_before" in self.widget.attrs:

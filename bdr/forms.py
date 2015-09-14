@@ -1,11 +1,22 @@
+"""
+This module defines the forms used to manipulate data descriptors managed by
+the repository.
+
+This following classes are exported:
+
+    CategoryForm
+    DatasetForm
+    SearchForm
+"""
+
 from django.forms import Form, ModelForm
-from django.forms.fields import BooleanField, CharField
-from django.forms.widgets import TextInput
+from django.forms.fields import CharField
+from django.forms.widgets import Textarea, TextInput
 from django.core.urlresolvers import reverse_lazy
 
-from .models import Category
+from .models import Category, Dataset
 
-__all__ = ["CategoryForm", "CategoryDeletionForm", "SearchForm"]
+__all__ = ["CategoryForm", "DatasetForm", "SearchForm"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -27,14 +38,32 @@ __license__ = """
 
 
 class CategoryForm(ModelForm):
+    """
+    Displays the properties of a category to facilitate creating new, and
+    editing existing, categories.
+    """
+
     class Meta(object):
+        """Configuration options for the category form."""
+
         model = Category
         fields = "__all__"
 
 
-class CategoryDeletionForm(Form):
-    delete = BooleanField(label="Confirm deletion",
-                          help_text="Are you sure you want to delete this category?")
+class DatasetForm(ModelForm):
+    """
+    Displays the properties of a category to facilitate creating new, and
+    editing existing, datasets.
+    """
+
+    class Meta(object):
+        """Configuration options for the dataset form."""
+
+        model = Dataset
+        fields = "__all__"
+        widgets = {
+            "notes": Textarea(attrs=dict(rows=6))
+        }
 
 
 class SearchForm(Form):

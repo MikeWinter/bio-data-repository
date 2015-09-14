@@ -22,7 +22,7 @@ from django.forms import fields, forms, widgets
 from django.forms.models import ModelForm
 
 from . import models
-from .widgets import AnnotatedNumberInput, ComboTextInput
+from .widgets import ComboTextInput
 
 
 class ArchiveMemberForm(forms.Form):
@@ -88,27 +88,6 @@ class TagForm(ModelForm):
         model = models.Tag
         fields = ['name']
         widgets = {'name': widgets.TextInput(attrs={'class': 'form-control'})}
-
-
-class DatasetForm(ModelForm):
-    class Meta(object):
-        model = models.Dataset
-        fields = ['name', 'slug', 'categories', 'tags', 'notes', 'update_uri', 'update_username', 'update_password',
-                  'update_frequency']
-        labels = {'update_uri': 'Update source',
-                  'update_username': 'User name',
-                  'update_password': 'Password'}
-        widgets = {'name': widgets.TextInput(attrs={'class': 'form-control'}),
-                   'slug': widgets.TextInput(attrs={'class': 'form-control'}),
-                   'categories': widgets.SelectMultiple(attrs={'class': 'form-control'}),
-                   'tags': widgets.SelectMultiple(attrs={'class': 'form-control'}),
-                   'notes': widgets.Textarea(attrs={'class': 'form-control'}),
-                   'update_uri': widgets.URLInput(attrs={'class': 'form-control',
-                                                         'placeholder': 'http://example.com/file'}),
-                   'update_username': widgets.TextInput(attrs={'class': 'form-control'}),
-                   'update_password': widgets.PasswordInput(attrs={'class': 'form-control'}),
-                   'update_frequency': AnnotatedNumberInput(attrs={'class': 'form-control'},
-                                                            suffix={'text': 'minutes'})}
 
 
 class FormatFieldSelectionForm(ModelForm):
