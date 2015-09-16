@@ -3,24 +3,25 @@
 jQuery(function ($) {
     "use strict";
     // Load the search engines used for matching query terms.
-    var engine = new Bloodhound({
-        remote: {
-            url: '{% url "bdr:search" %}?query=%QUERY',
-            wildcard: '%QUERY'
-        },
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace
-    });
-    engine.initialize();
     var tags = new Bloodhound({
         remote: {
-            url: '{% url "bdr.frontend:tags" %}?filter=%QUERY',
+            url: '{% url "bdr:tags" %}?query=%QUERY',
             wildcard: '%QUERY'
         },
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace
     });
     tags.initialize();
+
+    var datasets = new Bloodhound({
+        remote: {
+            url: '{% url "bdr:datasets" %}?query=%QUERY',
+            wildcard: '%QUERY'
+        },
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace
+    });
+    datasets.initialize();
 
     var form = $('.repository-search');
     var selection = null;
@@ -33,17 +34,22 @@ jQuery(function ($) {
         hint: true,
         minLength: 2
     }, {
-        source: engine.ttAdapter(),
-        name: 'datasets',
-        displayKey: 'name'
-    }, {
         source: tags.ttAdapter(),
         name: 'tags',
-        displayKey: 'name'
+        display: function (suggestion) {
+            return '#' + suggestion.name;
+        }
+    }, {
+        source: datasets.ttAdapter(),
+        name: 'datasets',
+        display: 'name'
     });
-    form.on('typeahead:autocompleted typeahead:selected', null, null,
-        function (evt, suggestion, dataset) {
-            selection = (dataset === 'datasets') ? suggestion : null;
+    /*
+     * Remember the selected suggestion for examination during submission.
+     */
+    form.on('typeahead:autocomplete typeahead:select', null, null,
+        function (evt, suggestion) {
+            selection = suggestion;
         });
     /*
      * This search handler examines query matches derived from dataset names.
@@ -51,11 +57,12 @@ jQuery(function ($) {
      * results page and takes the user directly to the match.
      */
     form.submit(function (evt) {
-        var term = this.elements.query.value;
+        var term = (this.elements.query.value || "").toLowerCase();
         var search = true;
         // Only process non-empty, non-default search terms.
-        if (term && selection && selection.href && (term !== this.elements.query.defaultValue) &&
-                (selection.name.toLowerCase() === term.toLowerCase())) {
+        if (term && selection && selection.href &&
+                (term !== this.elements.query.defaultValue.toLowerCase()) &&
+                ($.inArray(selection.name.toLowerCase(), [term, '#' + term]) !== -1)) {
             search = false;
             location.href = selection.href;
         }

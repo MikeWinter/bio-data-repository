@@ -23,11 +23,12 @@ The following mixin is also provided:
 """
 
 from django.shortcuts import render
+from django.core.urlresolvers import reverse_lazy
 from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, TemplateView
 
 from ..forms import SearchForm
-from ..models import Category, Dataset, Update
+from ..models import Category, Dataset, File, Revision, Update
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -146,7 +147,7 @@ class HomeView(SearchableViewMixin, ListView):
         """
         Set up and return variables for use in the template for this view.
 
-        :param kwargs: A mapping of data available for use in templates.
+        :param kwargs: A dictionary of data available for use in templates.
         :type kwargs: dict
         :return: A dictionary of key/value pairs.
         :rtype: dict
@@ -156,4 +157,58 @@ class HomeView(SearchableViewMixin, ListView):
             "category_list": Category.objects.exclude(dataset__isnull=True),
             "dataset_list": Dataset.objects.filter(categories__isnull=True),
         })
+        return context
+
+
+class SearchView(SearchableViewMixin, TemplateView):
+    """
+    This view displays search results for datasets, files and revisions that
+    match queried names and tags.
+
+    This class extends the get_context_data method of the Django TemplateView
+    class from which it inherits. For more information, see
+    https://docs.djangoproject.com/en/1.6/ref/class-based-views/base/
+    """
+
+    form_class = SearchForm
+    success_url = reverse_lazy()
+    template_name = "bdr/search.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Set up and return variables for use in the template for this view using
+        the query parameter passed in a GET request.
+
+        :param kwargs: A dictionary of data available for use in templates.
+        :type kwargs: dict
+        :return: A dictionary of key/value pairs.
+        :rtype: dict
+        """
+        context = super(SearchView, self).get_context_data(**kwargs)
+
+        if self.request.method == "GET" and "query" in self.request.GET:
+            query = self.request.GET["query"]
+            context["form"] = self.form_class(initial=self.request.GET)
+            context["query"] = query
+
+            if query:
+                datasets = Dataset.objects.all()
+                files = File.objects.all()
+                revisions = Revision.objects.filter(tags__isnull=False)
+
+                found_tag = False
+                for token in query.split():
+                    if token.startswith("#"):
+                        found_tag = True
+                        datasets = datasets.filter(tags__name__istartswith=token[1:])
+                        files = files.filter(tags__name__istartswith=token[1:])
+                        revisions = revisions.filter(tags__name__istartswith=token[1:])
+                    else:
+                        datasets = datasets.filter(name__icontains=token)
+                        files = files.filter(name__icontains=token)
+
+                context["datasets"] = datasets
+                context["files"] = files
+                context["revisions"] = revisions if found_tag else revisions.none()
+
         return context

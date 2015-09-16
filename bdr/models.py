@@ -126,6 +126,16 @@ class Tag(Model):
         """
         return reverse("bdr:tag", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
 
+    @classmethod
+    def get_field_names(cls):
+        """
+        Return the names of the fields in this model.
+
+        :return: A list of field names belonging to this model.
+        :rtype: list of unicode
+        """
+        return [field.name for field in cls._meta.concrete_fields]
+
     def __str__(self):
         return self.name
 
@@ -221,6 +231,16 @@ class Dataset(Model):
     #             # noinspection PyTypeChecker
     #             file_.add_revision(archive[member_name])
 
+    @classmethod
+    def get_field_names(cls):
+        """
+        Return the names of the fields in this model.
+
+        :return: A list of field names belonging to this model.
+        :rtype: list of unicode
+        """
+        return [field.name for field in cls._meta.concrete_fields]
+
     def __str__(self):
         return self.name
 
@@ -260,6 +280,16 @@ class File(Model):
         # return reverse('bdr.backend:file-detail', kwargs={'ds': self.dataset.slug,
         #                                                   'fn': self.name})
         raise NotImplementedError
+
+    @classmethod
+    def get_field_names(cls):
+        """
+        Return the names of the fields in this model.
+
+        :return: A list of field names belonging to this model.
+        :rtype: list of unicode
+        """
+        return [field.name for field in cls._meta.concrete_fields]
 
     def __str__(self):
         return self.name
