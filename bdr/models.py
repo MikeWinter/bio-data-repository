@@ -94,7 +94,8 @@ class Category(Model):
         Return a URL that can be used to obtain more details about this
         category.
         """
-        return reverse("bdr:category", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
+        return reverse("bdr:view-category", kwargs={"pk": self.pk,
+                                                    "name": slugify(unicode(self.name))})
 
     def __str__(self):
         return self.name
@@ -124,7 +125,7 @@ class Tag(Model):
         """
         Return a URL that can be used to obtain more details about this tag.
         """
-        return reverse("bdr:tag", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
+        return reverse("bdr:view-tag", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
 
     @classmethod
     def get_field_names(cls):
@@ -191,7 +192,8 @@ class Dataset(Model):
         Return a URL that can be used to obtain more details about this
         dataset.
         """
-        return reverse("bdr:dataset", kwargs={"pk": self.pk, "name": slugify(unicode(self.name))})
+        return reverse("bdr:view-dataset", kwargs={"dpk": self.pk,
+                                                   "dataset": slugify(unicode(self.name))})
 
     # def _map(self, filename):
     #     """
@@ -260,9 +262,13 @@ class File(Model):
     class.
     """
 
-    name = fields.CharField(max_length=100, blank=False, editable=False)
+    name = fields.CharField(max_length=100, blank=False,
+                            help_text='<span class="text-warning">Note: Any filters that map to'
+                                      ' this file name must also be changed if the file is'
+                                      ' renamed.</span>')
     """The name of this file."""
-    dataset = related.ForeignKey(Dataset, related_name="files", related_query_name="file")
+    dataset = related.ForeignKey(Dataset, editable=False, related_name="files",
+                                 related_query_name="file")
     """The dataset to which this file belongs."""
     # TODO: Enable default format
     # default_format = related.ForeignKey(Format, related_name='datafiles',
@@ -276,10 +282,10 @@ class File(Model):
         """
         Return a URL that can be used to obtain more details about this file.
         """
-        # TODO: Implement
-        # return reverse('bdr.backend:file-detail', kwargs={'ds': self.dataset.slug,
-        #                                                   'fn': self.name})
-        raise NotImplementedError
+        return reverse("bdr:view-file",
+                       kwargs={"dpk": self.dataset.pk,
+                               "dataset": slugify(unicode(self.dataset.name)),
+                               "fpk": self.pk, "filename": slugify(unicode(self.name))})
 
     @classmethod
     def get_field_names(cls):
@@ -629,6 +635,7 @@ class Revision(Model):
     """The size, in bytes, of this revision."""
     update = related.ForeignKey(Update, related_name="revisions", related_query_name="revision")
     """The update that caused the addition of this revision."""
+    # TODO: Add format
     # format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision')
     # """The format of this file."""
     tags = related.ManyToManyField(Tag, blank=True, related_name='revisions',

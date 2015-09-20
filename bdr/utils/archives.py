@@ -123,6 +123,32 @@ class Archive(DictMixin, object):
         """
         raise NotImplementedError
 
+    @property
+    def file(self):
+        """
+        Return the file wrapped by this archive.
+
+        :return: The file wrapped by this archive.
+        :rtype: file
+        """
+        return self._file
+
+    @property
+    def path(self):
+        """
+        Return the path to this archive, if available.
+
+        :return: The path to this archive if available; ``None`` otherwise.
+        :rtype: str | None
+        """
+        return self._path
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._file.close()
+
 
 class Member(object):
     """A file member of an archive."""
@@ -191,8 +217,8 @@ class GzipArchive(Archive):
         False.
         """
         if self._zip is None:
+            self._zip = gzip.GzipFile(fileobj=self._file, mode='rb')
             try:
-                self._zip = gzip.GzipFile(fileobj=self._file, mode='rb')
                 self._zip.read(1)
             except IOError:
                 return False
@@ -205,6 +231,10 @@ class GzipArchive(Archive):
         if not self.can_read():
             raise IOError('Not a gzipped archive.')
         return [self._name]
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._zip.close()
+        super(GzipArchive, self).__exit__(exc_type, exc_val, exc_tb)
 
 
 class GzipMember(Member):
@@ -312,6 +342,10 @@ class TarArchive(Archive):
             self._names = [member.name for member in self._tar.getmembers() if member.isfile()]
         return self._names
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._tar.close()
+        super(TarArchive, self).__exit__(exc_type, exc_val, exc_tb)
+
 
 class ZipArchive(Archive):
     """An adaptor for reading Zip format archives."""
@@ -349,3 +383,7 @@ class ZipArchive(Archive):
     def _open(self):
         if self._zip is None:
             self._zip = zipfile.ZipFile(self._file)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._zip.close()
+        super(ZipArchive, self).__exit__(exc_type, exc_val, exc_tb)

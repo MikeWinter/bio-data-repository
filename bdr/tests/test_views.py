@@ -1,3 +1,7 @@
+"""
+Tests for views defined in the application.
+"""
+
 from django.core.urlresolvers import reverse
 from django.test import TransactionTestCase
 
@@ -24,19 +28,22 @@ __license__ = """
     """
 
 
-# TODO: Add ordering tests for categories and updates, and exclusion tests for categories with no
-# TODO: associated datasets.
+# TODO: Add ordering tests for categories and updates, and exclusion tests for
+# TODO: categories with no associated datasets.
 class HomePageViewTest(TransactionTestCase):
     def test_http_ok(self):
-        """Check that the URL route is configured correctly and a 200 response code is received."""
+        """
+        Check that the URL route is configured correctly and a 200 response
+        code is received.
+        """
         response = self.client.get(reverse('bdr:home'))
 
         self.assertEqual(200, response.status_code)
 
     def test_empty(self):
         """
-        Ensure that a user is presented with an informative message, rather than an empty page, if there are no
-        datasets.
+        Ensure that a user is presented with an informative message, rather
+        than an empty page, if there are no datasets.
         """
         response = self.client.get(reverse('bdr:home'))
 
@@ -70,7 +77,10 @@ class HomePageViewTest(TransactionTestCase):
     #     self.assertInHTML(expected, response.content)
 
     def test_lists_categorised_dataset(self):
-        """Examine output for the correct grouping of datasets and their parent categories."""
+        """
+        Examine output for the correct grouping of datasets and their parent
+        categories.
+        """
         category_name = _get_random_text()
         dataset_name = _get_random_text()
         category = Category.objects.create(name=category_name)
@@ -102,15 +112,18 @@ class HomePageViewTest(TransactionTestCase):
 
 class DatasetListViewTest(TransactionTestCase):
     def test_http_ok(self):
-        """Check that the URL route is configured correctly and a 200 response code is received."""
+        """
+        Check that the URL route is configured correctly and a 200 response
+        code is received.
+        """
         response = self.client.get(reverse('bdr:datasets'))
 
         self.assertEqual(200, response.status_code)
 
     def test_empty(self):
         """
-        Ensure that a user is presented with an informative message, rather than an empty page, if there are no
-        datasets.
+        Ensure that a user is presented with an informative message, rather
+        than an empty page, if there are no datasets.
         """
         response = self.client.get(reverse('bdr:datasets'))
 
@@ -146,7 +159,10 @@ class DatasetListViewTest(TransactionTestCase):
         self.assertInHTML(expected, response.content)
 
     def test_list_no_category(self):
-        """Ensures that the datasets listing correctly handles datasets with no categorisation."""
+        """
+        Ensures that the datasets listing correctly handles datasets with no
+        categorisation.
+        """
         dataset_title = 'DrugBank'
         dataset = Dataset.objects.create(name=dataset_title)
         expected = '''
@@ -250,21 +266,26 @@ class DatasetListViewTest(TransactionTestCase):
 class DatasetDetailViewTest(TransactionTestCase):
     def test_http_ok(self):
         """
-        Check that the URL route is configured correctly and a 200 response code is received.
+        Check that the URL route is configured correctly and a 200 response
+        code is received.
 
-        This test also requires that dataset lookup proceeds correctly as a valid slug is required as part of the route.
+        This test also requires that dataset lookup proceeds correctly as a
+        valid slug is required as part of the route.
         """
         dataset = Dataset.objects.create(name='DrugBank')
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset.name}))
+        response = self.client.get(reverse('bdr:view-dataset', kwargs={'dpk': dataset.pk,
+                                                                       'dataset': dataset.name}))
 
         self.assertEqual(200, response.status_code)
 
     def test_http_not_found(self):
-        """Check that a non-existent dataset keyword results in a Not Found response."""
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': 0,
-                                                                  'name': 'does-not-exist'}))
+        """
+        Check that a non-existent dataset keyword results in a Not Found
+        response.
+        """
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': 0, 'dataset': 'does-not-exist'}))
 
         self.assertEqual(404, response.status_code)
 
@@ -274,8 +295,8 @@ class DatasetDetailViewTest(TransactionTestCase):
         dataset = Dataset.objects.create(name=title)
         expected = '<h1>{title}</h1>'.format(title=title)
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': title}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': title}))
 
         self.assertInHTML(expected, response.content)
 
@@ -293,8 +314,8 @@ class DatasetDetailViewTest(TransactionTestCase):
         </h1>
         '''.format(dataset=dataset_title, tag=tag_title, url=tag.get_absolute_url())
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset_title}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': dataset_title}))
 
         self.assertInHTML(expected, response.content)
 
@@ -315,8 +336,8 @@ class DatasetDetailViewTest(TransactionTestCase):
         </tr>
         '''.format(category=category_title, url=category.get_absolute_url())
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset.name}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': dataset.name}))
 
         self.assertInHTML(expected, response.content)
 
@@ -330,31 +351,35 @@ class DatasetDetailViewTest(TransactionTestCase):
         </tr>
         '''.format(note=note)
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset.name}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': dataset.name}))
 
         self.assertInHTML(expected, response.content)
 
     def test_no_files(self):
         """
-        Ensure that a user is presented with an informative message, rather than an empty list, if there are no files in
-        a dataset.
+        Ensure that a user is presented with an informative message, rather
+        than an empty list, if there are no files in a dataset.
         """
         dataset = Dataset.objects.create(name='DrugBank')
 
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset.name}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': dataset.name}))
         self.assertContains(response, 'There are no files in this dataset.')
 
     def test_lists_files(self):
-        """Check that a correct list of files, including their links, are displayed in the response."""
+        """
+        Check that a correct list of files, including their links, are
+        displayed in the response.
+        """
         filename = 'drugbank.xml'
         dataset = Dataset.objects.create(name='DrugBank')
-        expected = '<th><a href="">{name}</a>'.format(name=filename)
+        file_object = dataset.files.create(name=filename, dataset=dataset)
+        expected = '<th><a href="{url}">{name}</a>'.format(name=filename,
+                                                           url=file_object.get_absolute_url())
 
-        File.objects.create(name=filename, dataset=dataset)
-        response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
-                                                                  'name': dataset.name}))
+        response = self.client.get(reverse('bdr:view-dataset',
+                                           kwargs={'dpk': dataset.pk, 'dataset': dataset.name}))
 
         self.assertInHTML(expected, response.content)
 
@@ -413,7 +438,7 @@ class DatasetDetailViewTest(TransactionTestCase):
     #     </tr>
     #     '''.format(name=filename, revisions=len(revisions))
     #
-    #     response = self.client.get(reverse('bdr:dataset', kwargs={'pk': dataset.pk,
+    #     response = self.client.get(reverse('bdr:view-dataset', kwargs={'pk': dataset.pk,
     #                                                               'name': dataset.name}))
     #
     #     self.assertInHTML(expected, response.content)

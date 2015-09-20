@@ -11,18 +11,17 @@
             <li class="active" role="presentation"><a href="{{ dataset.get_absolute_url }}">
                 {% bootstrap_icon "file" %} View
             </a></li>
-            <li role="presentation"><a href="{% url 'bdr:edit-dataset' pk=dataset.pk name=dataset.name|slugify %}">
+            <li role="presentation"><a href="{% url 'bdr:edit-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "pencil" %} Edit
             </a></li>
-            <li role="presentation"><a href="{% url 'bdr:delete-dataset' pk=dataset.pk name=dataset.name|slugify %}">
+            <li role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "remove" %} Delete
             </a></li>
             {# TODO: Change route for adding sources #}
             <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
                 {% bootstrap_icon "plus" %} Add source
             </a></li>
-            {# TODO: Change route for file upload #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
+            <li role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "upload" %} Upload file
             </a></li>
         </ul>
@@ -71,8 +70,9 @@
                 <td>{{ dataset.notes|urlize|default:"None" }}</td>
             </tr>
         </table>
+    </section>
 
-
+    <section>
         <h2>Sources</h2>
     {% if dataset.sources.exists %}
         <table class="table table-condensed">
@@ -100,6 +100,7 @@
         {# TODO: Change route for adding sources #}
         <p>No sources have been added to this dataset. <a href="{% comment %}{% url 'bdr:add-source' %}{% endcomment %}">Add a source</a> to enable automatic updates.</p>
     {% endif %}
+    </section>
 {#        <div class="panel panel-default">#}
 {#            <div class="panel-heading" data-toggle="collapse" data-target="#source" aria-controls="source"#}
 {#                 aria-expanded="{% if dataset.update_uri %}true{% else %}false{% endif %}">Source <span#}
@@ -131,7 +132,7 @@
 {#            </div>#}
 {#        </div>#}
 
-
+    <section>
         <h2>Files</h2>
     {% if page_obj.object_list %}
         <table class="table table-condensed">
@@ -147,8 +148,7 @@
             {% for file in page_obj.object_list %}
                 <tr>
                     <th>
-                        {# TODO: Change route for file details #}
-                        <a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a>
+                        <a href="{{ file.get_absolute_url }}">{{ file.name }}</a>
                     {% if file.revisions.exists %}
                         {# TODO: Change route for exporting latest revision #}
                         <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
@@ -170,8 +170,7 @@
 
         {% bootstrap_pagination page_obj size="small" %}
     {% else %}
-        {# TODO: Change route for file upload #}
-        <p>There are no files in this dataset. <a href="{% comment %}{% url 'bdr:add-file' %}{% endcomment %}">Upload a file</a> to manually add its contents to the repository.</p>
+        <p>There are no files in this dataset. <a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">Upload a file</a> to manually add its contents to the repository.</p>
     {% endif %}
     </section>
 {% endblock %}

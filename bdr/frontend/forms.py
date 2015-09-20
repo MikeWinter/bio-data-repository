@@ -17,42 +17,11 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from django.core.exceptions import ValidationError
-from django.forms import fields, forms, widgets
+from django.forms import fields, widgets
 from django.forms.models import ModelForm
 
 from . import models
 from .widgets import ComboTextInput
-
-
-class ArchiveMemberForm(forms.Form):
-    name = fields.CharField(widget=widgets.HiddenInput())
-    selected = fields.BooleanField(initial=False, required=False)
-
-
-class FileEditForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(FileEditForm, self).__init__(*args, **kwargs)
-        self.empty_permitted = False
-
-    def clean_default_format(self):
-        value = self.cleaned_data.get('default_format', None)
-        if value is None:
-            ValidationError(self.fields['default_format'].error_messages['required'], code='required')
-        return value
-
-    class Meta(object):
-        model = models.File
-        fields = ['default_format', 'tags', 'name', 'dataset']
-        widgets = {'name': widgets.HiddenInput(),
-                   'dataset': widgets.HiddenInput(),
-                   'default_format': widgets.Select(attrs={'class': 'form-control'}),
-                   'tags': widgets.SelectMultiple(attrs={'class': 'form-control'})}
-
-
-class FileUploadForm(forms.Form):
-    new_file = fields.FileField(allow_empty_file=False,
-                                widget=widgets.FileInput(attrs={'class': 'form-control'}))
 
 
 class FormatForm(ModelForm):

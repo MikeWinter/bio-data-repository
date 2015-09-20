@@ -1,22 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.forms.formsets import TOTAL_FORM_COUNT
-from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
 
 from bdr.frontend import forms, models
-
-
-class ArchiveMemberSelectionFormSet(formset_factory(forms.ArchiveMemberForm, extra=0)):
-    def clean(self):
-        selected = [form for form in self.forms
-                    if not self._should_delete_form(form) and form.cleaned_data.get('selected', False)]
-        if len(selected) == 0:
-            raise ValidationError("No files selected.")
-
-
-class FileListFormSet(modelformset_factory(models.File, forms.FileEditForm, extra=0)):
-    def __init__(self, *args, **kwargs):
-        # kwargs.update(queryset=self.model.objects.none())
-        super(FileListFormSet, self).__init__(*args, **kwargs)
 
 
 class FormatFieldInlineFormSet(inlineformset_factory(models.Format, models.FormatField, forms.FormatFieldForm)):

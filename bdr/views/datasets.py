@@ -46,6 +46,7 @@ class DatasetDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     model = Dataset
     paginate_by = 10
     paginate_orphans = 2
+    pk_url_kwarg = "dpk"
     template_name = "bdr/datasets/dataset_detail.html"
 
     def __init__(self, **kwargs):
@@ -158,7 +159,6 @@ class DatasetListView(SearchableViewMixin, ListView):
             limit = default
         return limit
 
-
     def render_to_response(self, context, **response_kwargs):
         """
         Returns a response with a template rendered using the given context.
@@ -207,6 +207,7 @@ class DatasetEditView(SearchableViewMixin, UpdateView):
 
     model = Dataset
     form_class = DatasetForm
+    pk_url_kwarg = "dpk"
     template_name = "bdr/datasets/dataset_edit.html"
 
 
@@ -222,5 +223,6 @@ class DatasetDeleteView(SearchableViewMixin, DeleteView):
     """This view is used to confirm deletion of an existing dataset."""
 
     model = Dataset
+    pk_url_kwarg = "dpk"
     success_url = reverse_lazy('bdr:datasets')
     template_name = "bdr/datasets/dataset_confirm_delete.html"

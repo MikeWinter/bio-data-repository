@@ -82,8 +82,7 @@
             {% for file in tag.files.all %}
                 <tr>
                     <td><a href="{{ file.dataset.get_absolute_url }}">{{ file.dataset.name }}</a></td>
-                    {# TODO: Update route for file details #}
-                    <td><a href="{% comment %}{{ file.get_absolute_url }}{% endcomment %}">{{ file.name }}</a></td>
+                    <td><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></td>
                     <td>{{ file.revisions.count }}</td>
                     {% if file.revisions.exists %}
                         <td title="Updated on {{ file.revisions.last.update.timestamp }}">{{ file.revisions.last.update.timestamp|naturaltime }}</td>

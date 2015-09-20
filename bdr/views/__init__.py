@@ -90,7 +90,7 @@ class SearchableViewMixin(object):
 
         :param kwargs: A mapping of data available for use in templates.
         :type kwargs: dict
-        :return: A dictionary of key/value pairs.
+        :return: A dictionary of template variables and values.
         :rtype: dict
         """
         # noinspection PyUnresolvedReferences
@@ -138,8 +138,8 @@ class HomeView(SearchableViewMixin, ListView):
     https://docs.djangoproject.com/en/1.6/ref/class-based-views/base/
     """
 
-    model = Update
-    """The class of domain model listed by this view."""
+    queryset = Update.objects.order_by("-timestamp")[:10]
+    """A queryset containing recently updates to be presented in this view."""
     template_name = "bdr/home.html"
     """Defines the template file used to present the view."""
 

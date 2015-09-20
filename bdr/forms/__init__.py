@@ -6,18 +6,21 @@ This following classes are exported:
 
     CategoryForm
     DatasetForm
+    FileForm
     TagForm
     SearchForm
+    UploadForm
 """
 
 from django.forms import Form, ModelForm
-from django.forms.fields import CharField
-from django.forms.widgets import Textarea, TextInput
+from django.forms.fields import CharField, FileField
+from django.forms.widgets import FileInput, HiddenInput, Textarea, TextInput
 from django.core.urlresolvers import reverse_lazy
 
-from .models import Category, Dataset, Tag
+from .fields import SelectableCharField
+from ..models import Category, Dataset, File, Tag
 
-__all__ = ["CategoryForm", "DatasetForm", "TagForm", "SearchForm"]
+__all__ = ["CategoryForm", "DatasetForm", "FileForm", "TagForm", "SearchForm", "UploadForm"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -41,7 +44,7 @@ __license__ = """
 class CategoryForm(ModelForm):
     """
     Displays the properties of a category to facilitate creating new, and
-    editing existing, categories.
+    editing existing, entries.
     """
 
     class Meta(object):
@@ -53,8 +56,8 @@ class CategoryForm(ModelForm):
 
 class DatasetForm(ModelForm):
     """
-    Displays the properties of a category to facilitate creating new, and
-    editing existing, datasets.
+    Displays the properties of a dataset to facilitate creating new, and
+    editing existing, entries.
     """
 
     class Meta(object):
@@ -67,10 +70,30 @@ class DatasetForm(ModelForm):
         }
 
 
+class FileForm(ModelForm):
+    """
+    Displays the properties of a file to facilitate creating new, and
+    editing existing, entries.
+    """
+
+    # def clean_default_format(self):
+    #     value = self.cleaned_data.get('default_format', None)
+    #     if value is None:
+    #         ValidationError(self.fields['default_format'].error_messages['required'],
+    #                         code='required')
+    #     return value
+
+    class Meta(object):
+        """Configuration options for the file form."""
+
+        model = File
+        fields = "__all__"
+
+
 class TagForm(ModelForm):
     """
-    Displays the properties of a category to facilitate creating new, and
-    editing existing, tags.
+    Displays the properties of a tag to facilitate creating new, and
+    editing existing, entries.
     """
 
     class Meta(object):
@@ -92,7 +115,7 @@ class SearchForm(Form):
     query = CharField(
         label="",
         widget=TextInput(
-            attrs=dict(type="search", placeholder="Search the repository...", button_addon_after={
+            dict(type="search", placeholder="Search the repository...", button_addon_after={
                 "content": '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>'
                            '<span class="sr-only">Search</span>'})))
 
@@ -103,3 +126,26 @@ class SearchForm(Form):
 
         js = ("//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js",
               reverse_lazy("bdr:search.js"))
+
+
+class UploadForm(Form):
+    """
+    Provides a file selection box and submission button for uploading a file.
+    """
+
+    file = FileField(widget=FileInput({"class": "form-control"}))
+
+
+class FileContentSelectionForm(Form):
+    """
+    Enables a user to choose whether a file is added to the repository, and
+    what its name should be.
+    """
+
+    real_name = CharField(widget=HiddenInput)
+    mapped_name = SelectableCharField(required=False,
+                                      error_messages={"invalid": "Enter a file name."})
+
+    def __init__(self, *args, **kwargs):
+        super(FileContentSelectionForm, self).__init__(*args, **kwargs)
+        self.fields["mapped_name"].label = self.initial["real_name"]

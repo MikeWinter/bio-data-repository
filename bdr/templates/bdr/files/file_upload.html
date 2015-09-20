@@ -1,0 +1,85 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }}){% endblock %}
+
+{% block stylesheets %}
+    {{ wizard.form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ wizard.form.media.js }}
+{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ dataset.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+            {# TODO: Change route for adding sources #}
+            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
+                {% bootstrap_icon "plus" %} Add source
+            </a></li>
+            <li class="active" role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "upload" %} Upload file
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li>Files</li>
+            <li class="active">Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>
+            Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
+            <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>
+        </h1>
+    </header>
+
+    <section>
+        <p class="alert alert-warning alert-dismissable" role="alert"><strong>Note:</strong> Any
+            required <a class="alert-link" href="{% url 'bdr.backend:formats' %}">file formats</a>
+            should be defined before proceeding.
+
+            <button class="close" type="button" data-dismiss="alert" aria-label="Close">{% bootstrap_icon "remove-circle" %}</button>
+        </p>
+
+        <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name %}" method="post"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form wizard.management_form %}
+            {% if wizard.form.forms %}
+                {% bootstrap_form wizard.form.management_form %}
+                {% for form in wizard.form.forms %}
+                    {% bootstrap_form form %}
+                {% endfor %}
+            {% else %}
+                {% bootstrap_form wizard.form layout="horizontal" %}
+            {% endif %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-12 text-right">
+                    {% bootstrap_button button_type="submit" content="Upload" button_class="btn-primary" %}
+                    {% bootstrap_button content="Cancel" href=dataset.get_absolute_url button_class="btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}
