@@ -8,13 +8,13 @@ setting.
 """
 
 from datetime import datetime
+from UserDict import DictMixin
 import gzip
 import importlib
 import os
 import re
 import tarfile
 import tempfile
-from UserDict import DictMixin
 import zipfile
 
 from .. import app_settings
@@ -119,7 +119,7 @@ class Archive(DictMixin, object):
         Return a copy of the list of member names.
 
         :return: A list of file names in this archive.
-        :rtype:  list
+        :rtype:  list of str
         """
         raise NotImplementedError
 

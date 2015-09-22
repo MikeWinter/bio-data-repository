@@ -3,6 +3,7 @@ This module defines classes for displaying and editing tags.
 """
 
 import json
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse

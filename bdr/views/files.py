@@ -2,9 +2,10 @@
 This module defines classes for displaying and editing files.
 """
 
+import os.path
+
 from django.conf import settings
 from django.contrib.formtools.wizard.views import SessionWizardView
-import django.core.files as files
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
@@ -13,12 +14,12 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.views.generic import ListView, UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
-import os.path
 
 from . import SearchableViewMixin
 from ..forms import UploadForm, FileForm, FileContentSelectionForm
 from ..forms.sets import FileContentSelectionFormSet
 from ..models import Dataset, File
+from ..utils import RemoteFile
 from ..utils.archives import Archive
 
 __all__ = []
@@ -143,27 +144,17 @@ class FileUploadView(SearchableViewMixin, SessionWizardView):
         """
         with self.get_uploaded_archive() as archive:
             filename = archive.file.name
-            update = self.dataset.updates.create(source=None,
-                                                 size=self.file_storage.size(filename))
+            update = self.dataset.updates.create(size=self.file_storage.size(filename),
+                                                 source=None)
 
             for file_mapping in self.get_cleaned_data_for_step("selection"):
                 if file_mapping["mapped_name"] is None:
                     continue
 
                 member = archive[file_mapping["real_name"]]  # :type: Member
-                instance, _ = File.objects.get_or_create(name=file_mapping["mapped_name"],
-                                                         dataset=self.dataset)
-                data = member.file
-                # The FieldFile class, used by model file fields, gets the file
-                # size by reading the `size` attribute of the file. Not all
-                # archives have such an attribute and the fallback, used by
-                # `~django.core.files.File`, is to use the `seek` and `tell`
-                # methods, which are also not always available. Therefore, the
-                # attribute is added when necessary.
-                if not hasattr(data, "size"):
-                    setattr(data, "size", member.size)
-                revision = instance.revisions.create(size=member.size, update=update)
-                revision.data.save(member.name, files.File(data))
+                data = RemoteFile(member.file, file_mapping["mapped_name"], member.size,
+                                  member.mtime)
+                self.dataset.add_file(data, update)
 
         try:
             # TODO: Create management command to periodically clean out the

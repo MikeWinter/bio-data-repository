@@ -23,14 +23,14 @@ __license__ = """
     """
 
 
-class DownloadedFile(File):
+class RemoteFile(File):
     """
     A file-like object that extends `File` to add tracking modification time.
     """
 
     # noinspection PyShadowingBuiltins
     def __init__(self, file, name=None, size=-1, modified_time=None):
-        super(DownloadedFile, self).__init__(file, name)
+        super(RemoteFile, self).__init__(file, name)
         self._modified_time = modified_time
         if size != -1:
             self.size = size

@@ -36,7 +36,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils.text import slugify
 
-from .utils import utc, DownloadedFile
+from .utils import utc, RemoteFile
 from .utils.archives import Archive
 from .utils.storage import delta_storage, upload_path
 from .utils.transports import Transport
@@ -79,11 +79,11 @@ class Category(Model):
     """
     Categories organise datasets into a hierarchical structure.
 
-    The datasets belonging to a category can be retrieved using the `datasets`
-    property of an instance.
+    The datasets belonging to a category can be retrieved using the
+    :py:attr:`datasets` property of an instance.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     name = fields.CharField(max_length=50, unique=True)
@@ -101,7 +101,7 @@ class Category(Model):
         return self.name
 
     class Meta(object):
-        """Metadata options for the Category model class."""
+        """Metadata options for the ``Category`` model class."""
 
         ordering = ["name"]
         verbose_name_plural = "categories"
@@ -112,10 +112,11 @@ class Tag(Model):
     Tags annotate datasets, data files and revisions.
 
     The entities associated with a given tag can be retrieved via their
-    respective properties `datasets`, `datafiles` and `revisions`.
+    respective properties :py:attr:`datasets`, :py:attr:`datafiles` and
+    :py:attr:`revisions`.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     name = fields.CharField(max_length=25, unique=True)
@@ -141,7 +142,7 @@ class Tag(Model):
         return self.name
 
     class Meta(object):
-        """Metadata options for the Tag model class."""
+        """Metadata options for the ``Tag`` model class."""
 
         ordering = ["name"]
 
@@ -153,8 +154,8 @@ class Dataset(Model):
     The contents of a dataset can be updated automatically from a remote source
     if one has been specified.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     name = fields.CharField(max_length=100)
@@ -168,24 +169,38 @@ class Dataset(Model):
                                    related_query_name="dataset")
     """The tags used to annotate this dataset."""
 
-    # def update(self):
-    #     """
-    #     Query the sources for this dataset and add revisions for any modified
-    #     files.
-    #     """
-    #     for source in [src for src in self.sources.all() if src.has_update_elapsed()]:
-    #         with transaction.atomic():
-    #             source.checked()
-    #             if source._has_changed():
-    #                 for file_ in source.files():
-    #                     self.add_file(file_)
-    #                 source.changed()
-    #
-    # def add_file(self, file_):
-    #     # TODO: Add default format (raw) to defaults
-    #     defaults = {"dataset": self}
-    #     instance, _ = self.files.get_or_create(name=file_.name)
-    #     instance.add_revision()
+    def update(self):
+        """
+        Query the sources for this dataset and add revisions for any modified
+        files.
+        """
+        for source in [src for src in self.sources.all() if src.has_update_elapsed()]:
+            source.checked()
+
+            if source.has_changed():
+                file_list, size, modification_date = source.files()
+                update = self.updates.create(source=source, size=size,
+                                             modified_at=modification_date)
+                for source_file in file_list:
+                    self.add_file(source_file, update)
+
+    # noinspection PyShadowingBuiltins
+    def add_file(self, file, update):
+        """
+        Add the given file to this dataset and associate it with ``update``.
+
+        If the file does not already exist, it will be created. The file name
+        is taken from the name property of the file.
+
+        :param file: The file to add.
+        :type file: django.core.files.File
+        :param update: The update with which this addition should be
+                       associated.
+        :type update: Update
+        """
+        # TODO: Add default format (raw) to defaults
+        instance = self.files.get_or_create(name=file.name)[0]
+        instance.revisions.create(data=file, size=file.size, update=update)
 
     def get_absolute_url(self):
         """
@@ -194,44 +209,6 @@ class Dataset(Model):
         """
         return reverse("bdr:view-dataset", kwargs={"dpk": self.pk,
                                                    "dataset": slugify(unicode(self.name))})
-
-    # def _map(self, filename):
-    #     """
-    #     Compare the filename against the filters for this dataset and transform
-    #     it if appropriate.
-    #
-    #     If there are no matching filters, None is returned; if there are no
-    #     filters associated with
-    #
-    #     :type filename: str
-    #     :rtype: str | None
-    #     """
-    #     if not self.filters.exists():
-    #         return filename
-    #     for filter_id in self.get_filter_order():
-    #         filter_ = self.filters.get(filter_id)
-    #         if filter_.match(filename):
-    #             return filter_.map(filename)
-    #     return None
-    #
-    # def _process_archive(self, archive):
-    #     """
-    #     Add the contents of an archive to this dataset, updating or adding
-    #     files as required.
-    #
-    #     :param archive: The archive to process.
-    #     :type  archive: Archive
-    #     """
-    #     # TODO: Add default format (raw) to defaults
-    #     defaults = {"dataset": self}
-    #     # The Archive iterator returns str, not Member as inferred
-    #     for member_name in archive:
-    #         # noinspection PyTypeChecker
-    #         filename = self._map(member_name)
-    #         if filename:
-    #             file_, _ = self.files.get_or_create(name=filename, defaults=defaults)
-    #             # noinspection PyTypeChecker
-    #             file_.add_revision(archive[member_name])
 
     @classmethod
     def get_field_names(cls):
@@ -247,7 +224,7 @@ class Dataset(Model):
         return self.name
 
     class Meta(object):
-        """Metadata options for the Dataset model class."""
+        """Metadata options for the ``Dataset`` model class."""
 
         ordering = ["name"]
         """Order results lexicographically by name."""
@@ -258,8 +235,8 @@ class File(Model):
     Represents the files that constitute each dataset maintained by this
     repository.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     name = fields.CharField(max_length=100, blank=False,
@@ -314,8 +291,8 @@ class Source(Model):
     Represents a remote location that can be used to update one or more files
     within a dataset.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     url = fields.URLField()
@@ -355,8 +332,9 @@ class Source(Model):
         The files returned will consist of only those that pass the filters
         applicable to this data source.
 
-        :return: A filtered list of `DownloadedFile` instances obtained from this data source.
-        :rtype: list of DownloadedFile
+        :return: A filtered list of `RemoteFile` instances obtained from this
+                 data source, the combined update size, and modification date.
+        :rtype: tuple of (list of RemoteFile, long, datetime)
         """
         provider = self._get_transport_provider()
         archive = self._get_archive(provider.get_content())
@@ -369,9 +347,9 @@ class Source(Model):
                 pass  # If a file is rejected, skip it.
             else:
                 member = archive[file_name]
-                new_file = DownloadedFile(member.file, mapped_name, member.mtime)
+                new_file = RemoteFile(member.file, mapped_name, member.size, member.mtime)
                 file_list.append(new_file)
-        return file_list
+        return file_list, provider.get_size(), provider.get_modification_date()
 
     def checked(self, timestamp=None):
         """
@@ -390,12 +368,12 @@ class Source(Model):
 
     def has_update_elapsed(self):
         """
-        Return True if this data source is due to be checked.
+        Return ``True` if this data source is due to be checked.
 
-        If the update period is zero, this method returns False.
+        If the update period is zero, this method returns ``False``.
 
-        :return: True if this data source should be checked for updates; false
-                 otherwise.
+        :return: ``True`` if this data source should be checked for updates;
+                 ``False`` otherwise.
         :rtype:  bool
         """
         if not self.period:
@@ -409,7 +387,7 @@ class Source(Model):
         """
         Determine whether the resource at this source has changed.
 
-        :return: True if the resource has changed; otherwise False.
+        :return: ``True`` if the resource has changed; otherwise ``False``.
         :rtype:  bool
         """
         changed = False
@@ -450,7 +428,7 @@ class Source(Model):
 
     def _get_archive(self, data):
         """
-        Return an archive read from `data`.
+        Return an archive read from ``data``.
 
         :param data: A file-like object containing the data of an archive.
         :type data: file
@@ -491,7 +469,7 @@ class Source(Model):
         pass
 
     class Meta(object):
-        """Metadata options for the Source model class."""
+        """Metadata options for the ``Source`` model class."""
 
         unique_together = (("dataset", "url"),)
         """Require that datasets do not have duplicate source locations."""
@@ -503,8 +481,8 @@ class Filter(Model):
     sources to determine whether they should be added to the dataset associated
     with that source.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     pattern = fields.CharField(max_length=100, validators=[_validate_regex])
@@ -565,7 +543,9 @@ class Filter(Model):
             try:
                 regex = re.compile(self.pattern)
             except re.error:
-                pass  # If compilation fails, don't bother validating the mapping string.
+                # If compilation fails, don't bother validating the mapping
+                # string.
+                pass
             else:
                 matches = _BACK_REFERENCE.findall(self.mapping)
                 references = map(int, matches)
@@ -577,7 +557,7 @@ class Filter(Model):
         return self.pattern
 
     class Meta(object):
-        """Metadata options for the Filter model class."""
+        """Metadata options for the ``Filter`` model class."""
 
         order_with_respect_to = "source"
 
@@ -586,8 +566,8 @@ class Update(Model):
     """
     Records updates made to the repository for each dataset.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     dataset = related.ForeignKey(Dataset, related_name="updates", related_query_name="update")
@@ -621,8 +601,8 @@ class Revision(Model):
     """
     Represents revisions of files maintained by this repository.
 
-    This class overrides the `~Model.get_absolute_url` method of the `Model`
-    class.
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
     """
 
     file = related.ForeignKey(File, related_name='revisions', related_query_name='revision')
@@ -660,7 +640,8 @@ class Revision(Model):
 
     def get_absolute_url(self):
         """
-        Return a URL that can be used to obtain more details about this revision.
+        Return a URL that can be used to obtain more details about this
+        revision.
         """
         # TODO: Implement
         # return reverse('bdr.backend:revision-detail',
@@ -669,7 +650,7 @@ class Revision(Model):
         raise NotImplementedError
 
     class Meta(object):
-        """Metadata options for the Revision model class."""
+        """Metadata options for the ``Revision`` model class."""
 
         unique_together = (('file', 'number'),)
         """Require that each revision number is unique for revisions of any given file."""

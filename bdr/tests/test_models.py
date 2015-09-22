@@ -362,7 +362,8 @@ class SourceTest(TestCase):
             return FakeArchive(archive_file, path, file_names)
         source.archive_factory = _archive_factory
 
-        self.assertListEqual([file.name for file in source.files()], expected_files)
+        files, _, _ = source.files()
+        self.assertListEqual([file.name for file in files], expected_files)
 
     def test_no_matching_files_returns_empty_list(self):
         update = create_update()
@@ -379,7 +380,8 @@ class SourceTest(TestCase):
             return FakeArchive(archive_file, path, file_names)
         source.archive_factory = _archive_factory
 
-        self.assertListEqual(source.files(), expected_files)
+        files, _, _ = source.files()
+        self.assertListEqual(files, expected_files)
 
     def test_matching_files_returns_mapped_list(self):
         update = create_update()
@@ -396,7 +398,8 @@ class SourceTest(TestCase):
             return FakeArchive(archive_file, path, file_names)
         source.archive_factory = _archive_factory
 
-        self.assertListEqual([file.name for file in source.files()], expected_files)
+        files, _, _ = source.files()
+        self.assertListEqual([file.name for file in files], expected_files)
 
 
 class FakeArchive(Archive):
