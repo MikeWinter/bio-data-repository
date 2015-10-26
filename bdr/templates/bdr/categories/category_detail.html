@@ -35,7 +35,7 @@
 
     <section>
         <h2>Datasets</h2>
-    {% if category.datasets.exists %}
+    {% if datasets.exists %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -46,7 +46,7 @@
             </thead>
 
             <tbody>
-            {% for dataset in category.datasets.all %}
+            {% for dataset in datasets %}
                 <tr>
                     <th><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></th>
                     <td>{{ dataset.files.count }}</td>
@@ -59,6 +59,8 @@
             {% endfor %}
             </tbody>
         </table>
+
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
     {% else %}
         <p>There are no datasets in this category.</p>
     {% endif %}

@@ -48,7 +48,7 @@
         {% endfor %}
         </table>
 
-        {% bootstrap_pagination page_obj size="small" %}
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
     {% else %}
         <p>No categories have been added yet.</p>
     {% endif %}
