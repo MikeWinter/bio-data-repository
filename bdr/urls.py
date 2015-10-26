@@ -8,13 +8,15 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 from django.conf.urls import include, patterns, url
 
 from bdr.frontend.views import formats, revisions
-
 from views import HomeView, SearchView, AboutView, LegalView, search_script
 from views.categories import (CategoryListView, CategoryDetailView, CategoryAddView,
                               CategoryEditView, CategoryDeleteView)
 from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView, DatasetEditView,
                             DatasetDeleteView)
-from views.files import FileDetailView, FileUploadView, FileEditView, FileDeleteView
+from views.files import FileListView, FileDetailView, FileUploadView, FileEditView, FileDeleteView
+from views.filters import FilterAddView, FilterEditView, FilterDeleteView
+from views.sources import (SourceListView, SourceDetailView, SourceAddView, SourceEditView,
+                           SourceDeleteView)
 from views.tags import TagListView, TagDetailView, TagAddView, TagEditView, TagDeleteView
 
 __all__ = []
@@ -78,6 +80,7 @@ urlpatterns = patterns(
 
 
         # Files
+        url(r'^files/$', FileListView.as_view(), name='files'),
         url(r'^files/upload$', FileUploadView.as_view(), name='upload-file'),
         url(r'^files/(?P<filename>[\w_-]+)-(?P<fpk>\d+)/', include(patterns(
             '',
@@ -98,6 +101,25 @@ urlpatterns = patterns(
             # ))),
         ))),
 
+
+        # Sources
+        url(r'^sources/$', SourceListView.as_view(), name='sources'),
+        url(r'^sources/add$', SourceAddView.as_view(), name='add-source'),
+        url(r'^sources/(?P<source>\d+)/', include(patterns(
+            '',
+            url(r'^view$', SourceDetailView.as_view(), name='view-source'),
+            url(r'^edit$', SourceEditView.as_view(), name='edit-source'),
+            url(r'^delete$', SourceDeleteView.as_view(), name='delete-source'),
+
+
+            # Filters
+            url(r'^filters/add$', FilterAddView.as_view(), name='add-filter'),
+            url(r'^filters/(?P<filter>\d+)/', include(patterns(
+                '',
+                url(r'^edit$', FilterEditView.as_view(), name='edit-filter'),
+                url(r'^delete$', FilterDeleteView.as_view(), name='delete-filter'),
+            )))
+        ))),
     ))),
 
     url(r'^formats/$', formats.FormatListView.as_view(), name='formats'),

@@ -1,0 +1,99 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}Sources – {{ dataset.name }}{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <h3>Dataset</h3>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ dataset.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+        </ul>
+
+        <h4>Sources</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active" role="presentation"><a href="{% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "plus" %} Add source
+            </a></li>
+        </ul>
+
+        <h4>Files</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "upload" %} Upload file
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li class="active">Sources</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Sources <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></h1>
+    </header>
+
+    <section>
+    {% if sources.exists %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <td></td>
+                    <th class="col-xs-6">URL</th>
+                    <th class="col-xs-2">Update period (h)</th>
+                    <th class="col-xs-3">Last checked</th>
+                    <th class="col-xs-1"><span class="sr-only">Operations</span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for source in sources %}
+                <tr>
+                    <td><a href="{% url 'bdr:view-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="View details">{% bootstrap_icon "chevron-right" %}</a></td>
+                    <td class="truncated">{{ source.url }}</td>
+                    <td>{{ source.period }}</td>
+                {% if source.checked_at %}
+                    <td title="Checked at {{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>
+                {% else %}
+                    <td title="Never checked">Never</td>
+                {% endif %}
+                    <td class="text-right text-nowrap" role="navigation">
+                        <ul class="list-inline">
+                            <li><a href="{% url 'bdr:edit-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>
+                            <li><a href="{% url 'bdr:delete-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="Delete">{% bootstrap_icon "remove" %}</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
+    {% else %}
+        <p>No sources have been added to this dataset. <a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">Add a source</a> to enable automatic updates.</p>
+    {% endif %}
+    </section>
+{% endblock %}

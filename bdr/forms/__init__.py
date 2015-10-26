@@ -7,6 +7,8 @@ This following classes are exported:
     CategoryForm
     DatasetForm
     FileForm
+    FilterForm
+    SourceForm
     TagForm
     SearchForm
     UploadForm
@@ -18,9 +20,10 @@ from django.forms.widgets import FileInput, HiddenInput, Textarea, TextInput
 from django.core.urlresolvers import reverse_lazy
 
 from .fields import SelectableCharField
-from ..models import Category, Dataset, File, Tag
+from ..models import Category, Dataset, File, Filter, Source, Tag
 
-__all__ = ["CategoryForm", "DatasetForm", "FileForm", "TagForm", "SearchForm", "UploadForm"]
+__all__ = ["CategoryForm", "DatasetForm", "FileForm", "FilterForm", "SourceForm", "TagForm",
+           "SearchForm", "UploadForm"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -87,6 +90,39 @@ class FileForm(ModelForm):
         """Configuration options for the file form."""
 
         model = File
+        fields = "__all__"
+
+
+class FilterForm(ModelForm):
+    """
+    Displays the properties of a filter to facilitate creating new, and
+    editing existing, entries.
+    """
+
+    class Media(object):
+        """
+        Declares resources that should be included when this form is displayed.
+        """
+
+        js = ("bdr/js/filter-test.js",)
+
+    class Meta(object):
+        """Configuration options for the filter form."""
+
+        model = Filter
+        fields = "__all__"
+
+
+class SourceForm(ModelForm):
+    """
+    Displays the properties of a source to facilitate creating new, and
+    editing existing, entries.
+    """
+
+    class Meta(object):
+        """Configuration options for the source form."""
+
+        model = Source
         fields = "__all__"
 
 
