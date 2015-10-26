@@ -43,6 +43,35 @@ __license__ = """
     """
 
 
+class FileListView(SearchableViewMixin, ListView):
+    """Lists files associated with a dataset."""
+
+    context_object_name = "files"
+    model = File
+    paginate_by = 10
+    paginate_orphans = 2
+    template_name = "bdr/files/file_list.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Return the template context.
+
+        This method returns a dictionary containing the variables for rendering
+        this view. Available template context variables are:
+
+         * ``dataset`` - the parent dataset model
+         * ``files`` - the files associated with the parent dataset
+
+        :param kwargs: A mapping of extra data available for use in templates.
+        :type kwargs: dict of str
+        :return: A dictionary of template variables and values.
+        :rtype: dict of str
+        """
+        context = super(FileListView, self).get_context_data(**kwargs)
+        context["dataset"] = get_object_or_404(Dataset, pk=self.kwargs["dpk"])
+        return context
+
+
 class FileDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     """
     This view displays information about a given file, including a list of its
@@ -51,6 +80,7 @@ class FileDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     This class overrides the get and get_queryset methods of the `~ListView`
     and `~SingleObjectMixin` classes, respectively.
     """
+
     model = File
     """Designate the model class used for obtaining data."""
     paginate_by = 10
@@ -77,6 +107,27 @@ class FileDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         """
         self.object = self.get_object(queryset=self.model.objects.all())
         return super(FileDetailView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Return the template context for this view.
+
+        This method returns a dictionary containing variables for the rendered
+        view. Available template context variables are:
+
+         * ``dataset`` - the parent dataset model
+         * ``file`` - this file model
+         * ``revisions`` - the revisions of this file
+
+        :param kwargs: A mapping of extra data available for use in templates.
+        :type kwargs: dict of str
+        :return: A dictionary of template variables and values.
+        :rtype: dict of str
+        """
+        context = super(FileDetailView, self).get_context_data(**kwargs)
+        context["dataset"] = self.object.dataset
+        context["revisions"] = context["object_list"]
+        return context
 
     def get_queryset(self):
         """
@@ -173,12 +224,12 @@ class FileUploadView(SearchableViewMixin, SessionWizardView):
         """
         Return the template context for a step.
 
-        This method returns a dictionary containing the rendered form step.
-        Available template context variables are:
+        This method returns a dictionary containing variables for the rendered
+        form step. Available template context variables are:
 
          * all extra data stored in the storage backend
-         * `wizard` - a dictionary representation of the wizard instance
-         * `dataset` - the parent dataset model
+         * ``wizard`` - a dictionary representation of the wizard instance
+         * ``dataset`` - the parent dataset model
 
         :param form: The form to display in this step.
         :type form: django.forms.Form
@@ -241,6 +292,24 @@ class FileEditView(SearchableViewMixin, UpdateView):
     pk_url_kwarg = "fpk"
     template_name = "bdr/files/file_edit.html"
 
+    def get_context_data(self, **kwargs):
+        """
+        Return the template context.
+
+        This method returns a dictionary containing the variables for rendering
+        this view. Available template context variables are:
+
+         * ``dataset`` - the parent dataset model
+
+        :param kwargs: A mapping of extra data available for use in templates.
+        :type kwargs: dict of str
+        :return: A dictionary of template variables and values.
+        :rtype: dict of str
+        """
+        context = super(FileEditView, self).get_context_data(**kwargs)
+        context["dataset"] = get_object_or_404(Dataset, pk=self.kwargs["dpk"])
+        return context
+
 
 class FileDeleteView(SearchableViewMixin, DeleteView):
     """This view is used to confirm deletion of an existing file."""
@@ -248,6 +317,24 @@ class FileDeleteView(SearchableViewMixin, DeleteView):
     model = File
     pk_url_kwarg = "fpk"
     template_name = "bdr/files/file_confirm_delete.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Return the template context.
+
+        This method returns a dictionary containing the variables for rendering
+        this view. Available template context variables are:
+
+         * ``dataset`` - the parent dataset model
+
+        :param kwargs: A mapping of extra data available for use in templates.
+        :type kwargs: dict of str
+        :return: A dictionary of template variables and values.
+        :rtype: dict of str
+        """
+        context = super(FileDeleteView, self).get_context_data(**kwargs)
+        context["dataset"] = get_object_or_404(Dataset, pk=self.kwargs["dpk"])
+        return context
 
     def get_success_url(self):
         """

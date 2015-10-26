@@ -1,7 +1,7 @@
 {% extends "bdr/base-sidebar.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }}){% endblock %}
+{% block title %}Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }}) – {{ dataset.name }}{% endblock %}
 
 {% block stylesheets %}
     {{ wizard.form.media.css }}
@@ -24,8 +24,7 @@
             <li role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "remove" %} Delete
             </a></li>
-            {# TODO: Change route for adding sources #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
+            <li role="presentation"><a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "plus" %} Add source
             </a></li>
             <li class="active" role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
@@ -36,12 +35,23 @@
 {% endblock %}
 
 {% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">Files</a></li>
+            <li class="active">Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})</li>
+        </ol>
+    </nav>
+
     <header class="page-header">
         <h1>
             Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
             <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>
         </h1>
     </header>
+
     <section>
         <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name %}" method="post">
             {% csrf_token %}
