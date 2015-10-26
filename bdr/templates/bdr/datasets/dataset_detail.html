@@ -7,6 +7,7 @@
 {% block sidebar %}
     <nav>
         <h2>Actions</h2>
+        <h3>Dataset</h3>
         <ul class="nav nav-pills nav-stacked">
             <li class="active" role="presentation"><a href="{{ dataset.get_absolute_url }}">
                 {% bootstrap_icon "file" %} View
@@ -17,9 +18,22 @@
             <li role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "remove" %} Delete
             </a></li>
-            {# TODO: Change route for adding sources #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=object.slug %}{% endcomment %}">
+        </ul>
+
+        <h4>Sources</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "plus" %} Add source
+            </a></li>
+        </ul>
+
+        <h4>Files</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
             </a></li>
             <li role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "upload" %} Upload file
@@ -40,7 +54,7 @@
     <header class="page-header">
         <h1>
             {{ dataset.name }}
-        {% for tag in dataset.tags.all %}
+        {% for tag in tags %}
             <a class="label label-default tag" href="{{ tag.get_absolute_url }}">#{{ tag }}</a>
         {% endfor %}
         </h1>
@@ -57,7 +71,7 @@
                 <th>Categories</th>
                 <td>
                     <ul class="list-inline">
-                    {% for category in dataset.categories.all %}
+                    {% for category in categories %}
                         <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
                     {% empty %}
                         <li>None</li>
@@ -74,78 +88,65 @@
 
     <section>
         <h2>Sources</h2>
-    {% if dataset.sources.exists %}
+    {% if sources.exists %}
         <table class="table table-condensed">
             <thead>
                 <tr>
-                    <th>URL</th>
-                    <th>Update period (h)</th>
-                    <th>Last checked</th>
-                    <td class="sr-only">Operations</td>
+                    <td></td>
+                    <th class="col-xs-6">URL</th>
+                    <th class="col-xs-2">Update period (h)</th>
+                    <th class="col-xs-3">Last checked</th>
+                    <th class="col-xs-1"><span class="sr-only">Operations</span></th>
                 </tr>
             </thead>
 
             <tbody>
-            {% for source in dataset.sources %}
+            {% for source in sources.all|slice:":5" %}
                 <tr>
+                    <td><a href="{% url 'bdr:view-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="View details">{% bootstrap_icon "chevron-right" %}</a></td>
                     <td class="truncated">{{ source.url }}</td>
                     <td>{{ source.period }}</td>
+                {% if source.checked_at %}
                     <td title="Checked at {{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>
-                    <td></td>
+                {% else %}
+                    <td title="Never checked">Never</td>
+                {% endif %}
+                    <td class="text-right text-nowrap" role="navigation">
+                        <ul class="list-inline">
+                            <li><a href="{% url 'bdr:edit-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>
+                            <li><a href="{% url 'bdr:delete-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="Delete">{% bootstrap_icon "remove" %}</a></li>
+                        </ul>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="5"><a href="{% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify %}">Show all&hellip;</a></td>
+                </tr>
+            </tfoot>
         </table>
     {% else %}
-        {# TODO: Change route for adding sources #}
-        <p>No sources have been added to this dataset. <a href="{% comment %}{% url 'bdr:add-source' %}{% endcomment %}">Add a source</a> to enable automatic updates.</p>
+        <p>No sources have been added to this dataset. <a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">Add a source</a> to enable automatic updates.</p>
     {% endif %}
     </section>
-{#        <div class="panel panel-default">#}
-{#            <div class="panel-heading" data-toggle="collapse" data-target="#source" aria-controls="source"#}
-{#                 aria-expanded="{% if dataset.update_uri %}true{% else %}false{% endif %}">Source <span#}
-{#                    class="caret"></span></div>#}
-{#            <div class="panel-body container-fluid form-horizontal collapse{% if object.update_uri %} in{% endif %}"#}
-{#                 id="source">#}
-{#                <div class="form-group row">#}
-{#                    <label class="control-label col-sm-3">Address:</label>#}
-{#                    <div class="col-sm-9">#}
-{#                        <p class="form-control-static">{{ object.update_uri|default:'None' }}</p>#}
-{#                    </div>#}
-{#                </div>#}
-{#                {% if object.update_uri %}#}
-{#                <div class="form-group row">#}
-{#                    <label class="control-label col-sm-3">User:</label>#}
-{#                    <div class="col-sm-9">#}
-{#                        <p class="form-control-static">{{ object.update_username|default:'None' }}</p>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="form-group row">#}
-{#                    <label class="control-label col-sm-3">Update period:</label>#}
-{#                    <div class="col-sm-9">#}
-{#                        <p class="form-control-static">#}
-{#                            {% if object.update_frequency %}{{ object.update_frequency }} minutes{% else %}#}
-{#                                Disabled{% endif %}</p>#}
-{#                    </div>#}
-{#                </div>#}
-{#                {% endif %}#}
-{#            </div>#}
-{#        </div>#}
 
     <section>
         <h2>Files</h2>
-    {% if page_obj.object_list %}
+    {% if files.exists %}
         <table class="table table-condensed">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Revisions</th>
-                    <td></td>
+                    <th class="col-xs-6" colspan="2">Name</th>
+                    <th class="col-xs-2">Revisions</th>
+                    <th class="col-xs-3">Last modified</th>
+                    <th class="col-xs-1"><span class="sr-only">Operations</span></th>
                 </tr>
             </thead>
 
             <tbody>
-            {% for file in page_obj.object_list %}
+            {% for file in files.all|slice:":5" %}
                 <tr>
                     <th>
                         <a href="{{ file.get_absolute_url }}">{{ file.name }}</a>
@@ -157,18 +158,33 @@
                         </a>
                     {% endif %}
                     </th>
-                    <td>{{ file.revisions.count }}</td>
                     <td class="text-right">
                     {% for tag in file.tags.all %}
                         <a class="small label label-default" href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a>
                     {% endfor %}
                     </td>
+                    <td>{{ file.revisions.count }}</td>
+                {% if file.revisions.exists and file.revisions.last.update.modified_at %}
+                    <td title="Updated at {{ file.revisions.last.update.modified_at }}">{{ file.revisions.last.update.modified_at|naturaltime }}</td>
+                {% else %}
+                    <td>Unknown</td>
+                {% endif %}
+                    <td class="text-right text-nowrap" role="navigation">
+                        <ul class="list-inline">
+                            <li><a href="{% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>
+                            <li><a href="{% url 'bdr:delete-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" title="Delete">{% bootstrap_icon "remove" %}</a></li>
+                        </ul>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
-        </table>
 
-        {% bootstrap_pagination page_obj size="small" %}
+            <tfoot>
+                <tr>
+                    <td colspan="5"><a href="">Show all&hellip;</a></td>
+                </tr>
+            </tfoot>
+        </table>
     {% else %}
         <p>There are no files in this dataset. <a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">Upload a file</a> to manually add its contents to the repository.</p>
     {% endif %}

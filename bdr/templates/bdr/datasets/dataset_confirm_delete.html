@@ -3,9 +3,18 @@
 
 {% block title %}Delete {{ dataset.name }}?{% endblock %}
 
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
 {% block sidebar %}
     <nav>
         <h2>Actions</h2>
+        <h3>Dataset</h3>
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation"><a href="{{ dataset.get_absolute_url }}">
                 {% bootstrap_icon "file" %} View
@@ -16,9 +25,22 @@
             <li class="active" role="presentation"><a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "remove" %} Delete
             </a></li>
-            {# TODO: Change route for adding sources #}
-            <li role="presentation"><a href="{% comment %}{% url 'bdr.frontend:file-add' slug=form.initial.slug %}{% endcomment %}">
+        </ul>
+
+        <h4>Sources</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "plus" %} Add source
+            </a></li>
+        </ul>
+
+        <h4>Files</h4>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "th-list" %} List
             </a></li>
             <li role="presentation"><a href="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}">
                 {% bootstrap_icon "upload" %} Upload file

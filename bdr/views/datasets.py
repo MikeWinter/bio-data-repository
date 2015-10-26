@@ -7,8 +7,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
-from django.views.generic import ListView, UpdateView, CreateView, DeleteView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import DetailView, ListView, UpdateView, CreateView, DeleteView
 
 from . import SearchableViewMixin
 from ..forms import DatasetForm
@@ -35,49 +34,42 @@ __license__ = """
     """
 
 
-class DatasetDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
+class DatasetDetailView(SearchableViewMixin, DetailView):
     """
     This view displays the details of a dataset, including a list of its files
     and links to the most recent revision of each file.
-
-    This class overrides the get and get_queryset methods of the `~ListView`
-    and `~SingleObjectMixin` classes, respectively.
     """
 
     model = Dataset
-    paginate_by = 10
-    paginate_orphans = 2
     pk_url_kwarg = "dpk"
     template_name = "bdr/datasets/dataset_detail.html"
 
-    def __init__(self, **kwargs):
-        super(DatasetDetailView, self).__init__(**kwargs)
-        self.object = None
-
-    def get(self, request, *args, **kwargs):
+    def get_context_data(self, **kwargs):
         """
-        Send a response for HTTP GET requests sent to this view.
+        Return the template context for this view.
 
-        :param request: The request received by the view.
-        :type request: django.http.HttpRequest
-        :param args: The positional arguments captured from the route for this
-                     view.
-        :param kwargs: The named arguments captured from the route for this
-                       view.
-        :return: The response.
-        :rtype: django.http.HttpResponseBase
-        """
-        self.object = self.get_object(queryset=self.model.objects.all())
-        return super(DatasetDetailView, self).get(request, *args, **kwargs)
+        This method returns a dictionary containing variables for the rendered
+        view. Available template context variables are:
 
-    def get_queryset(self):
-        """
-        Get the list of files associated with this dataset.
+         * ``categories`` - the categories in which this dataset has been
+                            placed
+         * ``dataset`` - the dataset model
+         * ``files`` - a subset of the files that constitute this dataset
+         * ``sources`` - a subset of the data sources associated with this
+                         dataset
+         * ``tags`` - the tags annotating this dataset
 
-        :return: The files associated with this dataset.
-        :rtype: ``django.db.models.query.QuerySet`` | list
+        :param kwargs: A mapping of extra data available for use in templates.
+        :type kwargs: dict of str
+        :return: A dictionary of template variables and values.
+        :rtype: dict of str
         """
-        return self.object.files.all()
+        context = super(DatasetDetailView, self).get_context_data(**kwargs)
+        context["categories"] = self.object.categories.all()
+        context["files"] = self.object.files.all()[:5]
+        context["sources"] = self.object.sources.all()[:5]
+        context["tags"] = self.object.tags.all()
+        return context
 
 
 class DatasetListView(SearchableViewMixin, ListView):

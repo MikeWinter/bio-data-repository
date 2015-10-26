@@ -30,7 +30,7 @@
     </header>
 
     <section>
-    {% if datasets %}
+    {% if datasets.exists %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -69,7 +69,7 @@
         {% endfor %}
         </table>
 
-        {% bootstrap_pagination page_obj size="small" %}
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
     {% else %}
         <p>No datasets have been added yet.</p>
     {% endif %}
