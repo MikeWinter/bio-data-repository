@@ -8,11 +8,11 @@
         {% include "bdr/fragments/category_menu_block.html" with categories=category_list only %}
         {% include "bdr/fragments/dataset_menu_block.html" with datasets=dataset_list only %}
 
-        {% if not category_list and not dataset_list %}
+    {% if not category_list and not dataset_list %}
         <p>No datasets have been added yet.</p>
         <p>To <a href="{% url "bdr:add-dataset" %}">add a dataset</a>, go to the
             <a href="{% url "bdr:datasets" %}">datasets management page</a>.</p>
-        {% endif %}
+    {% endif %}
     </nav>
 {% endblock %}
 
@@ -34,7 +34,7 @@
 
     <section>
         <h2>Recent Updates</h2>
-        {% if update_list %}
+    {% if update_list %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -60,9 +60,9 @@
             {% endfor %}
             </tbody>
         </table>
-        {% else %}
+    {% else %}
         <p>No datasets have been updated recently.</p>
-        {% endif %}
+    {% endif %}
     </section>
 {% endblock %}
 

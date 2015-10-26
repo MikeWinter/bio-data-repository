@@ -3,6 +3,14 @@
 
 {% block title %}Delete #{{ tag.name }}?{% endblock %}
 
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
 {% block sidebar %}
     <nav>
         <h2>Actions</h2>
