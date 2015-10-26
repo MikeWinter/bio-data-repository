@@ -247,7 +247,7 @@ class File(Model):
     dataset = related.ForeignKey(Dataset, editable=False, related_name="files",
                                  related_query_name="file")
     """The dataset to which this file belongs."""
-    # TODO: Enable default format
+    # TODO: Enable default format to files
     # default_format = related.ForeignKey(Format, related_name='datafiles',
     #                                     related_query_name='datafile')
     """The format of this file."""
@@ -295,16 +295,18 @@ class Source(Model):
     :py:class:`Model` class.
     """
 
-    url = fields.URLField()
+    url = fields.URLField(verbose_name="URL")
     """A URL specifying the update source for files in this dataset."""
-    dataset = related.ForeignKey(Dataset, editable=False, related_name='sources',
-                                 related_query_name='source')
+    dataset = related.ForeignKey(Dataset, editable=False, related_name="sources",
+                                 related_query_name="source")
     """The dataset to which this update source relates."""
     username = fields.CharField(max_length=50, blank=True)
     """An optional user name for authentication."""
     password = fields.CharField(max_length=64, blank=True)
     """An optional password for authentication."""
-    period = fields.PositiveSmallIntegerField(default=0)
+    period = fields.PositiveSmallIntegerField(default=0, verbose_name="Update period",
+                                              help_text="The time, in hours, between update checks."
+                                                        " If zero, automatic updates are disabled.")
     """
     The time, in hours, between updates using this source; skipped if zero (0).
     """
@@ -324,6 +326,13 @@ class Source(Model):
     def __init__(self, *args, **kwargs):
         super(Source, self).__init__(*args, **kwargs)
         self._provider = None
+
+    def get_absolute_url(self):
+        """
+        Return a URL that can be used to obtain more details about this source.
+        """
+        return reverse("bdr:view-source", kwargs={"source": self.pk, "dpk": self.dataset.pk,
+                                                  "dataset": slugify(unicode(self.dataset.name))})
 
     def files(self):
         """
@@ -485,7 +494,8 @@ class Filter(Model):
     :py:class:`Model` class.
     """
 
-    pattern = fields.CharField(max_length=100, validators=[_validate_regex])
+    pattern = fields.CharField(max_length=100, verbose_name="Matching pattern",
+                               validators=[_validate_regex])
     """
     A regular expression defining file names accepted by this filter. Capture
     groups can be referenced by the mapping specification.
@@ -495,7 +505,7 @@ class Filter(Model):
     If True, a file is accepted by this filter if the name does not match the
     pattern expression.
     """
-    mapping = fields.CharField(max_length=100, blank=True)
+    mapping = fields.CharField(max_length=100, blank=True, verbose_name="Replacement pattern")
     """
     A string which is used to replace the name of a matching data file. Part of
     the original name can be included by enclosing that part of the name in
@@ -615,7 +625,7 @@ class Revision(Model):
     """The size, in bytes, of this revision."""
     update = related.ForeignKey(Update, related_name="revisions", related_query_name="revision")
     """The update that caused the addition of this revision."""
-    # TODO: Add format
+    # TODO: Add revision format
     # format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision')
     # """The format of this file."""
     tags = related.ManyToManyField(Tag, blank=True, related_name='revisions',
@@ -643,7 +653,7 @@ class Revision(Model):
         Return a URL that can be used to obtain more details about this
         revision.
         """
-        # TODO: Implement
+        # TODO: Implement revision URL
         # return reverse('bdr.backend:revision-detail',
         #                kwargs={'ds': self.datafile.dataset.slug, 'fn': self.datafile.name,
         #                        'rev': self.level})
