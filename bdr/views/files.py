@@ -205,7 +205,8 @@ class FileUploadView(SearchableViewMixin, SessionWizardView):
                 member = archive[file_mapping["real_name"]]  # :type: Member
                 data = RemoteFile(member.file, file_mapping["mapped_name"], member.size,
                                   member.mtime)
-                self.dataset.add_file(data, update)
+                default_format = file_mapping["format"]  # :type: Format
+                self.dataset.add_file(data, update, default_format)
 
         try:
             # TODO: Create management command to periodically clean out the

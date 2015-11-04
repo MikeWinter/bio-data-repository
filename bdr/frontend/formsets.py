@@ -1,18 +1,7 @@
 from django.core.exceptions import ValidationError
-from django.forms.formsets import TOTAL_FORM_COUNT
-from django.forms.models import inlineformset_factory, modelformset_factory
+from django.forms.models import modelformset_factory
 
 from bdr.frontend import forms, models
-
-
-class FormatFieldInlineFormSet(inlineformset_factory(models.Format, models.FormatField, forms.FormatFieldForm)):
-    def __init__(self, *args, **kwargs):
-        super(FormatFieldInlineFormSet, self).__init__(*args, **kwargs)
-        self.data = self.data.copy()
-
-    def add_extra_form(self):
-        field_name = self.add_prefix(TOTAL_FORM_COUNT)
-        self.data[field_name] = int(self.data[field_name]) + 1
 
 
 class FieldSelectionListFormSet(modelformset_factory(models.FormatField, forms.FormatFieldSelectionForm, extra=0)):

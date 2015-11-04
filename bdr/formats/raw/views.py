@@ -1,3 +1,6 @@
+from ...views.formats import FormatDetailView
+
+__all__ = ["Record", "Reader", "Writer"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -17,17 +20,10 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from django.forms import fields, widgets
-from django.forms.models import ModelForm
 
-from . import models
+class RawFormatDetailView(FormatDetailView):
+    """
+    This view indicates to the user that this format type cannot be modified.
+    """
 
-
-class FormatFieldSelectionForm(ModelForm):
-    selected = fields.BooleanField(initial=False, required=False)
-
-    class Meta(object):
-        model = models.FormatField
-        exclude = ['format', 'ordinal']
-        widgets = {'name': widgets.HiddenInput(),
-                   'is_key': widgets.HiddenInput()}
+    template_name = "bdr/formats/raw/raw_detail.html"

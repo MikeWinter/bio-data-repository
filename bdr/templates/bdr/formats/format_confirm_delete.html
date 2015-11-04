@@ -1,0 +1,55 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete {{ format.name }}? – Formats{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ format.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+        {% if format.editable %}
+            <li role="presentation"><a href="{% url 'bdr:edit-format' pk=format.pk %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+        {% endif %}
+        {% if format.deletable %}
+            <li class="active" role="presentation"><a href="{% url 'bdr:delete-format' pk=format.pk %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+        {% endif %}
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:formats' %}">Formats</a></li>
+            <li class="active">{{ format.name }}</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>
+            Delete {{ format.name }}?
+        </h1>
+    </header>
+
+    <section>
+        <form class="form-inline" action="{% url 'bdr:delete-format' pk=format.pk %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the <em>{{ format.name }}</em> format?</p>
+            <p class="text-danger help-block">This action is irreversible! Any files or revisions using this
+                format will be set to the default (raw) format.</p>
+
+            <div class="form-group">
+                {% bootstrap_button button_type="submit" content="Delete" button_class="btn-danger" %}
+                {% bootstrap_button content="Cancel" button_class="btn-default" href=file.get_absolute_url %}
+            </div>
+        </form>
+    </section>
+{% endblock %}

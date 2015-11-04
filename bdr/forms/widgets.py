@@ -2,7 +2,7 @@
 This module defines customised widgets for use with forms in this application.
 """
 
-from django.forms.widgets import CheckboxInput, MultiWidget, TextInput
+from django.forms.widgets import CheckboxInput, MultiWidget, Select, TextInput
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -83,3 +83,66 @@ class SelectableTextInput(MultiWidget):
             {1}
         </div>
         """.format(*rendered_widgets)
+
+
+class ComboTextInput(MultiWidget):
+    """
+    This widget combines a select menu with a text box to create a list of
+    suggested values and the ability to define a custom value.
+
+    This widget is intended to be used with the Bootstrap CSS framework.
+    """
+
+    def __init__(self, choices, default="", attrs=None):
+        if attrs is None:
+            attrs = {}
+        attrs["data-type"] = "combobox"
+        self._choices = choices
+        self._default = default
+        super(ComboTextInput, self).__init__([Select(choices=self._choices), TextInput], attrs)
+
+    def decompress(self, value):
+        """
+        Return a list of decompressed values for the given compressed value.
+
+        The first element is the selected, suggested value. The second element
+        is the customised value.
+
+        :param value: A compressed value to be represented by this widget.
+        :type value: str | unicode
+        :return: The decompressed interpretation of the value.
+        :rtype: list of (bool, str | unicode)
+        """
+        if value is None:
+            return [self._default, ""]
+        if value == "":
+            return ["None", ""]
+        for val, txt in self._choices:
+            if value == val:
+                return [value, ""]
+        return ["", value]
+
+    def value_from_datadict(self, data, files, name):
+        """
+        Return the value of this widget derived from the submitted data
+        dictionaries.
+
+        :param data: A dictionary of strings submitted by the user via a form.
+        :type data: dict of (str | unicode)
+        :param files: A dictionary of files uploaded by the user.
+        :type files: dict of str
+        :param name: The key name of this widget.
+        :type name: str
+        :return: The value of this widget.
+        :rtype: str | unicode
+        """
+        suggested, custom = super(ComboTextInput, self).value_from_datadict(data, files, name)
+        value = suggested if suggested != "" else custom
+        return value if value != "None" else ""
+
+    class Media(object):
+        """
+        Declares resources that should be included when this form is displayed.
+        """
+
+        js = ("bdr/js/combo.js",)

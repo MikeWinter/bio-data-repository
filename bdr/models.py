@@ -30,12 +30,14 @@ import re
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-from django.db.models import Model, fields
+from django.db.models import Model, fields, SET_DEFAULT
 from django.db.models.fields import files, related
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils import importlib
 from django.utils.text import slugify
 
+from .formats import get_entry_point
 from .utils import utc, RemoteFile
 from .utils.archives import Archive
 from .utils.storage import delta_storage, upload_path
@@ -97,7 +99,7 @@ class Category(Model):
         return reverse("bdr:view-category", kwargs={"pk": self.pk,
                                                     "name": slugify(unicode(self.name))})
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta(object):
@@ -138,11 +140,96 @@ class Tag(Model):
         """
         return [field.name for field in cls._meta.concrete_fields]
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta(object):
         """Metadata options for the ``Tag`` model class."""
+
+        ordering = ["name"]
+
+
+class Format(Model):
+    """
+    Represents the format of files stored in the repository.
+
+    This class overrides the :py:meth:`~Model.get_absolute_url` method of the
+    :py:class:`Model` class.
+    """
+
+    name = fields.CharField(max_length=50, unique=True, blank=False)
+    """The name of the format."""
+    entry_point_name = fields.CharField(max_length=150, editable=False)
+    """
+    The name of the plugin that provides the functionality related to this
+    format.
+    """
+    metadata = fields.BinaryField(blank=True)
+    """Parser-specific information for this format."""
+
+    @property
+    def deletable(self):
+        return "delete" in self.views
+
+    @property
+    def editable(self):
+        return "edit" in self.views
+
+    @property
+    def realisable(self):
+        return "create" in self.views
+
+    @property
+    def views(self):
+        return get_entry_point(self.entry_point_name).views
+
+    def reader(self, stream):
+        """
+        Return a :py:class:`Reader` over the given stream using this format.
+
+        :param stream: A readable data stream.
+        :type stream: io.IOBase
+        :return: A suitable ``Reader`` instance.
+        :rtype: bdr.formats.Reader
+        :raise ImportError: if this format does not have an associated Reader
+                            class.
+        """
+        return self._get_type("Reader")(stream, self.metadata)
+
+    def writer(self, stream, field_names):
+        """
+        Return a :py:class:`Writer` over the given stream using this format.
+
+        :param stream: A writable data stream.
+        :type stream: io.IOBase
+        :param field_names: An iterable that contains the names of fields to be
+                            written to ``stream``.
+        :type field_names: list of str | tuple of str
+        :return: A suitable ``Writer`` instance.
+        :rtype: bdr.formats.Writer
+        :raise ImportError: if this format does not have an associated Writer
+                            class.
+        """
+        return self._get_type("Writer")(stream, self.metadata, field_names)
+
+    def get_absolute_url(self):
+        """
+        Return a URL that can be used to obtain more details about this format.
+        """
+        return reverse("bdr:view-format", kwargs={"pk": self.pk})
+
+    def _get_type(self, class_name):
+        module = importlib.import_module(self.module)
+        type_object = getattr(module, class_name)
+        if not type_object:
+            raise ImportError("Appropriate module cannot be found (:s).".format(self.module))
+        return type_object
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta(object):
+        """Metadata options for the ``Format`` model class."""
 
         ordering = ["name"]
 
@@ -185,7 +272,7 @@ class Dataset(Model):
                     self.add_file(source_file, update)
 
     # noinspection PyShadowingBuiltins
-    def add_file(self, file, update):
+    def add_file(self, file, update, format=None):
         """
         Add the given file to this dataset and associate it with ``update``.
 
@@ -197,9 +284,12 @@ class Dataset(Model):
         :param update: The update with which this addition should be
                        associated.
         :type update: Update
+        :param format: (Optional) The default format for revisions of this
+                       file.
+        :type format: Format | None
         """
-        # TODO: Add default format (raw) to defaults
-        instance = self.files.get_or_create(name=file.name)[0]
+        file_defaults = {"default_format": format}
+        instance = self.files.get_or_create(name=file.name, defaults=file_defaults)[0]
         instance.revisions.create(data=file, size=file.size, update=update)
 
     def get_absolute_url(self):
@@ -220,7 +310,7 @@ class Dataset(Model):
         """
         return [field.name for field in cls._meta.concrete_fields]
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta(object):
@@ -247,10 +337,9 @@ class File(Model):
     dataset = related.ForeignKey(Dataset, editable=False, related_name="files",
                                  related_query_name="file")
     """The dataset to which this file belongs."""
-    # TODO: Enable default format to files
-    # default_format = related.ForeignKey(Format, related_name='datafiles',
-    #                                     related_query_name='datafile')
-    """The format of this file."""
+    default_format = related.ForeignKey(Format, related_name="files", related_query_name="file",
+                                        default=1, on_delete=SET_DEFAULT)
+    """The default format for revision of this file."""
     tags = related.ManyToManyField(Tag, blank=True, related_name="files",
                                    related_query_name="file")
     """The tags used to annotate this file."""
@@ -274,7 +363,7 @@ class File(Model):
         """
         return [field.name for field in cls._meta.concrete_fields]
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Meta(object):
@@ -469,7 +558,7 @@ class Source(Model):
                                                              password=self.password)
         return self._provider
 
-    def __str__(self):
+    def __unicode__(self):
         return self.url
 
     class FileRejected(Exception):
@@ -563,7 +652,7 @@ class Filter(Model):
                     raise ValidationError("The mapping contains a reference to a pattern group "
                                           "that does not exist")
 
-    def __str__(self):
+    def __unicode__(self):
         return self.pattern
 
     class Meta(object):
@@ -625,9 +714,9 @@ class Revision(Model):
     """The size, in bytes, of this revision."""
     update = related.ForeignKey(Update, related_name="revisions", related_query_name="revision")
     """The update that caused the addition of this revision."""
-    # TODO: Add revision format
-    # format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision')
-    # """The format of this file."""
+    format = related.ForeignKey(Format, related_name='revisions', related_query_name='revision',
+                                default=1, on_delete=SET_DEFAULT)
+    """The format of this revision."""
     tags = related.ManyToManyField(Tag, blank=True, related_name='revisions',
                                    related_query_name='revision')
     """The tags used to annotate this revision."""
@@ -638,14 +727,20 @@ class Revision(Model):
 
         If a revision number is not given, the next available sequence number
         is used.
+        If a format is not specified, the default format for the file is used.
 
         :keyword number: The revision number for this instance.
         :type number: int
+        :keyword format: The format for this instance.
+        :type format: Format
         """
-        if kwargs and "number" not in kwargs:
+        if kwargs:
             parent = kwargs["file"]
-            last_revision = parent.revisions.order_by("number").last()
-            kwargs["number"] = last_revision.number + 1 if last_revision else 1
+            if "number" not in kwargs:
+                last_revision = parent.revisions.order_by("number").last()
+                kwargs["number"] = last_revision.number + 1 if last_revision else 1
+            if "format" not in kwargs:
+                kwargs["format"] = parent.default_format
         super(Revision, self).__init__(*args, **kwargs)
 
     def get_absolute_url(self):

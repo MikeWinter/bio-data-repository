@@ -65,6 +65,20 @@
     </header>
 
     <section>
+        <h2>Details</h2>
+        <table class="table table-responsive">
+            <colgroup>
+                <col class="col-xs-2" />
+                <col class="col-xs-10" />
+            </colgroup>
+            <tr>
+                <th>Default format</th>
+                <td>{{ file.default_format.name }}</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
         <h2>Revisions</h2>
     {% if revisions.exists %}
         <table class="table table-condensed">

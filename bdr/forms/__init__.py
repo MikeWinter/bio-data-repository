@@ -14,13 +14,13 @@ This following classes are exported:
     UploadForm
 """
 
-from django.forms import Form, ModelForm
-from django.forms.fields import CharField, FileField
-from django.forms.widgets import FileInput, HiddenInput, Textarea, TextInput
+from django.forms import (Form, ModelForm, BooleanField, CharField, FileField, ModelChoiceField, FileInput, HiddenInput,
+                          Textarea, TextInput)
 from django.core.urlresolvers import reverse_lazy
 
 from .fields import SelectableCharField
-from ..models import Category, Dataset, File, Filter, Source, Tag
+from .widgets import ComboTextInput
+from ..models import Category, Dataset, File, Filter, Format, Source, Tag
 
 __all__ = ["CategoryForm", "DatasetForm", "FileForm", "FilterForm", "SourceForm", "TagForm",
            "SearchForm", "UploadForm"]
@@ -181,7 +181,41 @@ class FileContentSelectionForm(Form):
     real_name = CharField(widget=HiddenInput)
     mapped_name = SelectableCharField(required=False,
                                       error_messages={"invalid": "Enter a file name."})
+    format = ModelChoiceField(Format.objects.all())
 
     def __init__(self, *args, **kwargs):
         super(FileContentSelectionForm, self).__init__(*args, **kwargs)
         self.fields["mapped_name"].label = self.initial["real_name"]
+
+
+class SimpleFormatForm(ModelForm):
+    """
+    Presents the user with lists of common options used in simple formats as
+    well as the ability to specify customised values.
+    """
+
+    COMMENT_DEFAULT = "#"
+    COMMENT_CHOICES = [("#", "Hash (#)"), (";", "Semicolon (;)"), ("None", "None"), ("", "Other:")]
+    QUOTE_DEFAULT = "\""
+    QUOTE_CHOICES = [("\"", "Quotation mark (\")"), ("'", "Apostrophe (')"), ("|", "Pipe (|)"), ("None", "None"),
+                     ("", "Other:")]
+    SEPARATOR_DEFAULT = ","
+    SEPARATOR_CHOICES = [("\t", "Tab"), (" ", "Space"), (",", "Comma (,)"), (";", "Semicolon (;)"), ("|", "Pipe (|)"),
+                         ("", "Other:")]
+
+    separator = CharField(widget=ComboTextInput(choices=SEPARATOR_CHOICES, default=SEPARATOR_DEFAULT))
+    quote = CharField(required=False, widget=ComboTextInput(choices=QUOTE_CHOICES, default=QUOTE_DEFAULT))
+    comment = CharField(required=False, widget=ComboTextInput(choices=COMMENT_CHOICES, default=COMMENT_DEFAULT))
+
+    class Meta(object):
+        model = Format
+        fields = "__all__"
+
+
+class SimpleFormatFieldForm(Form):
+    """
+    Displays the properties of simple form fields.
+    """
+
+    name = CharField()
+    is_key = BooleanField(required=False)

@@ -47,14 +47,9 @@
             {% for update in update_list %}
                 <tr>
                     <td><a href="{{ update.dataset.get_absolute_url }}">{{ update.dataset.name }}</a></td>
-                    <td><a href="{{ update.get_absolute_url }}">{{ update.revisions.count }}</a></td>
+                    <td>{{ update.revisions.count }}</td>
                     <td>
                         <span title="Updated on {{ update.timestamp }}">{{ update.timestamp|naturaltime }}</span>
-            {# TODO: Move to update detail view #}
-            {#            <a class="btn btn-link btn-xs" href="{{ update.get_absolute_url }}"#}
-            {#               title="Download revision {{ update.level }}">#}
-            {#                <span class="glyphicon glyphicon-download" aria-hidden="true"></span>#}
-            {#            </a>#}
                     </td>
                 </tr>
             {% endfor %}

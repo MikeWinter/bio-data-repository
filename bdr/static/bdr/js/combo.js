@@ -1,5 +1,6 @@
 jQuery(function ($) {
-    var comboFields = $('select[datatype~="combobox"]');
+    "use strict";
+    var comboFields = $('select[data-type~="combobox"]');
 
     function changeHandler(evt) {
         var textField = getDependentField(this);
@@ -14,7 +15,7 @@ jQuery(function ($) {
     }
 
     function getDependentField(element) {
-        return $(element).next('input[datatype~="combobox"]');
+        return $(element).next('input[data-type~="combobox"]');
     }
 
     $.each(comboFields, function (index, element) {

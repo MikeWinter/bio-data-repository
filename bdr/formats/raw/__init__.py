@@ -1,3 +1,12 @@
+"""
+Files of the raw format type cannot be processed by the repository and are
+exported as-is to the user.
+"""
+
+from .. import Reader as BaseReader, Record as BaseRecord, Writer as BaseWriter
+from .views import RawFormatDetailView
+
+__all__ = ["Record", "Reader", "Writer"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -17,33 +26,40 @@ __license__ = """
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     """
 
-from . import Converter as BaseConverter, Reader as BaseReader, Record as BaseRecord
+name = "raw"
+views = {
+    "view": RawFormatDetailView.as_view(),
+}
 
 
 class Reader(BaseReader):
     """Reads files in chunks."""
+
     chunk_size = 8 * 1024 * 1024
 
     def __iter__(self):
         while True:
-            chunk = self._file.read(self.chunk_size)
+            chunk = self._stream.read(self.chunk_size)
             if not chunk:
                 break
             yield Record(chunk)
 
 
+# Base class implements all abstract methods
+# noinspection PyAbstractClass
 class Record(BaseRecord):
     """Represents a chunk of file data."""
-    _fields = ['data']
 
     def __init__(self, data):
         super(Record, self).__init__()
+        self._fields = ['data']
         self._data['data'] = data
 
     def __str__(self):
         return self.get('data')
 
 
-class Converter(BaseConverter):
+class Writer(BaseWriter):
     """A no-op converter that returns chunks as-is."""
+
     pass

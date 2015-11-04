@@ -1,4 +1,5 @@
 """Defines the various views for the API server."""
+import bdr.formats
 
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
@@ -267,8 +268,8 @@ class ExportView(SingleObjectMixin, View):
         delta = xdelta.DeltaFile(fp)
         delta.source = self._decode_chain(revision.get_previous())
 
-        reader = formats.Reader.instance(delta, revision.format)
-        converter = formats.Converter.instance(reader, revision.format, format_spec.get('fields', []))
+        reader = bdr.formats.Reader.instance(delta, revision.format)
+        converter = bdr.formats.Converter.instance(reader, revision.format, format_spec.get('fields', []))
 
         response = StreamingHttpResponse(converter, content_type='application/octet-stream')
         response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(revision.file.name)

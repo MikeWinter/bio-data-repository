@@ -20,26 +20,3 @@ class AnnotatedNumberInput(widgets.NumberInput):
             %s</div>''' % html)
 
 
-class ComboTextInput(widgets.MultiWidget):
-    def __init__(self, choices, default='', attrs=None):
-        if attrs is None:
-            attrs = {}
-        attrs.update(datatype='combobox')
-        self._choices = choices
-        self._default = default
-        super(ComboTextInput, self).__init__([widgets.Select(choices=self._choices), widgets.TextInput], attrs)
-
-    def decompress(self, value):
-        if value is None:
-            return [self._default, '']
-        if value == '':
-            return ['None', '']
-        for val, txt in self._choices:
-            if value == val:
-                return [value, '']
-        return ['', value]
-
-    def value_from_datadict(self, data, files, name):
-        suggested, custom = super(ComboTextInput, self).value_from_datadict(data, files, name)
-        value = suggested if suggested != '' else custom
-        return value if value != 'None' else ''

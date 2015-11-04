@@ -1,0 +1,10 @@
+[
+  {
+    "model": "bdr.format",
+    "pk": 1,
+    "fields": {
+      "name": "Raw",
+      "entry_point_name": "raw"
+    }
+  }
+]

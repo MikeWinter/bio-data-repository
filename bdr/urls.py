@@ -7,7 +7,7 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 
 from django.conf.urls import include, patterns, url
 
-from bdr.frontend.views import formats, revisions
+from bdr.frontend.views import revisions
 from views import HomeView, SearchView, AboutView, LegalView, search_script
 from views.categories import (CategoryListView, CategoryDetailView, CategoryAddView,
                               CategoryEditView, CategoryDeleteView)
@@ -15,6 +15,7 @@ from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView, 
                             DatasetDeleteView)
 from views.files import FileListView, FileDetailView, FileUploadView, FileEditView, FileDeleteView
 from views.filters import FilterAddView, FilterEditView, FilterDeleteView
+from views.formats import FormatListView, dispatch as dispatch_format_view
 from views.sources import (SourceListView, SourceDetailView, SourceAddView, SourceEditView,
                            SourceDeleteView)
 from views.tags import TagListView, TagDetailView, TagAddView, TagEditView, TagDeleteView
@@ -122,11 +123,16 @@ urlpatterns = patterns(
         ))),
     ))),
 
-    url(r'^formats/$', formats.FormatListView.as_view(), name='formats'),
-    url(r'^formats/add$', formats.FormatAddView.as_view(), name='format-add'),
-    url(r'^formats/(?P<slug>[\w-]+)$', formats.FormatDetailView.as_view(), name='format-detail'),
-    url(r'^formats/(?P<slug>[\w-]+)/edit$', formats.FormatEditView.as_view(), name='format-edit'),
-    url(r'^formats/(?P<slug>[\w-]+)/delete$', formats.FormatDeleteView.as_view(), name='format-delete'),
+
+    # Formats
+    url(r'^formats/$', FormatListView.as_view(), name='formats'),
+    url(r'^formats/create/(?P<slug>[\w-]+)$', dispatch_format_view, {"view": "create"}, name='create-format'),
+    url(r'^formats/(?P<pk>\d+)/', include(patterns(
+        '',
+        url(r'^view$', dispatch_format_view, {"view": "view"}, name='view-format'),
+        url(r'^edit$', dispatch_format_view, {"view": "edit"}, name='edit-format'),
+        url(r'^delete$', dispatch_format_view, {"view": "delete"}, name='delete-format'),
+    ))),
 
     url(r'^datasets/(?P<ds>[\w-]+)/(?P<fn>[\w .()/-]+)/(?P<rev>(?:\d+|latest))$',
         revisions.RevisionDownloadView.as_view(),
