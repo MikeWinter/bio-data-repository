@@ -128,6 +128,12 @@ class DeltaFileSystemStorage(FileSystemStorage):
         if not os.path.isdir(directory):
             raise IOError("{0:s} exists and is not a directory.".format(directory))
 
+        if not hasattr(content, "seekable") or not content.seekable():
+            copy = TemporaryFile()
+            shutil.copyfileobj(content, copy)
+            copy.seek(0)
+            content = copy
+
         with Lock(full_path):
             files = self._get_related_files(name)
             if files:

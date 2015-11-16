@@ -1,0 +1,3 @@
+include LICENSE LICENSE-*
+recursive-include bdr/static *
+recursive-include bdr/templates *
