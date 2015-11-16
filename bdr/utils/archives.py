@@ -13,6 +13,7 @@ import gzip
 import importlib
 import os
 import re
+import shutil
 import tarfile
 import tempfile
 import zipfile
@@ -354,13 +355,18 @@ class ZipArchive(Archive):
         super(ZipArchive, self).__init__(file_, path)
         self._zip = None
         self._names = None
+        self._members = {}
 
     def __getitem__(self, key):
         if key not in self.keys():
             raise KeyError('%s not found.' % key)
-        info = self._zip.getinfo(key)
-        return Member(info.filename, info.file_size, datetime(*info.date_time, tzinfo=utc),
-                      self._zip.open(info))
+        if key not in self._members:
+            info = self._zip.getinfo(key)
+            data = tempfile.TemporaryFile()
+            shutil.copyfileobj(self._zip.open(info), data)
+            data.seek(0)
+            self._members[key] = Member(info.filename, info.file_size, datetime(*info.date_time, tzinfo=utc), data)
+        return self._members[key]
 
     def can_read(self):
         """

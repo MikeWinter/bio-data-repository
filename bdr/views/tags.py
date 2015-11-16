@@ -196,5 +196,5 @@ class TagDeleteView(SearchableViewMixin, DeleteView):
     """Deletes an existing category."""
 
     model = Tag
-    success_url = reverse_lazy("bdr.frontend:tags")
+    success_url = reverse_lazy("bdr:tags")
     template_name = "bdr/tags/tag_confirm_delete.html"

@@ -145,7 +145,7 @@ class FileDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         :return: The revisions associated with this file.
         :rtype: ``django.db.models.query.QuerySet`` | list
         """
-        return self.object.revisions.all()
+        return self.object.revisions.order_by("-number")
 
 
 class FileUploadView(SearchableViewMixin, SessionWizardView):
