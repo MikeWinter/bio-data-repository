@@ -57,8 +57,8 @@
     </header>
 
     <section>
-    {% if sources.exists %}
-        <table class="table table-condensed">
+    {% if page_obj %}
+        <table class="table table-responsive">
             <thead>
                 <tr>
                     <td></td>
@@ -70,10 +70,10 @@
             </thead>
 
             <tbody>
-            {% for source in sources %}
+            {% for source in page_obj %}
                 <tr>
                     <td><a href="{% url 'bdr:view-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify %}" title="View details">{% bootstrap_icon "chevron-right" %}</a></td>
-                    <td class="truncated">{{ source.url }}</td>
+                    <td>{{ source.url }}</td>
                     <td>{{ source.period }}</td>
                 {% if source.checked_at %}
                     <td title="Checked at {{ source.checked_at }}">{{ source.checked_at|naturaltime }}</td>

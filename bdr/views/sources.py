@@ -33,33 +33,43 @@ __license__ = """
     """
 
 
-class SourceListView(SearchableViewMixin, ListView):
+class SourceListView(SearchableViewMixin, SingleObjectMixin, ListView):
     """Lists sources associated with a dataset."""
 
-    context_object_name = "sources"
-    model = Source
+    model = Dataset
     paginate_by = 10
     paginate_orphans = 2
+    pk_url_kwarg = "dpk"
     template_name = "bdr/sources/source_list.html"
 
-    def get_context_data(self, **kwargs):
+    def __init__(self, **kwargs):
+        super(SourceListView, self).__init__(**kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
         """
-        Return the template context.
+        Send a response for HTTP GET requests sent to this view.
 
-        This method returns a dictionary containing the variables for rendering
-        this view. Available template context variables are:
-
-         * ``dataset`` - the parent dataset model
-         * ``sources`` - the sources associated with the dataset
-
-        :param kwargs: A mapping of extra data available for use in templates.
-        :type kwargs: dict of str
-        :return: A dictionary of template variables and values.
-        :rtype: dict of str
+        :param request: The request received by the view.
+        :type request: django.http.HttpRequest
+        :param args: The positional arguments captured from the route for this
+                     view.
+        :param kwargs: The named arguments captured from the route for this
+                       view.
+        :return: The response.
+        :rtype: django.http.HttpResponseBase
         """
-        context = super(SourceListView, self).get_context_data(**kwargs)
-        context["dataset"] = get_object_or_404(Dataset, pk=self.kwargs["dpk"])
-        return context
+        self.object = self.get_object(queryset=self.model.objects.all())
+        return super(SourceListView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        """
+        Get the list of sources associated with this dataset.
+
+        :return: The files associated with this dataset.
+        :rtype: ``django.db.models.query.QuerySet`` | list
+        """
+        return self.object.sources.all()
 
 
 class SourceDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
