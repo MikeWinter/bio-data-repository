@@ -138,8 +138,8 @@
         <table class="table table-condensed">
             <thead>
                 <tr>
-                    <th class="col-xs-6" colspan="2">Name</th>
-                    <th class="col-xs-2">Revisions</th>
+                    <th class="col-xs-7" colspan="2">Name</th>
+                    <th class="col-xs-1">Revisions</th>
                     <th class="col-xs-3">Last modified</th>
                     <th class="col-xs-1"><span class="sr-only">Operations</span></th>
                 </tr>
@@ -150,13 +150,13 @@
                 <tr>
                     <th>
                         <a href="{{ file.get_absolute_url }}">{{ file.name }}</a>
-                    {% if file.revisions.exists %}
+{#                    {% if file.revisions.exists %}#}
                         {# TODO: Change route for exporting latest revision #}
-                        <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"
-                           title="Download latest revision">
-                            {% bootstrap_icon "download" %}
-                        </a>
-                    {% endif %}
+{#                        <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"#}
+{#                           title="Download latest revision">#}
+{#                            {% bootstrap_icon "download" %}#}
+{#                        </a>#}
+{#                    {% endif %}#}
                     </th>
                     <td class="text-right">
                     {% for tag in file.tags.all %}
@@ -181,7 +181,7 @@
 
             <tfoot>
                 <tr>
-                    <td colspan="5"><a href="">Show all&hellip;</a></td>
+                    <td colspan="5"><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">Show all&hellip;</a></td>
                 </tr>
             </tfoot>
         </table>
