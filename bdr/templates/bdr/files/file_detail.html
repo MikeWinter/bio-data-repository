@@ -80,7 +80,7 @@
 
     <section>
         <h2>Revisions</h2>
-    {% if revisions.exists %}
+    {% if page_obj %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -92,14 +92,13 @@
             </thead>
 
             <tbody>
-            {% for revision in revisions %}
+            {% for revision in page_obj %}
                 <tr>
-                    <td>{{ revision.number }}</td>
+                    <td><a href="{{ revision.get_absolute_url }}">{{ revision.number }}</a></td>
                     <td title="Updated on {{ revision.update.timestamp }}">{{ revision.update.timestamp|naturaltime }}</td>
                     <td>
                         {{ revision.size|filesizeformat }}
-                        {# TODO: Change route to revision details #}
-                        <a class="btn btn-link btn-xs" href="{% comment %}{{ revision.get_absolute_url }}{% endcomment %}" title="Download revision">
+                        <a class="btn btn-link btn-xs" href="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" title="Download revision">
                             {% bootstrap_icon "download" %}
                         </a>
                     </td>

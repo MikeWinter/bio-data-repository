@@ -10,7 +10,6 @@ import fnmatch
 import io
 import os.path
 import shutil
-
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from xdelta import DeltaFile
@@ -248,6 +247,7 @@ class Lock(object):
 
     The lock is released automatically when the block is left.
     """
+
     def __init__(self, path, **kwargs):
         base = os.path.splitext(path)[0]
         self._path = ".".join((base, "lock"))
@@ -270,6 +270,7 @@ class Lock(object):
 
 class FileNotFoundError(IOError):
     """File does not exist."""
+
     def __init__(self, name):
         code = errno.ENOENT
         message = "{0}: {1}".format(os.strerror(code), name)

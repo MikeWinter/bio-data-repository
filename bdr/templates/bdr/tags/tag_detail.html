@@ -117,14 +117,13 @@
                 <tr>
                     <td><a href="{{ revision.file.dataset.get_absolute_url }}">{{ revision.file.dataset.name }}</a></td>
                     <td><a href="{{ revision.file.get_absolute_url }}">{{ revision.file.name }}</a></td>
-                    <td>{{ revision.number }}</td>
+                    <td><a href="{{ revision.get_absolute_url }}">{{ revision.number }}</a></td>
                     <td title="Updated on {{ revision.update.timestamp }}">{{ revision.update.timestamp|naturaltime }}</td>
                     <td>
                         {{ revision.size|filesizeformat }}
-                        {# TODO: Update route for revision details #}
-                        <a class="btn btn-link btn-xs" href="{% comment %}{{ revision.get_absolute_url }}{% endcomment %}"
+                        <a class="btn btn-link btn-xs" href="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=revision.file.pk filename=revision.file.name|slugify dpk=revision.file.dataset.pk dataset=revision.file.dataset.name|slugify %}"
                            title="Download revision">
-                            <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                            {% bootstrap_icon "download" %}
                         </a>
                     </td>
                 </tr>

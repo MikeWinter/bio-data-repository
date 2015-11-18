@@ -1,0 +1,84 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}Export {{ file.name }} @r{{ revision.number }} – {{ dataset.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    {{ wizard.form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {{ wizard.form.media.js }}
+{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ file.get_absolute_url }}">
+                {% bootstrap_icon "level-up" %} Back to file
+            </a></li>
+            <li role="presentation"><a href="{{ revision.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:delete-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+            <li class="active" role="presentation"><a href="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "download" %} Export
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">Files</a></li>
+            <li><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></li>
+            <li><a href="{{ revision.get_absolute_url }}">@r{{ revision.number }}</a></li>
+            <li class="active">Export</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Export <a href="{{ file.get_absolute_url }}">{{ file.name }}</a> @r{{ revision.number }} <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></h1>
+    </header>
+
+    <section>
+        <form class="form-horizontal" action="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" method="post">
+            {% csrf_token %}
+            {% block form %}{% endblock %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-6 text-left">
+                {% block pre_previous %}{% endblock %}
+                {% if wizard.steps.step1 > 1 %}
+                    {% bootstrap_button button_type="submit" name="wizard_goto_step" value=wizard.steps.prev content="Previous" icon="chevron-left" button_class="btn btn-default" %}
+                {% endif %}
+                {% block post_previous %}{% endblock %}
+                </div>
+                <div class="form-inline col-xs-6 text-right">
+                {% block pre_next %}{% endblock %}
+                {% ifequal wizard.steps.step1 wizard.steps.count %}
+                    {% bootstrap_button button_type="submit" content="Export" icon="download" button_class="btn btn-primary" %}
+                {% else %}
+                    {% bootstrap_button button_type="submit" content="Next" icon="chevron-right" button_class="btn btn-primary" %}
+                {% endifequal %}
+                {% block post_next %}
+                    {% bootstrap_button href=revision.get_absolute_url content="Cancel" button_class="btn-default" %}
+                {% endblock %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

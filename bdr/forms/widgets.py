@@ -85,6 +85,8 @@ class SelectableTextInput(MultiWidget):
         """.format(*rendered_widgets)
 
 
+# noinspection PyAbstractClass
+# Base class implements the render method
 class ComboTextInput(MultiWidget):
     """
     This widget combines a select menu with a text box to create a list of
@@ -138,7 +140,7 @@ class ComboTextInput(MultiWidget):
         """
         suggested, custom = super(ComboTextInput, self).value_from_datadict(data, files, name)
         value = suggested if suggested != "" else custom
-        return value if value != "None" else ""
+        return value if value != "None" else None
 
     class Media(object):
         """

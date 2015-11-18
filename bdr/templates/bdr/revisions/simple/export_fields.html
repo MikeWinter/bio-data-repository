@@ -1,0 +1,41 @@
+{% extends "bdr/revisions/export.html" %}
+{% load bootstrap3 %}
+
+{% block form %}
+    <fieldset>
+        <legend>Fields</legend>
+        {% bootstrap_form wizard.management_form %}
+        {% bootstrap_form wizard.form.management_form %}
+        {% bootstrap_formset_errors wizard.form %}
+
+        <table class="table table-condensed table-responsive">
+            <thead>
+            <tr>
+                <th><span class="sr-only">Selected</span></th>
+                <th class="col-xs-8">Field name</th>
+                <th class="col-xs-4">Is a key?</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for form in wizard.form.forms %}
+                <tr>
+                    <td>
+                        <div class="form-control-static">{{ form.selected }}</div>
+                    </td>
+                    <td>
+                        <label class="form-control-static"
+                               for="{{ form.selected.id_for_label }}">{{ form.name.value }}</label>
+                        {{ form.name }}
+                    </td>
+                    <td>
+                    {% if form.is_key.value and form.is_key.value != "False" %}
+                        <div class="form-control-static">{% bootstrap_icon "ok" %}</div>
+                    {% endif %}
+                        {{ form.is_key }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </fieldset>
+{% endblock %}

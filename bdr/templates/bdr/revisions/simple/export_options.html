@@ -1,0 +1,11 @@
+{% extends "bdr/revisions/export.html" %}
+{% load bootstrap3 %}
+
+{% block form %}
+    <fieldset>
+        <legend>Options</legend>
+
+        {% bootstrap_form wizard.management_form %}
+        {% bootstrap_form wizard.form layout="horizontal" %}
+    </fieldset>
+{% endblock %}

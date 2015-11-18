@@ -34,6 +34,12 @@ __license__ = """
 
 
 class FilterTestMixin(object):
+    """
+    This mixin extracts the testing of filter pattern against sample file names
+    common to both the :py:class:`FilterAddView` and :py:class:`FilterEditView`
+    classes.
+    """
+
     feedback_classes = "has-feedback {type:s}"
     failure_class = "has-error"
     failure_message = "does not match"
@@ -41,6 +47,16 @@ class FilterTestMixin(object):
     success_message = "matches"
 
     def get_test_response(self, data, form):
+        """
+        Produce a template response showing the result of the pattern test.
+
+        :param data: The data submitted by the user containing the sample value.
+        :type data: dict of (str | unicode)
+        :param form: The form that describes the filter under construction.
+        :type form: FilterForm
+        :return: The response to return to the client.
+        :rtype: django.template.response.TemplateResponse
+        """
         if data.get("op") == "test":
             filename = data.get("filename", "")
             matches = form.instance.match(filename)

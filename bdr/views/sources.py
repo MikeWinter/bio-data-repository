@@ -109,6 +109,18 @@ class SourceDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         return super(SourceDetailView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        """
+        Send a response for HTTP POST requests sent to this view.
+
+        :param request: The request received by the view.
+        :type request: django.http.HttpRequest
+        :param args: The positional arguments captured from the route for this
+                     view.
+        :param kwargs: The named arguments captured from the route for this
+                       view.
+        :return: The response.
+        :rtype: django.http.HttpResponseBase
+        """
         instance = self.get_object(queryset=self.model.objects.all())
         direction = self._get_direction()
         filter_pk = long(request.POST.get(direction))

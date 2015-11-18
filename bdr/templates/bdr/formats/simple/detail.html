@@ -1,0 +1,42 @@
+{% extends "bdr/formats/detail.html" %}
+{% load bootstrap3 %}
+
+{% block details %}
+    <h2>Details</h2>
+    <table class="table table-condensed table-responsive">
+        <tr>
+            <th>Separator</th>
+            <td>{{ separator|default:"None" }}</td>
+        </tr>
+        <tr>
+            <th>Comment</th>
+            <td>{{ comment|default:"None" }}</td>
+        </tr>
+        <tr>
+            <th>Quote</th>
+            <td>{{ quote|default:"None" }}</td>
+        </tr>
+        <tr>
+            <th>Escape</th>
+            <td>{{ escape|default:"None" }}</td>
+        </tr>
+    </table>
+
+    <h2>Fields</h2>
+    <table class="table table-condensed table-responsive">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Key</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for field in fields %}
+        <tr>
+            <td>{{ field.name }}</td>
+            <td>{% if field.is_key %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+        </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,3 +1,4 @@
 include LICENSE LICENSE-*
+include bdr/fixtures/*.json
 recursive-include bdr/static *
 recursive-include bdr/templates *

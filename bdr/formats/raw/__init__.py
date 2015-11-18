@@ -3,8 +3,8 @@ Files of the raw format type cannot be processed by the repository and are
 exported as-is to the user.
 """
 
-from .. import Reader as BaseReader, Record as BaseRecord, Writer as BaseWriter
-from .views import RawFormatDetailView
+from .. import Reader as BaseReader, Record as BaseRecord, Converter as BaseConverter
+from .views import RawFormatDetailView, RawRevisionExportView
 
 __all__ = ["Record", "Reader", "Writer"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -29,6 +29,7 @@ __license__ = """
 name = "raw"
 views = {
     "view": RawFormatDetailView.as_view(),
+    "export": RawRevisionExportView.as_view(),
 }
 
 
@@ -59,7 +60,9 @@ class Record(BaseRecord):
         return self.get('data')
 
 
-class Writer(BaseWriter):
+# noinspection PyAbstractClass
+# Base class implements all abstract methods
+class Converter(BaseConverter):
     """A no-op converter that returns chunks as-is."""
 
     pass

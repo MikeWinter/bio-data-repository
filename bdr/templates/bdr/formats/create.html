@@ -1,0 +1,67 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}
+    Create {{ name }} format specification
+    {% ifnotequal wizard.steps.count 1 %}
+        ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
+    {% endifnotequal %}
+    – Formats
+{% endblock %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    {{ wizard.form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {{ wizard.form.media.js }}
+{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{% url 'bdr:formats' %}">
+                {% bootstrap_icon "th-list" %} List
+            </a></li>
+        {% for format in realisable_formats %}
+            <li {% ifequal type format.entry_point_name %}class="active"{% endifequal %} role="presentation"><a href="{% url 'bdr:create-format' type=format.entry_point_name %}">
+                {% bootstrap_icon "plus" %} Create {{ format.name }} format
+            </a></li>
+        {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:formats' %}">Formats</a></li>
+            <li class="active">
+                Create new {{ name }} format
+            {% ifnotequal wizard.steps.count 1 %}
+                ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
+            {% endifnotequal %}
+            </li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>
+            Create new {{ name }} format
+        {% ifnotequal wizard.steps.count 1 %}
+            ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
+        {% endifnotequal %}
+        </h1>
+    </header>
+
+    <section>
+        <form class="form-horizontal" action="{% url 'bdr:create-format' type=type %}" method="post">
+            {% csrf_token %}
+            {% block form %}{% endblock %}
+        </form>
+    </section>
+{% endblock %}

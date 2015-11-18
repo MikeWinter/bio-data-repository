@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/1.6/topics/http/urls/
 
 from django.conf.urls import include, patterns, url
 
-from bdr.frontend.views import revisions
 from views import HomeView, SearchView, AboutView, LegalView, search_script
 from views.categories import (CategoryListView, CategoryDetailView, CategoryAddView,
                               CategoryEditView, CategoryDeleteView)
@@ -16,6 +15,8 @@ from views.datasets import (DatasetListView, DatasetDetailView, DatasetAddView, 
 from views.files import FileListView, FileDetailView, FileUploadView, FileEditView, FileDeleteView
 from views.filters import FilterAddView, FilterEditView, FilterDeleteView
 from views.formats import FormatListView, dispatch as dispatch_format_view
+from views.revisions import (RevisionDetailView, RevisionEditView, RevisionDeleteView, LatestRevisionRedirectView,
+                             dispatch as dispatch_export_view)
 from views.sources import (SourceListView, SourceDetailView, SourceAddView, SourceEditView,
                            SourceDeleteView)
 from views.tags import TagListView, TagDetailView, TagAddView, TagEditView, TagDeleteView
@@ -93,13 +94,24 @@ urlpatterns = patterns(
             # Revisions
             # TODO: Implement revision views
             # url(r'^revisions/upload$', RevisionUploadView.as_view(), name='upload-revision'),
-            # url(r'^revisions/(?P<revision>\d+)-(?P<rpk>\d+)/', include(patterns(
-            #     '',
-            #     url(r'^view$', RevisionDetailView.as_view(), name='view-revision'),
-            #     url(r'^edit$', RevisionEditView.as_view(), name='edit-revision'),
-            #     url(r'^delete$', RevisionDeleteView.as_view(), name='delete-revision'),
-            #     url(r'^export$', RevisionExportView.as_view(), name='export-revision'),
-            # ))),
+            url(r'^revisions/(?P<revision>\d+)-(?P<rpk>\d+)/', include(patterns(
+                '',
+                url(r'^view$', RevisionDetailView.as_view(), name='view-revision'),
+                url(r'^edit$', RevisionEditView.as_view(), name='edit-revision'),
+                url(r'^delete$', RevisionDeleteView.as_view(), name='delete-revision'),
+                url(r'^export$', dispatch_export_view, {'view': 'export'}, name='export-revision'),
+            ))),
+            url(r'^revisions/latest/', include(patterns(
+                '',
+                url(r'^view$', LatestRevisionRedirectView.as_view(), dict(path='view'),
+                    name='view-latest-revision'),
+                url(r'^edit$', LatestRevisionRedirectView.as_view(), dict(path='edit'),
+                    name='edit-latest-revision'),
+                url(r'^delete$', LatestRevisionRedirectView.as_view(), dict(path='delete'),
+                    name='delete-latest-revision'),
+                url(r'^export$', LatestRevisionRedirectView.as_view(), dict(path='export'),
+                    name='export-latest-revision'),
+            ))),
         ))),
 
 
@@ -126,15 +138,11 @@ urlpatterns = patterns(
 
     # Formats
     url(r'^formats/$', FormatListView.as_view(), name='formats'),
-    url(r'^formats/create/(?P<slug>[\w-]+)$', dispatch_format_view, {"view": "create"}, name='create-format'),
+    url(r'^formats/create/(?P<type>[\w-]+)$', dispatch_format_view, {"view": "create"}, name='create-format'),
     url(r'^formats/(?P<pk>\d+)/', include(patterns(
         '',
         url(r'^view$', dispatch_format_view, {"view": "view"}, name='view-format'),
         url(r'^edit$', dispatch_format_view, {"view": "edit"}, name='edit-format'),
         url(r'^delete$', dispatch_format_view, {"view": "delete"}, name='delete-format'),
     ))),
-
-    url(r'^datasets/(?P<ds>[\w-]+)/(?P<fn>[\w .()/-]+)/(?P<rev>(?:\d+|latest))$',
-        revisions.RevisionDownloadView.as_view(),
-        name='download'),
 )

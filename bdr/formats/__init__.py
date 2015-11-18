@@ -1,4 +1,9 @@
 """
+This package defines the types used to implement format-dependent export and
+merge functionality within the repository.
+
+Each revision of a file within the repository is assigned a format, which
+enables parsing
 The base types for parsing and rewriting dataset file formats.
 """
 # TODO: Document format plug-in mechanism
@@ -8,7 +13,7 @@ import operator
 
 import pkg_resources
 
-__all__ = ["Record", "Reader", "Writer"]
+__all__ = ["Record", "Reader", "Converter"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
     Copyright (C) 2015 Michael Winter
@@ -36,7 +41,7 @@ def get_entry_point(name):
     Return the entry point of the format with the given name.
 
     :param name: The name of the format whose entry point is to be returned.
-    :type name: str
+    :type name: str | unicode
     :return: The entry point of the named format.
     :rtype: module
     """
@@ -102,23 +107,13 @@ class Reader(Iterable):
     Instances of this type are iterable, returning records in file order.
     """
 
-    def __init__(self, stream, metadata=""):
+    def __init__(self, stream, **kwargs):
         """
         :type stream: io.BufferedIOBase | io.RawIOBase
         :param metadata: str
         """
         self._stream = stream
-        self._metadata = metadata
-
-    def read(self):
-        """
-        Read a record from the stream wrapped by this reader.
-
-        :return: The read record.
-        :rtype: Record
-        """
-        for record in self:
-            yield record
+        self._options = kwargs
 
     def __iter__(self):
         """
@@ -127,28 +122,30 @@ class Reader(Iterable):
         raise NotImplementedError
 
 
-class Writer(object):
+class Converter(Iterable):
     """
-    Responsible for writing out records according to format-defined rules, yielding only the specified fields.
+    Responsible for converting records according to format-defined rules,
+    yielding only the specified fields.
 
-    Instances of this type are iterable, returning converted records in file order.
+    Instances of this type are iterable, returning converted records in file
+    order.
     """
 
-    def __init__(self, stream, metadata="", fields=None):
+    def __init__(self, reader, metadata="", fields=None):
         """
-        :type stream: io.BufferedIOBase | io.RawIOBase
+        :type reader: Reader
         :param metadata: str
         :param fields: list of str | None
         """
-        self._stream = stream
+        self._reader = reader
         self._metadata = metadata
         self._fields = fields or []
 
-    def write(self, record):
+    def __iter__(self):
         """
         Write the given record to the output stream wrapped by this writer.
 
-        :param record: The record to write.
-        :type record: Record
+        :return: The record to write.
+        :rtype: Record
         """
-        self._stream.write(str(record))
+        return iter(self._reader)

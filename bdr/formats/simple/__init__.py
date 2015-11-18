@@ -10,9 +10,9 @@ try:
 except ImportError:
     import pickle
 
-from ...views.formats import FormatDeleteView
-from .. import Reader as BaseReader, Record as BaseRecord, Writer as BaseWriter
-from .views import SimpleFormatDetailView, SimpleFormatCreateView, SimpleFormatEditView
+from .. import Reader as BaseReader, Record as BaseRecord, Converter as BaseConverter
+from .views import (SimpleFormatDetailView, SimpleFormatCreateView, SimpleFormatEditView, SimpleFormatDeleteView,
+                    SimpleRevisionExportView)
 
 __all__ = ["Record", "Reader", "Writer"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -39,7 +39,8 @@ views = {
     "view": SimpleFormatDetailView.as_view(),
     "create": SimpleFormatCreateView.as_view(),
     "edit": SimpleFormatEditView.as_view(),
-    "delete": FormatDeleteView.as_view(),
+    "delete": SimpleFormatDeleteView.as_view(),
+    "export": SimpleRevisionExportView.as_view(),
 }
 
 
@@ -62,17 +63,19 @@ class Reader(BaseReader):
 
     Instances of this type are iterable, returning records in file order.
     """
-    # Metadata contains:
-    #   * comment:   The character used to denote comments.
-    #   * delimiter: The separating character used between fields.
-    #   * quotechar: The character used to quote values containing other
-    #                special characters.
 
-    def __init__(self, stream, metadata=""):
-        options = pickle.loads(metadata)
-        super(Reader, self).__init__(stream, options)
-        if "quotechar" not in options:
-            options.update(quoting=csv.QUOTE_NONE)
+    def __init__(self, stream, escape, quote, separator, **kwargs):
+        super(Reader, self).__init__(stream, **kwargs)
+        options = {}
+        if quote:
+            options["quotechar"] = str(quote)
+        else:
+            options["quoting"] = csv.QUOTE_NONE
+        if escape:
+            options["escapechar"] = str(escape)
+            options["doublequote"] = False
+        if separator:
+            options["delimiter"] = str(separator)
         self._parser = csv.reader(stream, **options)
 
     def __iter__(self):
@@ -80,8 +83,8 @@ class Reader(BaseReader):
         :raises IOError: if the number of parsed columns does not match that
         specified by the format definition.
         """
-        comment_char = self._metadata.get("comment")
-        field_names = self._metadata["fields"]
+        comment_char = self._options["comment"]
+        field_names = self._options["fields"]
         field_count = len(field_names)
         for data in self._parser:
             if comment_char and data[0].startswith(comment_char):
@@ -91,25 +94,56 @@ class Reader(BaseReader):
             yield Record(field_names, data)
 
 
-class Writer(BaseWriter):
+class Converter(BaseConverter):
     """
     Converts records to nominally identical types, but with the option to elide
     fields.
     """
 
-    def __init__(self, stream, metadata="", fields=None):
-        options = pickle.loads(metadata)
-        if fields is None:
-            fields = options["fields"].keys()
-        super(Writer, self).__init__(stream, options, fields)
-        self._impl = csv.writer(stream, **options)
+    def __init__(self, reader, fields, comment, escape, line_terminator, quote, separator, **kwargs):
+        super(Converter, self).__init__(reader, kwargs, fields)
+        self.comment_char = comment
+        self.escape_char = escape
+        self.quote_char = quote
+        self.separator_char = separator
+        self.line_terminator = line_terminator
 
-    def write(self, record):
-        """
-        Write the given record to the output stream wrapped by this writer.
+    def __iter__(self):
+        for record in self._reader:
+            values = []
+            for field in self._fields:
+                value = self.prepare_value(record[field])
+                values.append(value)
+            yield self.separator_char.join(values) + self.line_terminator
 
-        :param record: The record to write.
-        :type record: Record
+    def prepare_value(self, value):
         """
-        values = [record[field] for field in self._fields]
-        self._impl.writerow(values)
+        Make a value safe for output according the options specified for
+        conversion.
+
+        If a value contains special characters, these must be escaped or quoted
+        as determined by the conversion settings. This includes literal escape
+        and quote characters (if applicable).
+
+        :param value: The value to make safe.
+        :type value: str | unicode
+        :return: The equivalent escaped or quoted value.
+        :rtype: str | unicode
+        :raise ValueError: if the conversion rules will result in emitting a
+                           value containing ambiguous special characters.
+        """
+        if self.escape_char:
+            value = value.replace(self.escape_char, self.escape_char * 2)
+        if self.quote_char:
+            replacement = self.escape_char + self.quote_char if self.escape_char else self.quote_char * 2
+            value = value.replace(self.quote_char, replacement)
+            if value.startswith(self.comment_char) or self.separator_char in value or self.line_terminator in value:
+                value = "{0}{1}{0}".format(self.quote_char, value)
+        elif self.escape_char:
+            if value.startswith(self.comment_char):
+                value = self.escape_char + value
+            value = value.replace(self.separator_char, self.escape_char + self.separator_char)
+            value = value.replace(self.line_terminator, self.escape_char + self.line_terminator)
+        elif value.startswith(self.comment_char) or self.separator_char in value or self.line_terminator in value:
+            raise ValueError(value)
+        return value

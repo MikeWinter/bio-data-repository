@@ -73,13 +73,12 @@
                 <tr>
                     <th>
                         <a href="{{ file.get_absolute_url }}">{{ file.name }}</a>
-{#                    {% if file.revisions.exists %}#}
-                        {# TODO: Change route for exporting latest revision #}
-{#                        <a class="btn btn-link btn-xs" href="{% comment %}{% url 'bdr.frontend:download' ds=object.slug fn=file.name rev='latest' %}{% endcomment %}"#}
-{#                           title="Download latest revision">#}
-{#                            {% bootstrap_icon "download" %}#}
-{#                        </a>#}
-{#                    {% endif %}#}
+                    {% if file.revisions.exists %}
+                        <a class="btn btn-link btn-xs" href="{% url 'bdr:export-latest-revision' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}"
+                           title="Download latest revision">
+                            {% bootstrap_icon "download" %}
+                        </a>
+                    {% endif %}
                     </th>
                     <td class="text-right">
                     {% for tag in file.tags.all %}

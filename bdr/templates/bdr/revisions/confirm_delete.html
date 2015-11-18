@@ -1,0 +1,66 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete {{ file.name }} @r{{ revision.number }}? – {{ dataset.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation"><a href="{{ file.get_absolute_url }}">
+                {% bootstrap_icon "level-up" %} Back to file
+            </a></li>
+            <li role="presentation"><a href="{{ revision.get_absolute_url }}">
+                {% bootstrap_icon "file" %} View
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:edit-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "pencil" %} Edit
+            </a></li>
+            <li class="active" role="presentation"><a href="{% url 'bdr:delete-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "remove" %} Delete
+            </a></li>
+            <li role="presentation"><a href="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}">
+                {% bootstrap_icon "download" %} Export
+            </a></li>
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">Files</a></li>
+            <li><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></li>
+            <li><a href="{{ revision.get_absolute_url }}">@r{{ revision.number }}</a></li>
+            <li class="active">Delete</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>Delete <a href="{{ file.get_absolute_url }}">{{ file.name }}</a> @r{{ revision.number }} <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></h1>
+    </header>
+
+    <section>
+        <form action="{% url 'bdr:delete-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete revision <em>{{ revision.number }}</em> of <em>{{ file.name }}</em>?</p>
+            <p class="text-danger help-block">This action is irreversible!</p>
+
+            <div class="form-group">
+                {% bootstrap_button button_type="submit" content="Delete" button_class="btn-danger" %}
+                {% bootstrap_button content="Cancel" button_class="btn-default" href=revision.get_absolute_url %}
+            </div>
+        </form>
+    </section>
+{% endblock %}

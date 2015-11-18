@@ -4,9 +4,7 @@ making changes to the data descriptors managed by the repository.
 """
 
 from django.core.exceptions import ValidationError
-from django.forms.formsets import formset_factory, BaseFormSet, TOTAL_FORM_COUNT
-
-from . import SimpleFormatFieldForm
+from django.forms.formsets import BaseFormSet
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -51,18 +49,3 @@ class FileContentSelectionFormSet(BaseFormSet):
                 break
         else:
             raise ValidationError("No files selected.")
-
-
-class SimpleFormatFieldFormSet(formset_factory(SimpleFormatFieldForm, extra=3, can_delete=True)):
-    """
-    Each form in this set represents a field definition in a simple format
-    type.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(SimpleFormatFieldFormSet, self).__init__(*args, **kwargs)
-        self.data = self.data.copy()
-
-    def add_extra_form(self):
-        field_name = self.add_prefix(TOTAL_FORM_COUNT)
-        self.data[field_name] = int(self.data[field_name]) + 1

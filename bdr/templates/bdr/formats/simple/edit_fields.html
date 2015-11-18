@@ -1,0 +1,58 @@
+{% extends "bdr/formats/edit.html" %}
+{% load bootstrap3 %}
+
+{% block form %}
+    <fieldset>
+        <legend>Fields</legend>
+        {% bootstrap_form wizard.management_form %}
+        {% bootstrap_form wizard.form.management_form %}
+        {% bootstrap_formset_errors wizard.form %}
+
+        <table class="table table-responsive table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-8">Name</th>
+                    <th class="col-xs-1 text-center">Is a key?</th>
+                    <th class="col-xs-2 text-center">Order</th>
+                    <th class="col-xs-1 text-center">Delete?</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for form in wizard.form.forms %}
+                <tr>
+                    <td>
+                        {% bootstrap_field form.name show_label=False layout="horizontal" horizontal_field_class="col-xs-12" horizontal_label_class="" %}
+                    {% for field in form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <span class="form-control-static col-xs-12 text-center">{{ form.is_key }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% bootstrap_field form.ORDER show_label=False layout="horizontal" horizontal_field_class="col-xs-12" horizontal_label_class="" %}
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <span class="form-control-static col-xs-12 text-center">{{ form.DELETE }}</span>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </fieldset>
+
+    <div class="form-group">
+        <div class="form-inline col-xs-5 text-left">
+            {% bootstrap_button button_type="submit" name="wizard_goto_step" value=wizard.steps.prev content="Previous" icon="chevron-left" button_class="btn btn-default" %}
+        </div>
+        <div class="form-inline col-xs-7 text-right">
+            {% bootstrap_button button_type="submit" content="Save" icon="floppy-disk" button_class="btn btn-primary" %}
+            {% bootstrap_button button_type="submit" name="operation" value="add" icon="plus" content="Add field" button_class="btn btn-primary" %}
+            <a class="btn btn-default" href="{% url 'bdr:formats' %}">Cancel</a>
+        </div>
+    </div>
+{% endblock %}

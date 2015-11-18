@@ -1,4 +1,17 @@
+"""
+This module defines classes for displaying raw type formats.
+"""
+
+import os.path
+
+from django.http import StreamingHttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.gzip import gzip_page
+from django.views.generic import View
+from django.views.generic.detail import SingleObjectMixin
+
 from ...views.formats import FormatDetailView
+from ...models.base import Revision
 
 __all__ = ["Record", "Reader", "Writer"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -26,4 +39,33 @@ class RawFormatDetailView(FormatDetailView):
     This view indicates to the user that this format type cannot be modified.
     """
 
-    template_name = "bdr/formats/raw/raw_detail.html"
+    template_name = "bdr/formats/raw/detail.html"
+
+
+class RawRevisionExportView(SingleObjectMixin, View):
+    """
+    This view streams a compressed file to the client.
+
+    File compression is performed on the fly.
+
+    This class overrides the get method of the Django View class. For more
+    information see
+    https://docs.djangoproject.com/en/1.6/ref/class-based-views/base/#django.views.generic.base.View
+    """
+
+    model = Revision
+    pk_url_kwarg = "rpk"
+
+    @method_decorator(gzip_page)
+    def get(self, *args, **kwargs):
+        """
+        Respond to a GET request by streaming the requested file to the client,
+        compressing on-the-fly.
+
+        :param args: The positional arguments extracted from the route.
+        :param kwargs: The keyword argument extracted from the route.
+        """
+        revision = self.get_object()
+        response = StreamingHttpResponse(revision.data, content_type="application/octet-stream")
+        response["Content-Disposition"] = "attachment; filename={:s}".format(os.path.basename(revision.file.name))
+        return response

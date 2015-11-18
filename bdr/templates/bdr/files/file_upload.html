@@ -69,13 +69,13 @@
 
     <section>
         <p class="alert alert-warning alert-dismissable" role="alert"><strong>Note:</strong> Any
-            required <a class="alert-link" href="{% url 'bdr.backend:formats' %}">file formats</a>
+            required <a class="alert-link" href="{% url 'bdr:formats' %}">file formats</a>
             should be defined before proceeding.
 
             <button class="close" type="button" data-dismiss="alert" aria-label="Close">{% bootstrap_icon "remove-circle" %}</button>
         </p>
 
-        <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name %}" method="post"
+        <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}" method="post"
               enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form wizard.management_form %}

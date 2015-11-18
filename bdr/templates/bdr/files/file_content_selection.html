@@ -53,7 +53,7 @@
     </header>
 
     <section>
-        <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name %}" method="post">
+        <form class="form-horizontal" action="{% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify %}" method="post">
             {% csrf_token %}
             {% bootstrap_form wizard.management_form %}
             {% bootstrap_formset wizard.form layout="horizontal" %}

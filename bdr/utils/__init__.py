@@ -1,3 +1,7 @@
+"""
+This package contains various utilities used by the repository.
+"""
+
 from datetime import datetime, timedelta, tzinfo
 
 from django.core.files import File
