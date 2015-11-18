@@ -799,7 +799,7 @@ class Revision(Model):
         if kwargs:
             parent = kwargs["file"]
             # Use the default file format if the keyword is None or missing
-            kwargs["_format"] = kwargs.pop("format") or parent.default_format
+            kwargs["_format"] = kwargs.pop("format", None) or parent.default_format
             if "number" not in kwargs:
                 last_revision = parent.revisions.order_by("number").last()
                 kwargs["number"] = last_revision.number + 1 if last_revision else 1
