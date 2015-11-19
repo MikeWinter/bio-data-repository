@@ -38,7 +38,7 @@ class CategoryDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     model = Category
     paginate_by = 10
     paginate_orphans = 2
-    template_name = "bdr/categories/category_detail.html"
+    template_name = "bdr/categories/detail.html"
 
     def __init__(self, **kwargs):
         super(CategoryDetailView, self).__init__(**kwargs)
@@ -60,25 +60,6 @@ class CategoryDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         self.object = self.get_object(queryset=self.model.objects.all())
         return super(CategoryDetailView, self).get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        """
-        Return the template context for this view.
-
-        This method returns a dictionary containing variables for the rendered
-        view. Available template context variables are:
-
-         * ``category`` - this category
-         * ``datasets`` - the datasets associated with this category
-
-        :param kwargs: A mapping of extra data available for use in templates.
-        :type kwargs: dict of str
-        :return: A dictionary of template variables and values.
-        :rtype: dict of str
-        """
-        context = super(CategoryDetailView, self).get_context_data(**kwargs)
-        context["datasets"] = context["object_list"]
-        return context
-
     def get_queryset(self):
         """
         Get the list of datasets associated with this category.
@@ -92,11 +73,10 @@ class CategoryDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
 class CategoryListView(SearchableViewMixin, ListView):
     """Lists categories previously added to the repository."""
 
-    context_object_name = "categories"
     model = Category
     paginate_by = 10
     paginate_orphans = 2
-    template_name = "bdr/categories/category_list.html"
+    template_name = "bdr/categories/list.html"
 
 
 class CategoryEditView(SearchableViewMixin, UpdateView):
@@ -104,7 +84,7 @@ class CategoryEditView(SearchableViewMixin, UpdateView):
 
     model = Category
     form_class = CategoryForm
-    template_name = "bdr/categories/category_edit.html"
+    template_name = "bdr/categories/edit.html"
 
 
 class CategoryDeleteView(SearchableViewMixin, DeleteView):
@@ -112,7 +92,7 @@ class CategoryDeleteView(SearchableViewMixin, DeleteView):
 
     model = Category
     success_url = reverse_lazy('bdr:categories')
-    template_name = "bdr/categories/category_confirm_delete.html"
+    template_name = "bdr/categories/confirm_delete.html"
 
 
 class CategoryAddView(SearchableViewMixin, CreateView):
@@ -120,4 +100,4 @@ class CategoryAddView(SearchableViewMixin, CreateView):
 
     model = Category
     form_class = CategoryForm
-    template_name = "bdr/categories/category_add.html"
+    template_name = "bdr/categories/add.html"

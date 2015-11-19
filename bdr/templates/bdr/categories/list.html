@@ -1,36 +1,26 @@
-{% extends "bdr/base-sidebar.html" %}
+{% extends "bdr/categories/base.html" %}
 {% load bootstrap3 %}
 
 {% block title %}Categories{% endblock %}
+{% block heading %}Categories{% endblock %}
+{% block breadcrumbs %}
+    <li class="active">Categories</li>
+{% endblock %}
 
-{% block sidebar %}
-    <nav>
-        <h2>Actions</h2>
-        <ul class="nav nav-pills nav-stacked">
-            <li class="active" role="presentation"><a href="{% url 'bdr:categories' %}">
-                {% bootstrap_icon "th-list" %} List
-            </a></li>
-            <li role="presentation"><a href="{% url 'bdr:add-category' %}">
-                {% bootstrap_icon "plus" %} Add
-            </a></li>
-        </ul>
-    </nav>
+{% block menu_items %}
+    <li class="active" role="presentation">
+        <a href="{% url 'bdr:categories' %}">{% bootstrap_icon "th-list" %} List</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:add-category' %}">{% bootstrap_icon "plus" %} Add</a>
+    </li>
 {% endblock %}
 
 {% block content %}
-    <nav>
-        <ol class="breadcrumb small">
-            <li><a href="{% url 'bdr:home' %}">Home</a></li>
-            <li class="active">Categories</li>
-        </ol>
-    </nav>
-
-    <header class="page-header">
-        <h1>Categories</h1>
-    </header>
+    {{ block.super }}
 
     <section>
-    {% if categories %}
+    {% if page_obj %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -38,7 +28,7 @@
                     <th class="col-xs-4">Datasets</th>
                 </tr>
             </thead>
-        {% for category in categories %}
+        {% for category in page_obj %}
             <tbody>
                 <tr>
                     <th><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></th>

@@ -80,6 +80,8 @@ available.
 4. Initialise the database using the manage script: ``./manage.py syncdb``
 5. Extract the application assets: ``./manage.py collectstatic``
 
+Once the server process has been restarted, the application will be available for use.
+
 
 Legal
 -----
