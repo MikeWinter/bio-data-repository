@@ -3,21 +3,23 @@ Storage handling for models based on delta-compression.
 """
 
 from hashlib import sha1 as hash_algorithm
-from locket import lock_file
 from tempfile import TemporaryFile
 import errno
 import fnmatch
 import io
 import os.path
 import shutil
+
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from locket import lock_file
 from xdelta import DeltaFile
 
 __all__ = ["delta_storage", "upload_path"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
-    Copyright (C) 2015 Michael Winter
+    Biological Dataset Repository: data archival and retrieval.
+    Copyright (C) 2015  Michael Winter
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,9 +31,9 @@ __license__ = """
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
     """
 
 

@@ -1,10 +1,13 @@
 """
 This package defines the types used to implement format-dependent export and
-merge functionality within the repository.
+merge functionality within the repository, and the plug-in mechanism for
+extending it.
 
 Each revision of a file within the repository is assigned a format, which
-enables parsing
-The base types for parsing and rewriting dataset file formats.
+enables the parsing of its content into discrete fields. The repository
+includes built-in support for tabular formats (CSV and DSV, more generally) but
+it is recognised that this will not cater for all format types. To this end, it
+is possible to introduce format plug-ins to implement other types.
 """
 # TODO: Document format plug-in mechanism
 
@@ -16,7 +19,8 @@ import pkg_resources
 __all__ = ["Record", "Reader", "Converter"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
-    Copyright (C) 2015 Michael Winter
+    Biological Dataset Repository: data archival and retrieval.
+    Copyright (C) 2015  Michael Winter
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,9 +32,9 @@ __license__ = """
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
     """
 
 _ENTRY_POINT_GROUP_NAME = "bdr.formats"
