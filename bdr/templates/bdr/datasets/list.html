@@ -1,36 +1,26 @@
-{% extends "bdr/base-sidebar.html" %}
+{% extends "bdr/datasets/base.html" %}
 {% load bootstrap3 %}
 
 {% block title %}Datasets{% endblock %}
+{% block heading %}Datasets{% endblock %}
+{% block breadcrumbs %}
+    <li class="active">Datasets</li>
+{% endblock %}
 
-{% block sidebar %}
-    <nav>
-        <h2>Actions</h2>
-        <ul class="nav nav-pills nav-stacked">
-            <li class="active" role="presentation"><a href="{% url 'bdr:datasets' %}">
-                {% bootstrap_icon "th-list" %} List
-            </a></li>
-            <li role="presentation"><a href="{% url 'bdr:add-dataset' %}">
-                {% bootstrap_icon "plus" %} Add
-            </a></li>
-        </ul>
-    </nav>
+{% block menu_items %}
+    <li class="active" role="presentation">
+        <a href="{% url 'bdr:datasets' %}">{% bootstrap_icon "th-list" %} List</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:add-dataset' %}">{% bootstrap_icon "plus" %} Add</a>
+    </li>
 {% endblock %}
 
 {% block content %}
-    <nav>
-        <ol class="breadcrumb small">
-            <li><a href="{% url 'bdr:home' %}">Home</a></li>
-            <li class="active">Datasets</li>
-        </ol>
-    </nav>
-
-    <header class="page-header">
-        <h1>Datasets</h1>
-    </header>
+    {{ block.super }}
 
     <section>
-    {% if datasets.exists %}
+    {% if page_obj %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -38,7 +28,7 @@
                     <th class="col-xs-4">Files</th>
                 </tr>
             </thead>
-        {% for dataset in datasets %}
+        {% for dataset in page_obj %}
             <tbody>
                 <tr>
                     <th><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></th>

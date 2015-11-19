@@ -1,0 +1,50 @@
+{% extends "bdr/datasets/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Editing {{ dataset.name }} {{ block.super }}{% endblock %}
+{% block heading %}{{ dataset.name }}{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+    <li class="active">Edit</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    <li role="presentation">
+        <a href="{{ dataset.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    <li class="active" role="presentation">
+        <a href="{% url 'bdr:edit-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:delete-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        <h2>Details</h2>
+        <form class="form-horizontal" action="{% url 'bdr:edit-dataset' dpk=dataset.pk dataset=dataset.name|slugify %}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form layout="horizontal" %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-12 text-right">
+                    {% bootstrap_button button_type="submit" content="Save" button_class="btn-primary" %}
+                    {% bootstrap_button content="Cancel" href=dataset.get_absolute_url button_class="btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

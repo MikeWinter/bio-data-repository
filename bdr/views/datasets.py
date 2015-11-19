@@ -43,7 +43,7 @@ class DatasetDetailView(SearchableViewMixin, DetailView):
 
     model = Dataset
     pk_url_kwarg = "dpk"
-    template_name = "bdr/datasets/dataset_detail.html"
+    template_name = "bdr/datasets/detail.html"
 
     def get_context_data(self, **kwargs):
         """
@@ -99,11 +99,10 @@ class DatasetListView(SearchableViewMixin, ListView):
             select the final page.
     """
 
-    context_object_name = "datasets"
     model = Dataset
     paginate_by = 10
     paginate_orphans = 2
-    template_name = "bdr/datasets/dataset_list.html"
+    template_name = "bdr/datasets/list.html"
 
     def get_queryset(self):
         """
@@ -202,7 +201,7 @@ class DatasetEditView(SearchableViewMixin, UpdateView):
     model = Dataset
     form_class = DatasetForm
     pk_url_kwarg = "dpk"
-    template_name = "bdr/datasets/dataset_edit.html"
+    template_name = "bdr/datasets/edit.html"
 
 
 class DatasetAddView(SearchableViewMixin, CreateView):
@@ -210,7 +209,7 @@ class DatasetAddView(SearchableViewMixin, CreateView):
 
     model = Dataset
     form_class = DatasetForm
-    template_name = "bdr/datasets/dataset_add.html"
+    template_name = "bdr/datasets/add.html"
 
 
 class DatasetDeleteView(SearchableViewMixin, DeleteView):
@@ -219,4 +218,4 @@ class DatasetDeleteView(SearchableViewMixin, DeleteView):
     model = Dataset
     pk_url_kwarg = "dpk"
     success_url = reverse_lazy('bdr:datasets')
-    template_name = "bdr/datasets/dataset_confirm_delete.html"
+    template_name = "bdr/datasets/confirm_delete.html"
