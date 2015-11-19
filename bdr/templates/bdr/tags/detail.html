@@ -1,38 +1,29 @@
-{% extends "bdr/base-sidebar.html" %}
+{% extends "bdr/tags/base.html" %}
 {% load bootstrap3 %}
 {% load humanize %}
 
-{% block title %}#{{ tag.name }}{% endblock %}
+{% block title %}#{{ tag.name }} {{ block.super }}{% endblock %}
+{% block heading %}#{{ tag.name }}{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">#{{ tag.name }}</li>
+{% endblock %}
 
-{% block sidebar %}
-    <nav>
-        <h2>Actions</h2>
-        <ul class="nav nav-pills nav-stacked">
-            <li class="active" role="presentation"><a href="{{ tag.get_absolute_url }}">
-                {% bootstrap_icon "file" %} View
-            </a></li>
-            <li role="presentation"><a href="{% url 'bdr:edit-tag' pk=tag.pk name=tag.name|slugify %}">
-                {% bootstrap_icon "pencil" %} Edit
-            </a></li>
-            <li role="presentation"><a href="{% url 'bdr:delete-tag' pk=tag.pk name=tag.name|slugify %}">
-                {% bootstrap_icon "remove" %} Delete
-            </a></li>
-        </ul>
-    </nav>
+{% block menu_items %}
+    {{ block.super }}
+    <li class="active" role="presentation">
+        <a href="{{ tag.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:edit-tag' pk=tag.pk name=tag.name|slugify %}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:delete-tag' pk=tag.pk name=tag.name|slugify %}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
 {% endblock %}
 
 {% block content %}
-    <nav>
-        <ol class="breadcrumb small">
-            <li><a href="{% url 'bdr:home' %}">Home</a></li>
-            <li><a href="{% url 'bdr:tags' %}">Tags</a></li>
-            <li class="active">#{{ tag.name }}</li>
-        </ol>
-    </nav>
-
-    <header class="page-header">
-        <h1>#{{ tag.name }}</h1>
-    </header>
+    {{ block.super }}
 
     <section>
         <h2>Datasets</h2>
@@ -40,9 +31,9 @@
         <table class="table table-condensed">
             <thead>
                 <tr>
-                    <th class="col-xs-6">Dataset</th>
-                    <th class="col-xs-2">Files</th>
-                    <th class="col-xs-4">Updated</th>
+                    <th class="col-xs-8">Dataset</th>
+                    <th class="col-xs-1">Files</th>
+                    <th class="col-xs-3">Updated</th>
                 </tr>
             </thead>
 
@@ -73,8 +64,8 @@
                 <tr>
                     <th>Dataset</th>
                     <th>File</th>
-                    <th>Revisions</th>
-                    <th>Updated</th>
+                    <th class="col-xs-1">Revisions</th>
+                    <th class="col-xs-3">Updated</th>
                 </tr>
             </thead>
 
@@ -106,9 +97,9 @@
                 <tr>
                     <th>Dataset</th>
                     <th>File</th>
-                    <th>Revision</th>
-                    <th>Updated</th>
+                    <th class="col-xs-1">Revision</th>
                     <th>Size</th>
+                    <th class="col-xs-3">Updated</th>
                 </tr>
             </thead>
 
@@ -118,7 +109,6 @@
                     <td><a href="{{ revision.file.dataset.get_absolute_url }}">{{ revision.file.dataset.name }}</a></td>
                     <td><a href="{{ revision.file.get_absolute_url }}">{{ revision.file.name }}</a></td>
                     <td><a href="{{ revision.get_absolute_url }}">{{ revision.number }}</a></td>
-                    <td title="Updated on {{ revision.update.timestamp }}">{{ revision.update.timestamp|naturaltime }}</td>
                     <td>
                         {{ revision.size|filesizeformat }}
                         <a class="btn btn-link btn-xs" href="{% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=revision.file.pk filename=revision.file.name|slugify dpk=revision.file.dataset.pk dataset=revision.file.dataset.name|slugify %}"
@@ -126,6 +116,7 @@
                             {% bootstrap_icon "download" %}
                         </a>
                     </td>
+                    <td title="Updated on {{ revision.update.timestamp }}">{{ revision.update.timestamp|naturaltime }}</td>
                 </tr>
             {% endfor %}
             </tbody>

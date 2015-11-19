@@ -23,7 +23,6 @@ The following mixin is also provided:
 """
 
 from django.shortcuts import render
-from django.core.urlresolvers import reverse_lazy
 from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, TemplateView
 
@@ -172,7 +171,6 @@ class SearchView(SearchableViewMixin, TemplateView):
     """
 
     form_class = SearchForm
-    success_url = reverse_lazy()
     template_name = "bdr/search.html"
 
     def get_context_data(self, **kwargs):

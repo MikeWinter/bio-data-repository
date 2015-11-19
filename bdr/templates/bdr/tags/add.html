@@ -1,0 +1,45 @@
+{% extends "bdr/tags/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Add {{ block.super }}{% endblock %}
+{% block heading %}Add a new tag{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">Add tag</li>
+{% endblock %}
+
+{% block menu_items %}
+    <li role="presentation"><a href="{% url 'bdr:tags' %}">
+        {% bootstrap_icon "th-list" %} List
+    </a></li>
+    <li class="active" role="presentation"><a href="{% url 'bdr:add-tag' %}">
+        {% bootstrap_icon "plus" %} Add
+    </a></li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        <form class="form-horizontal" action="{% url 'bdr:add-tag' %}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form layout="horizontal" %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-12 text-right">
+                    {% url 'bdr:tags' as tag_list_url %}
+                    {% bootstrap_button button_type="submit" content="Save" button_class="btn-primary" %}
+                    {% bootstrap_button content="Cancel" href=tag_list_url button_class="btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

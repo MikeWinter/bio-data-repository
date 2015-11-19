@@ -63,11 +63,10 @@ class TagListView(SearchableViewMixin, ListView):
             select the final page.
     """
 
-    context_object_name = 'tags'
     model = Tag
     paginate_by = 10
     paginate_orphans = 2
-    template_name = "bdr/tags/tag_list.html"
+    template_name = "bdr/tags/list.html"
 
     def get_queryset(self):
         """
@@ -169,7 +168,7 @@ class TagAddView(SearchableViewMixin, CreateView):
 
     model = Tag
     form_class = TagForm
-    template_name = "bdr/tags/tag_add.html"
+    template_name = "bdr/tags/add.html"
 
 
 class TagDetailView(SearchableViewMixin, DetailView):
@@ -181,8 +180,7 @@ class TagDetailView(SearchableViewMixin, DetailView):
     model = Tag
     paginate_by = 10
     paginate_orphans = 2
-    supported_objects = ("datasets", "files", "revisions")
-    template_name = "bdr/tags/tag_detail.html"
+    template_name = "bdr/tags/detail.html"
 
 
 class TagEditView(SearchableViewMixin, UpdateView):
@@ -190,7 +188,7 @@ class TagEditView(SearchableViewMixin, UpdateView):
 
     form_class = TagForm
     model = Tag
-    template_name = "bdr/tags/tag_edit.html"
+    template_name = "bdr/tags/edit.html"
 
 
 class TagDeleteView(SearchableViewMixin, DeleteView):
@@ -198,4 +196,4 @@ class TagDeleteView(SearchableViewMixin, DeleteView):
 
     model = Tag
     success_url = reverse_lazy("bdr:tags")
-    template_name = "bdr/tags/tag_confirm_delete.html"
+    template_name = "bdr/tags/confirm_delete.html"

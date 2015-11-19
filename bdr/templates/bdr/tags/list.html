@@ -1,36 +1,26 @@
-{% extends "bdr/base-sidebar.html" %}
+{% extends "bdr/tags/base.html" %}
 {% load bootstrap3 %}
 
 {% block title %}Tags{% endblock %}
+{% block heading %}Tags{% endblock %}
+{% block breadcrumbs %}
+    <li class="active">Tags</li>
+{% endblock %}
 
-{% block sidebar %}
-    <nav>
-        <h2>Actions</h2>
-        <ul class="nav nav-pills nav-stacked">
-            <li class="active" role="presentation"><a href="{% url 'bdr:tags' %}">
-                {% bootstrap_icon "th-list" %} List
-            </a></li>
-            <li role="presentation"><a href="{% url 'bdr:add-tag' %}">
-                {% bootstrap_icon "plus" %} Add
-            </a></li>
-        </ul>
-    </nav>
+{% block menu_items %}
+    <li class="active" role="presentation"><a href="{% url 'bdr:tags' %}">
+        {% bootstrap_icon "th-list" %} List
+    </a></li>
+    <li role="presentation"><a href="{% url 'bdr:add-tag' %}">
+        {% bootstrap_icon "plus" %} Add
+    </a></li>
 {% endblock %}
 
 {% block content %}
-    <nav>
-        <ol class="breadcrumb small">
-            <li><a href="{% url 'bdr:home' %}">Home</a></li>
-            <li class="active">Tags</li>
-        </ol>
-    </nav>
-
-    <header class="page-header">
-        <h1>Tags</h1>
-    </header>
+    {{ block.super }}
 
     <section>
-    {% if tags %}
+    {% if page_obj %}
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -42,7 +32,7 @@
             </thead>
 
             <tbody>
-            {% for tag in tags %}
+            {% for tag in page_obj %}
                 <tr>
                     <th><a href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a></th>
                     <td>{{ tag.datasets.count }}</td>
@@ -53,7 +43,7 @@
             </tbody>
         </table>
 
-        {% bootstrap_pagination page_obj size="small" %}
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
     {% else %}
         <p>No tags have been added yet.</p>
     {% endif %}

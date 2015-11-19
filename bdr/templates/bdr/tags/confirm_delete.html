@@ -1,0 +1,48 @@
+{% extends "bdr/tags/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete #{{ tag.name }}? {{ block.super }}{% endblock %}
+{% block heading %}Delete #{{ tag.name }}?{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a></li>
+    <li class="active">Delete</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    <li role="presentation">
+        <a href="{{ tag.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    <li role="presentation">
+        <a href="{% url 'bdr:edit-tag' pk=tag.pk name=tag.name|slugify %}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    <li class="active" role="presentation">
+        <a href="{% url 'bdr:delete-tag' pk=tag.pk name=tag.name|slugify %}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        <form action="{% url 'bdr:delete-tag' pk=tag.pk name=tag.name|slugify %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the <em>{{ tag.name }}</em> tag?</p>
+            <p class="text-danger help-block">This action is irreversible!</p>
+
+            <div class="form-group">
+                {% bootstrap_button button_type="submit" content="Delete" button_class="btn-danger" %}
+                {% bootstrap_button content="Cancel" button_class="btn-default" href=tag.get_absolute_url %}
+            </div>
+        </form>
+    </section>
+{% endblock %}
