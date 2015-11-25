@@ -2,7 +2,7 @@
 This module defines customised widgets for use with forms in this application.
 """
 
-from django.forms.widgets import CheckboxInput, MultiWidget, Select, TextInput
+from django.forms.widgets import CheckboxInput, MultiWidget, NumberInput, Select, TextInput
 
 __all__ = []
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -69,19 +69,93 @@ class SelectableTextInput(MultiWidget):
         Given a list of rendered widgets (as strings), returns a Unicode string
         representing the HTML for the whole lot.
 
-        This hook allows you to format the HTML design of the widgets, if
-        needed.
-
         :param rendered_widgets: A list of widgets rendered in HTML.
         :type rendered_widgets: list of unicode
         :return: A HTML string combining each widget.
         :rtype: unicode
         """
 
-        return """
+        return u"""
         <div class="input-group">
             <span class="input-group-addon">{0}</span>
             {1}
+        </div>
+        """.format(*rendered_widgets)
+
+
+# noinspection PyAbstractClass
+# Base class implements the render method
+class ScaledNumberInput(MultiWidget):
+    """
+    This widget combines a text box with a select menu to enable the user to
+    specify values at different scales.
+
+    The widget normalises the value according to the factor associated with
+    each scale.
+
+    This widget is intended to be used with the Bootstrap CSS framework.
+    """
+
+    def __init__(self, choices, default, attrs=None):
+        self._choices = list(choices)
+        self._default = default
+        widgets = (NumberInput, Select(choices=choices))
+        super(ScaledNumberInput, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        """
+        Return a list of decompressed values for the given compressed value.
+
+        The first element is the numeric value. The second element is the scale
+        type.
+
+        :param value: A compressed value to be represented by this widget.
+        :type value: str | unicode
+        :return: The decompressed interpretation of the value.
+        :rtype: list of (bool, str | unicode)
+        """
+        if value is None or value == 0:
+            return 0, self._default
+        for factor, _ in sorted(self._choices, key=lambda x: x[0], reverse=True):
+            if value % factor == 0:
+                return [value / factor, factor]
+        return [value, self._default]
+
+    def value_from_datadict(self, data, files, name):
+        """
+        Return the normalised value of this widget derived from the submitted
+        data dictionaries.
+
+        :param data: A dictionary of strings submitted by the user via a form.
+        :type data: dict of (str | unicode)
+        :param files: A dictionary of files uploaded by the user.
+        :type files: dict of str
+        :param name: The key name of this widget.
+        :type name: str
+        :return: The value of this widget.
+        :rtype: str | unicode
+        """
+        number, interval_type = super(ScaledNumberInput, self).value_from_datadict(data, files, name)
+        return int(float(number) * float(interval_type))
+
+    def format_output(self, rendered_widgets):
+        """
+        Given a list of rendered widgets (as strings), returns a Unicode string
+        representing the HTML for the whole lot.
+
+        :param rendered_widgets: A list of widgets rendered in HTML.
+        :type rendered_widgets: list of unicode
+        :return: A HTML string combining each widget.
+        :rtype: unicode
+        """
+        return u"""
+        <div class="row">
+            <div class="col-sm-6">
+                {0}
+            </div>
+            <div class="col-sm-6">
+                {1}
+            </div>
         </div>
         """.format(*rendered_widgets)
 

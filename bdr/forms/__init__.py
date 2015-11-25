@@ -21,7 +21,7 @@ from django.forms import FileInput, HiddenInput, Textarea, TextInput
 from django.forms import Form, ModelForm
 
 from .fields import SelectableCharField
-from .widgets import ComboTextInput
+from .widgets import ComboTextInput, ScaledNumberInput
 from ..models import Category, Dataset, File, Filter, Format, Revision, Source, Tag
 
 __all__ = ["CategoryForm", "DatasetForm", "FileForm", "FilterForm", "SourceForm", "TagForm",
@@ -82,13 +82,6 @@ class FileForm(ModelForm):
     editing existing, entries.
     """
 
-    # def clean_default_format(self):
-    #     value = self.cleaned_data.get('default_format', None)
-    #     if value is None:
-    #         ValidationError(self.fields['default_format'].error_messages['required'],
-    #                         code='required')
-    #     return value
-
     class Meta(object):
         """Configuration options for the file form."""
 
@@ -140,6 +133,9 @@ class SourceForm(ModelForm):
 
         model = Source
         fields = "__all__"
+        widgets = {
+            "period": ScaledNumberInput([(1, "hours"), (24, "days"), (168, "weeks")], default=1)
+        }
 
 
 class TagForm(ModelForm):
