@@ -31,7 +31,7 @@
                 <tr>
                     <th class="col-xs-7">Name</th>
                     <th class="col-xs-1">Revisions</th>
-                    <th class="col-xs-3">Last modified</th>
+                    <th class="col-xs-3">Last updated</th>
                     <th class="col-xs-1"><span class="sr-only">Operations</span></th>
                 </tr>
             </thead>
@@ -52,7 +52,7 @@
                     {% endfor %}
                     </th>
                     <td>{{ file.revisions.count }}</td>
-                    <td>{{ file.revisions.last.update.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
+                    <td>{{ file.revisions.last.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
                     <td class="text-right text-nowrap" role="navigation">
                         <ul class="list-inline">
                             <li><a href="{{ edit_url }}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>

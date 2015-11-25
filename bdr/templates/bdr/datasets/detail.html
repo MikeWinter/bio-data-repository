@@ -57,7 +57,11 @@
     </section>
 
     <section>
-        <h2>Sources</h2>
+        <h2>
+            Sources
+            {% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify as add_source_url %}
+            <small><a href="{{ add_source_url }}" title="Add source&hellip;">{% bootstrap_icon "plus-sign" %}</a></small>
+        </h2>
     {% if sources.exists %}
         <table class="table table-condensed">
             <thead>
@@ -103,14 +107,18 @@
     </section>
 
     <section>
-        <h2>Files</h2>
+        <h2>
+            Files
+            {% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}
+            <small><a href="{{ upload_url }}" title="Upload file&hellip;">{% bootstrap_icon "plus-sign" %}</a></small>
+        </h2>
     {% if files.exists %}
         <table class="table table-condensed">
             <thead>
                 <tr>
                     <th class="col-xs-7">Name</th>
                     <th class="col-xs-1">Revisions</th>
-                    <th class="col-xs-3">Last modified</th>
+                    <th class="col-xs-3">Last updated</th>
                     <th class="col-xs-1"><span class="sr-only">Operations</span></th>
                 </tr>
             </thead>
@@ -131,7 +139,7 @@
                     {% endfor %}
                     </th>
                     <td>{{ file.revisions.count }}</td>
-                    <td>{{ file.revisions.last.update.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
+                    <td>{{ file.revisions.last.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
                     <td class="text-right text-nowrap" role="navigation">
                         <ul class="list-inline">
                             <li><a href="{% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify %}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>

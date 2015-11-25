@@ -322,7 +322,7 @@ class TarArchive(Archive):
         if not self.can_read():
             raise IOError('Not a tar archive.')
         info = self._tar.getmember(key)
-        return Member(info.name, info.size, info.mtime, self._tar.extractfile(info))
+        return Member(info.name, info.size, datetime.fromtimestamp(info.mtime, tz=utc), self._tar.extractfile(info))
 
     def can_read(self):
         """

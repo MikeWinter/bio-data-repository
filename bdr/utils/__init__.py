@@ -36,14 +36,9 @@ class RemoteFile(File):
     # noinspection PyShadowingBuiltins
     def __init__(self, file, name=None, size=-1, modified_time=None):
         super(RemoteFile, self).__init__(file, name)
-        self._modified_time = modified_time
+        self.modified_time = modified_time
         if size != -1:
             self.size = size
-
-    def _get_modified_time(self):
-        if self._modified_time is None:
-            pass
-        return self._modified_time
 
 
 class UTC(tzinfo):

@@ -52,9 +52,10 @@
             <thead>
                 <tr>
                     <th class="col-xs-1">Revision</th>
-                    <th class="col-xs-4">Updated on</th>
+                    <th class="col-xs-3">Last modified</th>
+                    <th class="col-xs-3">Added on</th>
                     <th class="col-xs-2">Size</th>
-                    <td class="col-xs-5"></td>
+                    <td class="col-xs-3"></td>
                 </tr>
             </thead>
 
@@ -63,7 +64,8 @@
                 {% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as export_url %}
                 <tr>
                     <td><a href="{{ revision.get_absolute_url }}">{{ revision.number }}</a></td>
-                    <td>{{ revision.update.timestamp|date:"j M Y, H:i"|default:"Unknown"}}</td>
+                    <td>{{ revision.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
+                    <td>{{ revision.update.timestamp|date:"j M Y, H:i"|default:"Unknown" }}</td>
                     <td>
                         {{ revision.size|filesizeformat }}
                         <a class="btn btn-link btn-xs" href="{{ export_url }}" title="Download revision">

@@ -352,7 +352,8 @@ class Dataset(Model):
         """
         file_defaults = {"default_format": Format.default() if format is None else format}
         instance = self.files.get_or_create(name=file.name, defaults=file_defaults)[0]
-        instance.revisions.create(data=file, size=file.size, update=update, format=format)
+        instance.revisions.create(data=file, size=file.size, modified_at=file.modified_time, update=update,
+                                  format=format)
 
     def get_absolute_url(self):
         """
@@ -499,6 +500,7 @@ class Source(Model):
         :rtype: tuple of (list of RemoteFile, long, datetime)
         """
         provider = self._get_transport_provider()
+        size, modification_date = provider.get_size(), provider.get_modification_date()
         archive = self._get_archive(provider.get_content())
         filters = self._get_filters()
         file_list = []
@@ -509,9 +511,9 @@ class Source(Model):
                 pass  # If a file is rejected, skip it.
             else:
                 member = archive[file_name]
-                new_file = RemoteFile(member.file, mapped_name, member.size, member.mtime)
+                new_file = RemoteFile(member.file, mapped_name, member.size, member.mtime or modification_date)
                 file_list.append(new_file)
-        return file_list, provider.get_size(), provider.get_modification_date()
+        return file_list, size, modification_date
 
     def checked(self, timestamp=None):
         """
@@ -775,6 +777,8 @@ class Revision(Model):
     """The data contained within this file."""
     size = fields.BigIntegerField(editable=False)
     """The size, in bytes, of this revision."""
+    modified_at = fields.DateTimeField(blank=True, null=True, editable=False)
+    """A timestamp indicating when this revision was modified at source."""
     update = related.ForeignKey(Update, related_name="revisions", related_query_name="revision", editable=False)
     """The update that caused the addition of this revision."""
     _format = related.ForeignKey(Format, verbose_name="Format", related_name='revisions', related_query_name='revision',

@@ -56,8 +56,12 @@
                 <col class="col-xs-10" />
             </colgroup>
             <tr>
-                <th>Updated at</th>
-                <td>{{ revision.update.timestamp }}</td>
+                <th>Added at</th>
+                <td>{{ revision.update.timestamp|date:"j M Y, H:i"|default:"Unknown" }}</td>
+            </tr>
+            <tr>
+                <th>Last modified</th>
+                <td>{{ revision.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
             </tr>
             <tr>
                 <th>Size</th>

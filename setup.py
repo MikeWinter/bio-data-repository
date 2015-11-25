@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 setup(
     name='bio-data-repository',
     description='Biological Dataset Repository: a simple archival and retrieval system for biological data.',
-    version='2.0a7',
+    version='2.0a8',
     author='Michael Winter',
     author_email='Michael.Winter.2013@live.rhul.ac.uk',
     url='https://github.com/MikeWinter/bio-data-repository',
