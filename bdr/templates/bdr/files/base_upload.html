@@ -1,0 +1,75 @@
+{% extends "bdr/files/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }}) {{ block.super }}{% endblock %}
+{% block heading %}
+    Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})
+    <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>
+{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">Upload file ({{ wizard.steps.step1 }}/{{ wizard.steps.count }})</li>
+{% endblock %}
+
+{% block menu_items %}
+    <li role="presentation">
+        <a href="{{ dataset.get_absolute_url }}">{% bootstrap_icon "level-up" %} Back to Dataset</a>
+    </li>
+    <li role="presentation">
+        {% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify as list_url %}
+        <a href="{{ list_url }}">{% bootstrap_icon "th-list" %} List files</a>
+    </li>
+    <li class="active" role="presentation">
+        {% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}
+        <a href="{{ upload_url }}">{% bootstrap_icon "upload" %} Upload file</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ wizard.form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ wizard.form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+    {% block prologue %}{% endblock %}
+
+        {% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}
+        <form class="form-horizontal" action="{{ upload_url }}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form wizard.management_form %}
+        {% if wizard.form.forms %}
+            {% bootstrap_form wizard.form.management_form %}
+            {% for form in wizard.form.forms %}
+                {% bootstrap_form form layout="horizontal" %}
+            {% endfor %}
+        {% else %}
+            {% bootstrap_form wizard.form layout="horizontal" %}
+        {% endif %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-5 text-left">
+                {% ifnotequal wizard.steps.step1 1 %}
+                    <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn btn-default" formnovalidate="formnovalidate">
+                        {% bootstrap_icon "chevron-left" %} Previous
+                    </button>
+                {% endifnotequal %}
+                </div>
+                <div class="form-inline col-xs-7 text-right">
+                {% ifnotequal wizard.steps.step1 wizard.steps.count %}
+                    {% bootstrap_button button_type="submit" content="Next" icon="chevron-right" button_class="btn btn-primary" %}
+                {% else %}
+                    {% bootstrap_button button_type="submit" content="Save" button_class="btn btn-primary" %}
+                {% endifnotequal %}
+                    {% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify as list_url %}
+                    {% bootstrap_button href=list_url content="Cancel" button_class="btn btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "bdr/files/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Files {{ block.super }}{% endblock %}
+{% block heading %}Files <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>{% endblock %}
+{% block breadcrumbs %}
+    <li class="active">Files</li>
+{% endblock %}
+
+{% block menu_items %}
+    <li role="presentation">
+        <a href="{{ dataset.get_absolute_url }}">{% bootstrap_icon "level-up" %} Back to Dataset</a>
+    </li>
+    <li class="active" role="presentation">
+        {% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify as list_url %}
+        <a href="{{ list_url }}">{% bootstrap_icon "th-list" %} List files</a>
+    </li>
+    <li role="presentation">
+        {% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}
+        <a href="{{ upload_url }}">{% bootstrap_icon "upload" %} Upload file</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+    {% if page_obj %}
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th class="col-xs-7">Name</th>
+                    <th class="col-xs-1">Revisions</th>
+                    <th class="col-xs-3">Last modified</th>
+                    <th class="col-xs-1"><span class="sr-only">Operations</span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for file in page_obj %}
+                {% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as edit_url %}
+                {% url 'bdr:delete-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+                <tr>
+                    <th>
+                        <a href="{{ file.get_absolute_url }}">{{ file.name }}</a>
+                    {% if file.revisions.exists %}
+                        {% url 'bdr:export-latest-revision' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as export_latest_url %}
+                        <a class="btn btn-link btn-xs" href="{{ export_latest_url }}" title="Download latest revision">{% bootstrap_icon "download" %}</a>
+                    {% endif %}
+                    {% for tag in file.tags.all %}
+                        <a class="small label label-default" href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a>
+                    {% endfor %}
+                    </th>
+                    <td>{{ file.revisions.count }}</td>
+                    <td>{{ file.revisions.last.update.modified_at|date:"j M Y, H:i"|default:"Unknown" }}</td>
+                    <td class="text-right text-nowrap" role="navigation">
+                        <ul class="list-inline">
+                            <li><a href="{{ edit_url }}" title="Edit">{% bootstrap_icon "pencil" %}</a></li>
+                            <li><a href="{{ delete_url }}" title="Delete">{% bootstrap_icon "remove" %}</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
+    {% else %}
+        {% url 'bdr:upload-file' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}
+        <p>There are no files in this dataset. <a href="{{ upload_url }}">Upload a file</a> to manually add its contents
+            to the repository.</p>
+    {% endif %}
+    </section>
+{% endblock %}

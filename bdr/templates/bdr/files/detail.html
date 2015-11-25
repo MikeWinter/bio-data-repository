@@ -1,0 +1,92 @@
+{% extends "bdr/files/base.html" %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}{{ file.name }} {{ block.super }}{% endblock %}
+{% block heading %}{{ file.name }} <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">{{ file.name }}</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    <li class="active" role="presentation">
+        <a href="{{ file.get_absolute_url }}">{% bootstrap_icon "file" %} View</a></li>
+    <li role="presentation">
+    {% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as edit_url %}
+        <a href="{{ edit_url }}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    {% url 'bdr:delete-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+    <li role="presentation">
+        <a href="{{ delete_url }}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+    {# TODO: Change route for revision upload and remove disabled class #}
+    {% comment %}{% url 'bdr.frontend:file-add' slug=object.slug as upload_url %}{% endcomment %}
+    <li class="disabled" role="presentation">
+        <a href="{{ upload_url }}">{% bootstrap_icon "upload" %} Upload revision</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        <h2>Details</h2>
+        <table class="table table-responsive">
+            <colgroup>
+                <col class="col-xs-2" />
+                <col class="col-xs-10" />
+            </colgroup>
+            <tr>
+                <th>Default format</th>
+                <td>{{ file.default_format.name }}</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Revisions</h2>
+    {% if page_obj %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-xs-1">Revision</th>
+                    <th class="col-xs-4">Updated on</th>
+                    <th class="col-xs-2">Size</th>
+                    <td class="col-xs-5"></td>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for revision in page_obj %}
+                {% url 'bdr:export-revision' rpk=revision.pk revision=revision.number fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as export_url %}
+                <tr>
+                    <td><a href="{{ revision.get_absolute_url }}">{{ revision.number }}</a></td>
+                    <td>{{ revision.update.timestamp|date:"j M Y, H:i"|default:"Unknown"}}</td>
+                    <td>
+                        {{ revision.size|filesizeformat }}
+                        <a class="btn btn-link btn-xs" href="{{ export_url }}" title="Download revision">
+                            {% bootstrap_icon "download" %}
+                        </a>
+                    </td>
+                    <td class="text-right">
+                    {% for tag in revision.tags.all %}
+                        <a class="small label label-default"
+                           href="{% url 'bdr:view-tag' pk=tag.pk name=tag.name|slugify %}">{{ tag.name }}</a>
+                    {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
+    {% else %}
+        {# TODO: Change route for revision upload #}
+        {% comment %}{% url 'bdr:add-file' as upload_url %}{% endcomment %}
+        <p>There are no revisions of this file. <a href="{{ upload_url }}">Upload a revision</a> to manually add its
+            contents to the repository.</p>
+    {% endif %}
+    </section>
+{% endblock %}

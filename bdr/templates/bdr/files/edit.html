@@ -1,0 +1,57 @@
+{% extends "bdr/files/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Editing {{ file.name }} {{ block.super }}{% endblock %}
+{% block heading %}{{ file.name }} <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{{ file.get_absolute_url }}">{{ file.name }}</a></li>
+    <li class="active">Edit</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    <li role="presentation">
+        <a href="{{ file.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    {% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as view_url %}
+    <li class="active" role="presentation">
+        <a href="{{ view_url }}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    {% url 'bdr:delete-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+    <li role="presentation">
+        <a href="{{ delete_url }}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+    {# TODO: Change route for revision uploads and remove disabled class #}
+    {% comment %}{% url 'bdr:upload-revision' dpk=dataset.pk dataset=dataset.name|slugify as upload_url %}{% endcomment %}
+    <li class="disabled" role="presentation">
+        <a href="{{ upload_url }}">{% bootstrap_icon "upload" %} Upload revision</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        {% url 'bdr:edit-file' fpk=file.pk filename=file.name|slugify dpk=dataset.pk dataset=dataset.name|slugify as action_url %}
+        <form class="form-horizontal" action="{{ action_url }}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form layout="horizontal" %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-12 text-right">
+                    {% bootstrap_button button_type="submit" content="Save" button_class="btn-primary" %}
+                    {% bootstrap_button content="Cancel" href=file.get_absolute_url button_class="btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %} – {{ dataset.name }}{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+        {% block menu_items %}
+            <li role="presentation">
+                <a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">{% bootstrap_icon "level-up" %} Back to Files</a>
+            </li>
+        {% endblock %}
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+        {% block breadcrumbs %}
+            <li><a href="{% url 'bdr:files' dpk=dataset.pk dataset=dataset.name|slugify %}">Files</a></li>
+        {% endblock %}
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>{% block heading %}{% endblock %}</h1>
+    </header>
+{% endblock %}

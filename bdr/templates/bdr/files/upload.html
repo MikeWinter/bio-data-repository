@@ -1,0 +1,11 @@
+{% extends "bdr/files/base_upload.html" %}
+{% load bootstrap3 %}
+
+{% block prologue %}
+    <p class="alert alert-warning alert-dismissable" role="alert"><strong>Note:</strong> Any
+        required <a class="alert-link" href="{% url 'bdr:formats' %}">file formats</a>
+        should be defined before proceeding.
+
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close">{% bootstrap_icon "remove-circle" %}</button>
+    </p>
+{% endblock %}

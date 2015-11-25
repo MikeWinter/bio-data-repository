@@ -51,7 +51,7 @@ class FileListView(SearchableViewMixin, SingleObjectMixin, ListView):
     paginate_by = 10
     paginate_orphans = 2
     pk_url_kwarg = "dpk"
-    template_name = "bdr/files/file_list.html"
+    template_name = "bdr/files/list.html"
 
     def __init__(self, **kwargs):
         super(FileListView, self).__init__(**kwargs)
@@ -97,7 +97,7 @@ class FileDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     paginate_by = 10
     paginate_orphans = 2
     pk_url_kwarg = "fpk"
-    template_name = "bdr/files/file_detail.html"
+    template_name = "bdr/files/detail.html"
 
     def __init__(self, **kwargs):
         super(FileDetailView, self).__init__(**kwargs)
@@ -162,12 +162,11 @@ class FileUploadView(SearchableViewMixin, SessionWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "tmp"))
     form_list = [
         ("upload", UploadForm),
-        ("selection", formset_factory(FileContentSelectionForm, formset=FileContentSelectionFormSet,
-                                      extra=0)),
+        ("selection", formset_factory(FileContentSelectionForm, formset=FileContentSelectionFormSet, extra=0)),
     ]
     templates = {
-        "upload": "bdr/files/file_upload.html",
-        "selection": "bdr/files/file_content_selection.html",
+        "upload": "bdr/files/upload.html",
+        "selection": "bdr/files/content_selection.html",
     }
 
     def __init__(self, **kwargs):
@@ -266,8 +265,22 @@ class FileUploadView(SearchableViewMixin, SessionWizardView):
         """
         if step == "selection":
             archive = self.get_uploaded_archive()
-            return [{"real_name": member, "mapped_name": member} for member in archive]
-        return super(FileUploadView, self).get_form_initial(step)
+            initial = []
+            for member in archive:
+                data = {"real_name": member, "mapped_name": member}
+                try:
+                    existing_file = self.dataset.files.get(name=member)
+                except (File.DoesNotExist, File.MultipleObjectsReturned):
+                    # If no file is found, the initial format is unspecified.
+                    pass
+                else:
+                    # If a file is found, use its default format for the
+                    # initial value.
+                    data["format"] = existing_file.default_format.pk
+                initial.append(data)
+        else:
+            initial = super(FileUploadView, self).get_form_initial(step)
+        return initial
 
     def get_template_names(self):
         """
@@ -301,7 +314,7 @@ class FileEditView(SearchableViewMixin, UpdateView):
     model = File
     form_class = FileForm
     pk_url_kwarg = "fpk"
-    template_name = "bdr/files/file_edit.html"
+    template_name = "bdr/files/edit.html"
 
     def get_context_data(self, **kwargs):
         """
@@ -327,7 +340,7 @@ class FileDeleteView(SearchableViewMixin, DeleteView):
 
     model = File
     pk_url_kwarg = "fpk"
-    template_name = "bdr/files/file_confirm_delete.html"
+    template_name = "bdr/files/confirm_delete.html"
 
     def get_context_data(self, **kwargs):
         """

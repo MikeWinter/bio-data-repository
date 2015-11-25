@@ -14,6 +14,7 @@ This following classes are exported:
     UploadForm
 """
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse_lazy
 from django.forms import CharField, FileField, ModelChoiceField
 from django.forms import FileInput, HiddenInput, Textarea, TextInput
@@ -196,8 +197,20 @@ class FileContentSelectionForm(Form):
     real_name = CharField(widget=HiddenInput)
     mapped_name = SelectableCharField(required=False,
                                       error_messages={"invalid": "Enter a file name."})
-    format = ModelChoiceField(Format.objects.all())
+    format = ModelChoiceField(Format.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(FileContentSelectionForm, self).__init__(*args, **kwargs)
         self.fields["mapped_name"].label = self.initial["real_name"]
+
+    def clean(self):
+        """
+        Validate the form.
+
+        In particular, this method asserts that if a file is selected, its
+        format has also been set.
+        """
+        cleaned_data = super(FileContentSelectionForm, self).clean()
+        if cleaned_data["mapped_name"] is not None and cleaned_data["format"] is None:
+            raise ValidationError("A format must be specified for a file to be added to the repository.")
+        return cleaned_data
