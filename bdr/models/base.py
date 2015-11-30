@@ -393,10 +393,7 @@ class File(Model):
     :py:class:`Model` class.
     """
 
-    name = fields.CharField(max_length=100, blank=False,
-                            help_text='<span class="text-warning">Note: Any filters that map to'
-                                      ' this file name must also be changed if the file is'
-                                      ' renamed.</span>')
+    name = fields.CharField(max_length=100, blank=False, editable=False)
     """The name of this file."""
     dataset = related.ForeignKey(Dataset, editable=False, related_name="files",
                                  related_query_name="file")
