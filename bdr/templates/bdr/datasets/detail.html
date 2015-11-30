@@ -51,7 +51,7 @@
             </tr>
             <tr>
                 <th>Notes</th>
-                <td>{{ dataset.notes|urlize|default:"None" }}</td>
+                <td>{{ dataset.notes|urlize|linebreaks|default:"None" }}</td>
             </tr>
         </table>
     </section>
