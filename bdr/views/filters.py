@@ -80,7 +80,7 @@ class FilterAddView(FilterTestMixin, SearchableViewMixin, CreateView):
     model = Filter
     form_class = FilterForm
     pk_url_kwarg = "filter"
-    template_name = "bdr/filters/filter_add.html"
+    template_name = "bdr/filters/add.html"
 
     def __init__(self, **kwargs):
         super(FilterAddView, self).__init__(**kwargs)
@@ -145,7 +145,7 @@ class FilterAddView(FilterTestMixin, SearchableViewMixin, CreateView):
         form is re-rendered with the result of the test.
 
         :param form: A form containing validated data for creating the object.
-        :type form: django.forms.ModelForm
+        :type form: FilterForm
         :return: The response to this request.
         :rtype: django.http.HttpResponse
         """
@@ -166,7 +166,7 @@ class FilterEditView(FilterTestMixin, SearchableViewMixin, UpdateView):
     model = Filter
     form_class = FilterForm
     pk_url_kwarg = "filter"
-    template_name = "bdr/filters/filter_edit.html"
+    template_name = "bdr/filters/edit.html"
 
     def __init__(self, **kwargs):
         super(FilterEditView, self).__init__(**kwargs)
@@ -181,7 +181,7 @@ class FilterEditView(FilterTestMixin, SearchableViewMixin, UpdateView):
         form is re-rendered with the result of the test.
 
         :param form: A form containing validated data for creating the object.
-        :type form: django.forms.ModelForm
+        :type form: FilterForm
         :return: The response to this request.
         :rtype: django.http.HttpResponse
         """
@@ -239,7 +239,7 @@ class FilterDeleteView(SearchableViewMixin, DeleteView):
 
     model = Filter
     pk_url_kwarg = "filter"
-    template_name = "bdr/filters/filter_confirm_delete.html"
+    template_name = "bdr/filters/confirm_delete.html"
 
     def __init__(self, **kwargs):
         super(FilterDeleteView, self).__init__(**kwargs)

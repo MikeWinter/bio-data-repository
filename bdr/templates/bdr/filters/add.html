@@ -1,0 +1,92 @@
+{% extends "bdr/filters/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Add filter {{ block.super }}{% endblock %}
+{% block heading %}
+    Add new filter
+    <small><a class="text-muted"
+              href="{{ source.get_absolute_url }}">{% bootstrap_icon "chevron-right" %}</a> {{ source.url }}</small>
+{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">Add</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    {% url 'bdr:add-filter' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as add_url %}
+    <li class="active" role="presentation">
+        <a href="{{ add_url }}">{% bootstrap_icon "plus" %} Add filter</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    {% url 'bdr:add-filter' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as add_url %}
+
+    <section>
+        <p>Filters have two main components: the matching pattern and the invert option. When a file is retrieved from a
+            data source its name is matched against each filter in order. In the case of an archive, this is the name of
+            each file contained therein. Normally, if the name matches a filter the file is added to the repository; if
+            no matching filter is found, the file is skipped. If the match pattern is inverted, this is reversed: files
+            with names that match that pattern are discarded and non-matching files are kept instead. The matching
+            pattern is specified using a <a href="http://www.zytrax.com/tech/web/regex.htm" target="_blank">regular
+                expression</a>.</p>
+
+        <p>Filters have an optional, additional feature: the replacement pattern. When a matching filter is found (or a
+            non-matching filter using an inverted pattern), the name of the file is changed to the value of the
+            replacement pattern. This can be more than just a simple name: using <a
+                    href="http://www.zytrax.com/tech/web/regex.htm#submatches" target="_blank">backreferences</a>, the
+            replacement can include parts of the original file name, enabling several different files to be handled by
+            one filter.</p>
+
+        <form id="filter-form" class="form-horizontal" action="{{ add_url }}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Patterns</legend>
+
+                {% bootstrap_form form layout="horizontal" %}
+
+                <div class="form-group">
+                    <div class="form-inline col-xs-12 text-right">
+                        {% bootstrap_button name="op" button_type="submit" value="save" content="Save" button_class="btn-primary" %}
+                        {% bootstrap_button content="Cancel" href=source.get_absolute_url button_class="btn-default" %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Testing</legend>
+
+                <div class="form-group{% if filename %} has-feedback {% if matches %}has-success{% else %}has-error{% endif %}{% endif %}">
+                    <label for="pattern-test" class="control-label col-xs-3">Filename</label>
+
+                    <div class="col-xs-9">
+                        <div class="input-group">
+                            <input id="pattern-test" name="filename" type="text" value="{{ filename }}"
+                                   class="form-control"/>
+                            <span class="input-group-btn">
+                                {% bootstrap_button name="op" button_type="submit" value="test" content="Test" button_class="btn-primary" %}
+                            </span>
+                            {% if filename %}
+                                <span class="form-control-feedback glyphicon {% if matches %}glyphicon-ok text-success{% else %}glyphicon-remove text-danger{% endif %}"
+                                      role="status" aria-hidden="true" style="right: 4.25em"></span>
+                                <span class="sr-only" role="status">({{ feedback_message }})</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if mapped_to %}
+                    <div id="mapped-to" class="form-group">
+                        <label class="control-label col-xs-3">Maps to</label>
+
+                        <div class="col-xs-9">
+                            <p class="form-control-static">{{ mapped_to }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </fieldset>
+        </form>
+    </section>
+{% endblock %}

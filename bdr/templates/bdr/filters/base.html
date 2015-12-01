@@ -1,0 +1,44 @@
+{% extends "bdr/base-sidebar.html" %}
+{% load bootstrap3 %}
+
+{% block title %}– {{ source.url|truncatechars:100 }} – {{ dataset.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block sidebar %}
+    <nav>
+        <h2>Actions</h2>
+        <ul class="nav nav-pills nav-stacked">
+        {% block menu_items %}
+            <li role="presentation">
+                <a href="{{ source.get_absolute_url }}">{% bootstrap_icon "level-up" %} Back to Source</a>
+            </li>
+        {% endblock %}
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <nav>
+        <ol class="breadcrumb small">
+            <li><a href="{% url 'bdr:home' %}">Home</a></li>
+            <li><a href="{% url 'bdr:datasets' %}">Datasets</a></li>
+            <li><a href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a></li>
+            <li><a href="{% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify %}">Sources</a></li>
+            <li><a href="{{ source.get_absolute_url }}">{{ source.url|truncatechars:"100" }}</a></li>
+        {% block breadcrumbs %}
+            <li>Filters</li>
+        {% endblock %}
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <h1>{% block heading %}{% endblock %}</h1>
+    </header>
+{% endblock %}
