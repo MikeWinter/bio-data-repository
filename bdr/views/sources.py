@@ -41,7 +41,7 @@ class SourceListView(SearchableViewMixin, SingleObjectMixin, ListView):
     paginate_by = 10
     paginate_orphans = 2
     pk_url_kwarg = "dpk"
-    template_name = "bdr/sources/source_list.html"
+    template_name = "bdr/sources/list.html"
 
     def __init__(self, **kwargs):
         super(SourceListView, self).__init__(**kwargs)
@@ -87,7 +87,7 @@ class SourceDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
     paginate_by = 10
     paginate_orphans = 2
     pk_url_kwarg = "source"
-    template_name = "bdr/sources/source_detail.html"
+    template_name = "bdr/sources/detail.html"
 
     def __init__(self, **kwargs):
         super(SourceDetailView, self).__init__(**kwargs)
@@ -151,7 +151,6 @@ class SourceDetailView(SearchableViewMixin, SingleObjectMixin, ListView):
         """
         context = super(SourceDetailView, self).get_context_data(**kwargs)
         context["dataset"] = self.object.dataset
-        context["filters"] = context["object_list"]
         return context
 
     def get_queryset(self):
@@ -176,7 +175,7 @@ class SourceAddView(SearchableViewMixin, CreateView):
     model = Source
     form_class = SourceForm
     pk_url_kwarg = "dpk"
-    template_name = "bdr/sources/source_add.html"
+    template_name = "bdr/sources/add.html"
 
     def __init__(self, **kwargs):
         super(SourceAddView, self).__init__(**kwargs)
@@ -237,7 +236,7 @@ class SourceEditView(SearchableViewMixin, UpdateView):
     model = Source
     form_class = SourceForm
     pk_url_kwarg = "source"
-    template_name = "bdr/sources/source_edit.html"
+    template_name = "bdr/sources/edit.html"
 
     def get_queryset(self):
         """
@@ -275,7 +274,7 @@ class SourceDeleteView(SearchableViewMixin, DeleteView):
 
     model = Source
     pk_url_kwarg = "source"
-    template_name = "bdr/sources/source_confirm_delete.html"
+    template_name = "bdr/sources/confirm_delete.html"
 
     def get_context_data(self, **kwargs):
         """

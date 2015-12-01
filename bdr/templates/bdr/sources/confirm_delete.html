@@ -1,0 +1,50 @@
+{% extends "bdr/sources/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete {{ source.url }} ? {{ block.super }}{% endblock %}
+{% block heading %}Delete {{ source.url }} ?{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{{ source.get_absolute_url }}">{{ source.url|truncatechars:100 }}</a></li>
+    <li class="active">Delete</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    {% url 'bdr:edit-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as edit_url %}
+    {% url 'bdr:delete-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+    <li role="presentation">
+        <a href="{{ source.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    <li role="presentation">
+        <a href="{{ edit_url }}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    <li class="active" role="presentation">
+        <a href="{{ delete_url }}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    {% url 'bdr:delete-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+
+    <section>
+        <form action="{{ delete_url }}" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the <em>{{ source.url }}</em> source?</p>
+
+            <div class="form-group">
+                {% bootstrap_button button_type="submit" content="Delete" button_class="btn-danger" %}
+                {% bootstrap_button content="Cancel" button_class="btn-default" href=source.get_absolute_url %}
+            </div>
+        </form>
+    </section>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "bdr/sources/base.html" %}
+{% load bootstrap3 %}
+{% load humanize %}
+
+{% block title %}{{ source.url }} {{ block.super }}{% endblock %}
+{% block heading %}{{ source.url }} <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">{{ source.url }}</li>
+{% endblock %}
+
+{% block menu_items %}
+    {{ block.super }}
+    {% url 'bdr:edit-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as edit_url %}
+    {% url 'bdr:delete-source' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+    <li class="active" role="presentation">
+        <a href="{{ source.get_absolute_url }}">{% bootstrap_icon "file" %} View</a>
+    </li>
+    <li role="presentation">
+        <a href="{{ edit_url }}">{% bootstrap_icon "pencil" %} Edit</a>
+    </li>
+    <li role="presentation">
+        <a href="{{ delete_url }}">{% bootstrap_icon "remove" %} Delete</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <section>
+        <h2>Details</h2>
+        <table class="table table-responsive">
+            <colgroup>
+                <col class="col-xs-3" />
+                <col class="col-xs-9" />
+            </colgroup>
+            <tr>
+                <th>URL</th>
+                <td>{{ source.url }}</td>
+            </tr>
+            <tr>
+                <th>Username</th>
+                <td>{{ source.username|default:"None" }}</td>
+            </tr>
+            <tr>
+                <th>Password protected?</th>
+                <td>{{ source.password|yesno|capfirst }}</td>
+            </tr>
+            <tr>
+                <th>Update period</th>
+            {% if source.period > 0 %}
+                <td>{{ source.period }} hour{{ source.period|pluralize }}</td>
+            {% else %}
+                <td>Disabled</td>
+            {% endif %}
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>
+            Filters
+            {% url 'bdr:add-filter' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as add_filter_url %}
+            <small><a href="{{ add_filter_url }}" title="Add filter&hellip;">{% bootstrap_icon "plus-sign" %}</a></small>
+        </h2>
+    {% if page_obj %}
+        <form action="{{ source.get_absolute_url }}" method="post">
+            {% csrf_token %}
+
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th class="col-xs-5">Pattern</th>
+                        <th class="col-xs-1">Inverted?</th>
+                        <th class="col-xs-4">Maps to&hellip;</th>
+                        <th class="text-center col-xs-1" colspan="2">Ordering</th>
+                        <th class="col-xs-1"><span class="sr-only">Operations</span></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for filter in page_obj %}
+                    {% url 'bdr:edit-filter' filter=filter.pk source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as edit_url %}
+                    {% url 'bdr:delete-filter' filter=filter.pk source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as delete_url %}
+                    <tr>
+                        <td>{{ filter.pattern }}</td>
+                        <td>{{ filter.inverted|yesno|capfirst }}</td>
+                        <td>{{ filter.mapping|default:"<em>Unchanged</em>" }}</td>
+                        <td class="text-right">
+                        {% if not forloop.first %}
+                            {% bootstrap_button button_type="submit" name="up" value=filter.pk content='<span class="glyphicon glyphicon-triangle-top" title="Move up"></span>' size="xs" button_class="btn-default" %}
+                        {% endif %}
+                        </td>
+                        <td>
+                        {% if not forloop.last %}
+                            {% bootstrap_button button_type="submit" name="down" value=filter.pk content='<span class="glyphicon glyphicon-triangle-bottom" title="Move down"></span>' size="xs" button_class="btn-default" %}
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% bootstrap_button button_type="link" href=edit_url content='<span class="glyphicon glyphicon-pencil" title="Edit"></span>' size="xs" button_class="btn-default" %}
+                            {% bootstrap_button button_type="link" href=delete_url content='<span class="glyphicon glyphicon-remove" title="Delete"></span>' size="xs" button_class="btn-danger" %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+        <nav class="text-center">{% bootstrap_pagination page_obj size="small" %}</nav>
+    {% else %}
+        {% url 'bdr:add-filter' source=source.pk dpk=dataset.pk dataset=dataset.name|slugify as add_url %}
+        <p>No filters have been applied to this data source. <a href="{{ add_url }}">Add a filter</a> to alter how files
+            are added to the repository.</p>
+    {% endif %}
+    </section>
+{% endblock %}

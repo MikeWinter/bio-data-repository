@@ -456,7 +456,7 @@ class Source(Model):
     password = fields.CharField(max_length=64, blank=True)
     """An optional password for authentication."""
     period = fields.PositiveSmallIntegerField(default=0, verbose_name="Update period",
-                                              help_text="The time, in hours, between update checks."
+                                              help_text="The time between update checks."
                                                         " If zero, automatic updates are disabled.")
     """
     The time, in hours, between updates using this source; skipped if zero (0).

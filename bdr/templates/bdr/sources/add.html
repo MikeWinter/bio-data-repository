@@ -1,0 +1,51 @@
+{% extends "bdr/sources/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Add source {{ block.super }}{% endblock %}
+{% block heading %}Add a new source <a class="small" href="{{ dataset.get_absolute_url }}">{{ dataset.name }}</a>{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">Add</li>
+{% endblock %}
+
+{% block menu_items %}
+    {% url 'bdr:sources' dpk=dataset.pk dataset=dataset.name|slugify as list_url %}
+    {% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify as add_url %}
+    <li role="presentation">
+        <a href="{{ dataset.get_absolute_url }}">{% bootstrap_icon "level-up" %} Back to Dataset</a>
+    </li>
+    <li role="presentation">
+        <a href="{{ list_url }}">{% bootstrap_icon "th-list" %} List sources</a>
+    </li>
+    <li class="active" role="presentation">
+        <a href="{{ add_url }}">{% bootstrap_icon "upload" %} Add source</a>
+    </li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block scripts %}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    {% url 'bdr:add-source' dpk=dataset.pk dataset=dataset.name|slugify as add_url %}
+
+    <section>
+        <h2>Details</h2>
+        <form class="form-horizontal" action="{{ add_url }}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form layout="horizontal" %}
+
+            <div class="form-group">
+                <div class="form-inline col-xs-12 text-right">
+                    {% bootstrap_button button_type="submit" content="Save" button_class="btn-primary" %}
+                    {% bootstrap_button content="Cancel" href=dataset.get_absolute_url button_class="btn-default" %}
+                </div>
+            </div>
+        </form>
+    </section>
+{% endblock %}
