@@ -153,7 +153,7 @@ class Archive(DictMixin, object):
 
 
 class Member(object):
-    """A file member of an archive."""
+    """A file member in an archive."""
 
     def __init__(self, name, size, mtime, member):
         self._name, self._size, self._mtime, self._member = name, size, mtime, member
@@ -193,6 +193,68 @@ class Member(object):
         :rtype: int
         """
         return self._size
+
+
+class CompressArchive(Archive):
+    """An adaptor for reading Compress archives."""
+
+    def __init__(self, file_, path=None):
+        super(CompressArchive, self).__init__(file_, path)
+        self._name = os.path.basename(self._path or file_.name)
+        self._data = None
+
+    def __getitem__(self, key):
+        self._check_readability()
+        if key != self._name:
+            raise KeyError("{:s} not found.".format(key))
+        self._data.seek(0, os.SEEK_END)
+        size = self._data.tell()
+        self._data.seek(0)
+        return Member(self._name, size, None, self._data)
+
+    def can_read(self):
+        """
+        Return True if this instance can be used to read the archive; otherwise
+        False.
+
+        :return: True if this instance can be used to read the archive.
+        :rtype:  bool
+        """
+        if self._data is None:
+            magic = None
+            if self.path.endswith(".Z") or self.file.name.endswith(".Z"):
+                magic = self.file.read(2)
+                self.file.seek(0)
+            if magic != "\x1f\x9d":
+                return False
+            self._data = self._decompress()
+        return self._data is not None
+
+    def keys(self):
+        """
+        Return a copy of the list of member names.
+
+        :return: A list of file names in this archive.
+        :rtype:  list of str
+        """
+        self._check_readability()
+        return [self._name]
+
+    def _check_readability(self):
+        if not self.can_read():
+            raise IOError("Not a compressed file.")
+
+    def _decompress(self):
+        if app_settings.UNCOMPRESS_BIN is None or not os.path.exists(app_settings.UNCOMPRESS_BIN):
+            raise RuntimeError("Cannot find uncompress utility.")
+        import subprocess
+        data = tempfile.TemporaryFile()
+        try:
+            subprocess.check_call((app_settings.UNCOMPRESS_BIN, "-c"), stdin=self.file, stdout=data)
+        except subprocess.CalledProcessError:
+            return None
+        data.seek(0)
+        return data
 
 
 class GzipArchive(Archive):
@@ -240,7 +302,7 @@ class GzipArchive(Archive):
 
 
 class GzipMember(Member):
-    """A file member of a gzip archive."""
+    """A file member in a gzip archive."""
 
     def __init__(self, *args, **kwargs):
         super(GzipMember, self).__init__(*args, **kwargs)
