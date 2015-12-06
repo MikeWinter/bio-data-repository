@@ -348,7 +348,7 @@ class DatasetDetailViewTest(TransactionTestCase):
         expected = '''
         <tr>
             <th>Notes</th>
-            <td>{note}</td>
+            <td><p>{note}</p></td>
         </tr>
         '''.format(note=note)
 
