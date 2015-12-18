@@ -169,7 +169,7 @@ class SimpleFormat(Format):
         :raise ImportError: if this format does not have an associated Reader
                             class.
         """
-        from bdr.formats.simple import Reader
+        from ..formats.simple import Reader
         fields = [field["name"] for field in self.fields]
         return Reader(data, comment=self.comment, escape=self.escape, fields=fields, quote=self.quote,
                       separator=self.separator)
@@ -191,8 +191,7 @@ class SimpleFormat(Format):
         :raise ImportError: if this format does not have an associated
                             ``Converter`` class.
         """
-
-        from bdr.formats.simple import Converter
+        from ..formats.simple import Converter
         return Converter(reader, field_names, **kwargs)
 
     class Meta(object):
@@ -213,6 +212,43 @@ class SimpleRevision(Revision):
         if self._format.entry_point_name != "simple":
             raise TypeError("Not a simple format type")
         return SimpleFormat.objects.get(pk=self._format.pk)
+
+    def merge(self, key_name, fields, other, other_key_name, other_fields, mapping=None):
+        """
+        Merge this revision with another by performing a natural join over key
+        fields.
+
+        It is possible to merge revisions from other files so long as the
+        formats are compatible.
+
+        :param key_name: The name of the field containing keys in this
+                         revision.
+        :type key_name: str | unicode
+        :param fields: An iterable containing the field names to include from
+                       this revision.
+        :type fields: collections.Iterable of (str | unicode)
+        :param other: The other revision with which this instance is to be
+                      merged. This may be from a different file.
+        :type other: SimpleRevision
+        :param other_key_name: The name of the field containing keys in the
+                               other revision.
+        :type other_key_name: str | unicode
+        :param other_fields: An iterable containing the field names to include
+                             from the other revision.
+        :type other_fields: collections.Iterable of (str | unicode)
+        :param mapping: (Optional) A map from key aliases to the canonical
+                        representation of those keys.
+        :type mapping: dict of str
+        :return: The merged data.
+        """
+        from ..formats.simple import Record
+        if mapping is None:
+            mapping = {}
+        for record in self.format.reader(self.data):
+            key = mapping.get(record[key_name], record[key_name])
+            for other_record in other.format.reader(other.data):
+                if key != mapping.get(other_record[other_key_name], other_record[other_key_name]):
+                    continue
 
     class Meta(object):
         """Metadata options for the ``SimpleRevision`` model class."""

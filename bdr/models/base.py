@@ -835,6 +835,20 @@ class Revision(Model):
         """Require that each revision number is unique for revisions of any given file."""
 
 
+class Mapping(Model):
+    # SOURCES = [(i, x) for i, x in enumerate(["UniProtKB-ID", "Entrez-GeneID", "RefSeq", "GI", "PDB", "GO", "UniRef100",
+    #                                          "UniRef90", "UniRef50", "UniParc", "PIR", "NCBI-taxon", "MIM", "UniGene",
+    #                                          "PubMed", "EMBL", "EMBL-CDS", "Ensembl", "Ensembl_TRS", "Ensembl_PRO",
+    #                                          "PubMed (Additional)"])]
+
+    alias = fields.CharField(max_length=20, db_index=True)
+    source = fields.CharField(max_length=20)
+    accession_number = fields.CharField(max_length=20)
+
+    class Meta(object):
+        app_label = "bdr"
+
+
 # noinspection PyUnusedLocal
 # The sender parameter is unnecessary as the instance is guaranteed to be a
 # Revision
