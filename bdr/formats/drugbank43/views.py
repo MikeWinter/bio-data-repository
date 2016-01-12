@@ -1,14 +1,13 @@
 import os.path
 
-from django.forms.formsets import formset_factory
 from django.http import StreamingHttpResponse
 
-from .forms import Drugbank43ExportForm
+from .forms import DrugBank43ExportForm
 from ...models import Revision
 from ...views.revisions import RevisionExportView
 
 
-class Drugbank43RevisionExportView(RevisionExportView):
+class DrugBank43RevisionExportView(RevisionExportView):
     """
     This view streams a compressed file to the client.
 
@@ -17,8 +16,7 @@ class Drugbank43RevisionExportView(RevisionExportView):
 
     form_list = [
         # ("options", SimpleFormatExportOptionsForm),
-        ("fields", Drugbank43ExportForm),
-        # ("fields", formset_factory(SimpleFormatFieldSelectionForm, formset=SimpleFormatFieldSelectionFormSet, extra=0)),
+        ("fields", DrugBank43ExportForm),
     ]
     model = Revision
     templates = {
@@ -37,9 +35,9 @@ class Drugbank43RevisionExportView(RevisionExportView):
         :return: The contents of this revision.
         :rtype: StreamingHttpResponse
         """
-        options_form, fields_formset \
+        options_form, fields_form \
             = form_list  # type: SimpleFormatExportOptionsForm, SimpleFormatFieldSelectionFormSet
-        field_names = [field["name"] for field in fields_formset.selected]
+        field_names = fields_form.cleaned_metadata['selected']
         options = options_form.cleaned_metadata
 
         iterator = self.object.format.convert(self.object.data, field_names, **options)
@@ -60,7 +58,7 @@ class Drugbank43RevisionExportView(RevisionExportView):
         """
         # if step == "fields":
         #     return self.object.format.fields
-        return super(Drugbank43RevisionExportView, self).get_form_initial(step)
+        return super(DrugBank43RevisionExportView, self).get_form_initial(step)
 
     def get_form_instance(self, step):
         """
@@ -75,4 +73,4 @@ class Drugbank43RevisionExportView(RevisionExportView):
         """
         if step == "options":
             return self.object.format
-        return super(Drugbank43RevisionExportView, self).get_form_instance(step)
+        return super(DrugBank43RevisionExportView, self).get_form_instance(step)

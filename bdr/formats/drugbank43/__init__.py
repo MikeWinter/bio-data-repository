@@ -1,5 +1,5 @@
-from .views import Drugbank43RevisionExportView
+from .views import DrugBank43RevisionExportView
 
 views = {
-    "export": Drugbank43RevisionExportView.as_view()
+    "export": DrugBank43RevisionExportView.as_view()
 }
