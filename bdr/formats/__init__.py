@@ -152,4 +152,4 @@ class Converter(Iterable):
         :return: The record to write.
         :rtype: Record
         """
-        return iter(self._reader)
+        return unicode(iter(self._reader)).encode('utf_8')

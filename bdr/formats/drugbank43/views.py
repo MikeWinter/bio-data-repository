@@ -2,8 +2,10 @@ import os.path
 
 from django.http import StreamingHttpResponse
 
-from .forms import DrugBank43ExportForm
+from .forms import DrugBank43FieldSelectionForm, DrugBank43FormatExportOptionsForm
+from .parser import Reader
 from ...models import Revision
+from ...models.drugbank43 import DrugBank43Revision
 from ...views.revisions import RevisionExportView
 
 
@@ -15,12 +17,12 @@ class DrugBank43RevisionExportView(RevisionExportView):
     """
 
     form_list = [
-        # ("options", SimpleFormatExportOptionsForm),
-        ("fields", DrugBank43ExportForm),
+        ("options", DrugBank43FormatExportOptionsForm),
+        ("fields", DrugBank43FieldSelectionForm),
     ]
-    model = Revision
+    model = DrugBank43Revision
     templates = {
-        # "options": "bdr/revisions/simple/export_options.html",
+        "options": "bdr/revisions/drugbank43/export_options.html",
         "fields": "bdr/revisions/drugbank43/export_fields.html",
     }
 
@@ -36,11 +38,12 @@ class DrugBank43RevisionExportView(RevisionExportView):
         :rtype: StreamingHttpResponse
         """
         options_form, fields_form \
-            = form_list  # type: SimpleFormatExportOptionsForm, SimpleFormatFieldSelectionFormSet
-        field_names = fields_form.cleaned_metadata['selected']
+            = form_list  # type: DrugBank43FormatExportOptionsForm, DrugBank43ExportForm
+        field_names = fields_form.cleaned_data['selected']
         options = options_form.cleaned_metadata
 
-        iterator = self.object.format.convert(self.object.data, field_names, **options)
+        reader = Reader(self.object.data, selected=field_names)
+        iterator = self.object.format.convert(self.object.data, field_names, reader, **options)
         response = StreamingHttpResponse(iterator, content_type="application/octet-stream")
         response["Content-Disposition"] = "attachment; filename={:s}".format(os.path.basename(self.object.file.name))
         return response

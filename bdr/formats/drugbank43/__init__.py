@@ -1,3 +1,4 @@
+from .parser import Reader
 from .views import DrugBank43RevisionExportView
 
 views = {

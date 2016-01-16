@@ -1,9 +1,8 @@
 import collections
 import itertools
-from copy import deepcopy
 from xml.dom import Node, pulldom
 
-from .. import Reader as BaseReader, Record
+from .. import Converter as BaseConverter, Reader as BaseReader, Record as BaseRecord
 
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
 __license__ = """
@@ -24,6 +23,61 @@ __license__ = """
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
     """
+
+
+class Converter(BaseConverter):
+    """
+    Converts records to nominally identical types, but with the option to elide
+    fields.
+    """
+
+    def __init__(self, reader, fields, comment, escape, line_terminator, quote, separator, **kwargs):
+        super(Converter, self).__init__(reader, kwargs, fields)
+        self.comment_char = comment
+        self.escape_char = escape
+        self.quote_char = quote
+        self.separator_char = separator
+        self.line_terminator = line_terminator
+
+    def __iter__(self):
+        for record in self._reader:
+            values = []
+            for field in self._fields:
+                value = self.prepare_value(record.get(field, u''))
+                values.append(value)
+            yield unicode(self.separator_char.join(values) + self.line_terminator).encode('utf_8')
+
+    def prepare_value(self, value):
+        """
+        Make a value safe for output according the options specified for
+        conversion.
+
+        If a value contains special characters, these must be escaped or quoted
+        as determined by the conversion settings. This includes literal escape
+        and quote characters (if applicable).
+
+        :param value: The value to make safe.
+        :type value: str | unicode
+        :return: The equivalent escaped or quoted value.
+        :rtype: str | unicode
+        :raise ValueError: if the conversion rules will result in emitting a
+                           value containing ambiguous special characters.
+        """
+        if self.escape_char:
+            value = value.replace(self.escape_char, self.escape_char * 2)
+        if self.quote_char:
+            replacement = self.escape_char + self.quote_char if self.escape_char else self.quote_char * 2
+            value = value.replace(self.quote_char, replacement)
+            if value.startswith(self.comment_char) or self.separator_char in value or self.line_terminator in value:
+                value = u"{0}{1}{0}".format(self.quote_char, value)
+        elif self.escape_char:
+            if value.startswith(self.comment_char):
+                value = self.escape_char + value
+            value = value.replace(self.separator_char, self.escape_char + self.separator_char)
+            value = value.replace(self.line_terminator, self.escape_char + self.line_terminator)
+        elif value.startswith(self.comment_char) or self.separator_char in value or self.line_terminator in value:
+            raise ValueError(value)
+        return unicode(value)
 
 
 class Reader(BaseReader):
@@ -66,23 +120,23 @@ class Reader(BaseReader):
         'drug/reactions/reaction/right-element',
         'drug/reactions/reaction/enzymes/enzyme',
         'drug/snp-effects/effect',
-        'drug/snp-effects/effect/protein-name',
-        'drug/snp-effects/effect/gene-symbol',
-        'drug/snp-effects/effect/uniprot-id',
-        'drug/snp-effects/effect/rs-id',
-        'drug/snp-effects/effect/allele',
-        'drug/snp-effects/effect/defining-change',
-        'drug/snp-effects/effect/description',
-        'drug/snp-effects/effect/pubmed-id',
+        # 'drug/snp-effects/effect/protein-name',
+        # 'drug/snp-effects/effect/gene-symbol',
+        # 'drug/snp-effects/effect/uniprot-id',
+        # 'drug/snp-effects/effect/rs-id',
+        # 'drug/snp-effects/effect/allele',
+        # 'drug/snp-effects/effect/defining-change',
+        # 'drug/snp-effects/effect/description',
+        # 'drug/snp-effects/effect/pubmed-id',
         'drug/snp-adverse-drug-reactions/reaction',
-        'drug/snp-adverse-drug-reactions/reaction/protein-name',
-        'drug/snp-adverse-drug-reactions/reaction/gene-symbol',
-        'drug/snp-adverse-drug-reactions/reaction/uniprot-id',
-        'drug/snp-adverse-drug-reactions/reaction/rs-id',
-        'drug/snp-adverse-drug-reactions/reaction/allele',
-        'drug/snp-adverse-drug-reactions/reaction/defining-change',
-        'drug/snp-adverse-drug-reactions/reaction/description',
-        'drug/snp-adverse-drug-reactions/reaction/pubmed-id',
+        # 'drug/snp-adverse-drug-reactions/reaction/protein-name',
+        # 'drug/snp-adverse-drug-reactions/reaction/gene-symbol',
+        # 'drug/snp-adverse-drug-reactions/reaction/uniprot-id',
+        # 'drug/snp-adverse-drug-reactions/reaction/rs-id',
+        # 'drug/snp-adverse-drug-reactions/reaction/allele',
+        # 'drug/snp-adverse-drug-reactions/reaction/defining-change',
+        # 'drug/snp-adverse-drug-reactions/reaction/description',
+        # 'drug/snp-adverse-drug-reactions/reaction/pubmed-id',
         'drug/targets/target',
         'drug/targets/target/actions/action',
         'drug/targets/target/polypeptide',
@@ -122,61 +176,113 @@ class Reader(BaseReader):
     def __iter__(self):
         document = pulldom.parse(self._stream)
         for event, node in document:
-            if event == pulldom.START_ELEMENT and node.tagName == 'drug':
+            if event == pulldom.START_ELEMENT and node.nodeName == 'drug':
                 document.expandNode(node)
 
                 for record in self._parse_drug(node):
                     yield record
 
+                node.unlink()
+
     def _parse_drug(self, element):
         record_set = RecordSet()
 
-        for child in element.childNodes:
-            if not self._is_element(child):
-                continue
-            if child.tagName not in {'snp-effects', 'snp-adverse-drug-reactions'}:
-                record_set = self._process_element(child, ['drug'], record_set)
-            else:
-                for sequence in itertools.ifilter(self._is_element, child.childNodes):
-                    record_set = self._process_sequence(sequence.childNodes, 'protein-name')
-
+        child = element.firstChild
+        while child:
+            if self._is_element(child):
+                if child.nodeName not in {'snp-effects', 'snp-adverse-drug-reactions'}:
+                    name = child.nodeName
+                    print 'drugs', name, self._element_repeats(name, ('drug',))
+                    if not self._element_repeats(name, ('drug',)):
+                        new_records = self._process_element(child, ('drug',))
+                    else:
+                        new_records = RecordSet()
+                        while child and child.nodeName == name:
+                            new_records |= self._process_element(child, ('drug',))
+                            child = child.nextSibling
+                            while child and not self._is_element(child):
+                                child = child.nextSibling
+                        child = child.previousSibling
+                    record_set *= new_records
+                else:
+                    sequences = RecordSet()
+                    for sequence in itertools.ifilter(self._is_element, child.childNodes):
+                        sequences |= self._process_sequence(sequence, ('drug', child.nodeName), 'pubmed-id')
+                    record_set *= sequences
+            child = child.nextSibling
         return record_set
 
-    def _process_element(self, element, context, record_set):
-        name = element.tagName
-
+    def _process_element(self, element, context):
+        records = RecordSet()
         for i in range(element.attributes.length):
             attribute = element.attributes.item(i)
-            if self._is_attribute_selected(attribute.name, context + [name]):
-                record_set.update(attribute.name, attribute.value)
+            if self._is_attribute_selected(attribute.name, element.nodeName, context):
+                records *= Record({self._build_xpath(element.nodeName, context, attribute.name): attribute.value})
 
-        selected = self._is_element_selected(element, context)
+        selected = self._is_element_selected(element.nodeName, context)
         if selected:
             element.normalize()
-        for child in element.childNodes:
-            if self._is_element(child):
-                pass
-            elif selected and self._is_text(child):
-                record_set.update(name, child.nodeValue)
+        node = element.firstChild
+        while node:
+            if self._is_element(node):
+                name = node.nodeName
+                if not self._element_repeats(name, context):
+                    new_records = self._process_element(node, context + (element.nodeName,))
+                else:
+                    new_records = RecordSet()
+                    while node and node.nodeName == name:
+                        if self._is_element(node):
+                            new_records |= self._process_element(node, context + (element.nodeName,))
+                        node = node.nextSibling
+                records *= new_records
+            elif selected and self._is_text(node):
+                records *= Record({self._build_xpath(element.nodeName, context): node.nodeValue})
+            node = node.nextSibling
+        return records
 
-        return record_set
-
-    def _process_sequence(self, elements, sentinel):
-        return []
+    def _process_sequence(self, parent, context, sentinel):
+        records = RecordSet()
+        node = parent.firstChild
+        while node:
+            if self._is_element(node):
+                if not self._element_repeats(node.nodeName, context + (parent.nodeName,)):
+                    new_records = self._process_element(node, context + (parent.nodeName,))
+                else:
+                    new_records = RecordSet()
+                    name = node.nodeName
+                    while node and node.nodeName == name:
+                        if self._is_element(node):
+                            new_records |= self._process_element(node, context + (parent.nodeName,))
+                        node = node.nextSibling
+                records *= new_records
+            elif self._is_element_selected(parent.nodeName, context) and self._is_text(node):
+                records *= Record({self._build_xpath(parent.nodeName, context): node.nodeValue})
+            node = node.nextSibling
+        return records
 
     def _has_selected_descendant(self, context):
-        xpath = '/'.join(context)
+        xpath = self._build_xpath(context[-1], context[:-1])
         return any(itertools.ifilter(lambda name: name.startsWith(xpath), self._options['selected']))
 
-    def _is_attribute_selected(self, name, context):
-        return False
+    def _is_attribute_selected(self, name, element, context):
+        xpath = self._build_xpath(element, context, name)
+        return xpath in self._options['selected']
 
     def _is_element_selected(self, name, context):
-        return False
+        xpath = self._build_xpath(name, context)
+        return xpath in self._options['selected']
+
+    @staticmethod
+    def _build_xpath(element, context, attribute=None):
+        path = '/'.join(context + (element,))
+        if attribute is not None:
+            path += '@' + attribute
+        return path
 
     @classmethod
     def _element_repeats(cls, name, context):
-        return '/'.join(context + [name]) in cls.MULTIPLES
+        xpath = cls._build_xpath(name, context)
+        return xpath in cls.MULTIPLES
 
     @staticmethod
     def _is_element(node):
@@ -189,47 +295,22 @@ class Reader(BaseReader):
 
 class RecordSet(object):
     def __init__(self, records=None):
-        self._records = []
-
-    def copy(self):
-        copy = RecordSet()
-        copy._records = deepcopy(self._records)
-        return copy
-
-    def update(self, name, values):
-        if not self._records:
-            self._records.append(MutableRecord())
-        if isinstance(values, basestring) or not isinstance(values, collections.Iterable):
-            values = (values,)
-
-        additional_records = []
-
-        for record in self._records:
-            original = deepcopy(record)
-            iterator = iter(values)
-            record[name] = next(iterator)
-            for value in iterator:
-                duplicate = deepcopy(original)
-                duplicate[name] = value
-                additional_records.append(duplicate)
-
-        self._records.extend(additional_records)
+        if records is None:
+            records = [Record.IDENTITY]
+        self._records = tuple(records)
 
     def __mul__(self, other):
-        if not isinstance(other, RecordSet):
-            return NotImplemented
-
-        product = RecordSet()
-
-        return product
+        if isinstance(other, RecordSet):
+            return type(self)(a | b for a in self for b in other)
+        if isinstance(other, Record):
+            return self * type(self)([other])
+        return NotImplemented
 
     def __or__(self, other):
         if not isinstance(other, RecordSet):
             return NotImplemented
-
-        union = self.copy()
-        union._records.extend(deepcopy(other._records))
-        return union
+        records = filter(lambda o: o != Record.IDENTITY, self._records + tuple(other._records)) or [Record.IDENTITY]
+        return type(self)(records)
 
     def __iter__(self):
         return iter(self._records)
@@ -241,16 +322,21 @@ collections.Iterable.register(RecordSet)
 collections.Sized.register(RecordSet)
 
 
-class MutableRecord(Record):
+class Record(BaseRecord):
     """
     Represents a record within a data file, composed of one or more fields.
 
     By default, records serialise to a comma-separated string.
-
-    Records are typically immutable; this subclass allows client code to extend
-    its field list and data.
     """
 
-    def __setitem__(self, field, value):
-        self._fields.append(field)
-        self._data[field] = value
+    def __init__(self, *args, **kwargs):
+        data = dict(*args, **kwargs)
+        self._fields = tuple(data)
+        self._data = data
+
+    def __or__(self, other):
+        if not isinstance(other, Record):
+            return NotImplemented
+        return type(self)(self._data.items() + other._data.items())
+
+Record.IDENTITY = Record()

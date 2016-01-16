@@ -1,8 +1,64 @@
 # coding=utf-8
-from django.forms import Form, MultipleChoiceField
+
+from django.forms import Form, CharField, MultipleChoiceField
+
+from bdr.forms import ComboTextInput
 
 
-class DrugBank43ExportForm(Form):
+class DrugBank43FormatExportOptionsForm(Form):
+    """
+    Presents the user with common options used to export data.
+    """
+
+    COMMENT_DEFAULT = "#"
+    COMMENT_CHOICES = [("#", "Hash (#)"), (";", "Semicolon (;)"), ("None", "None"), ("", "Other:")]
+    ESCAPE_DEFAULT = "\\"
+    ESCAPE_CHOICES = [("\\", "Backslash (\\)"), ("None", "None"), ("", "Other:")]
+    QUOTE_DEFAULT = "\""
+    QUOTE_CHOICES = [("\"", "Quotation mark (\")"), ("'", "Apostrophe (')"), ("|", "Pipe (|)"), ("None", "None"),
+                     ("", "Other:")]
+    SEPARATOR_DEFAULT = ","
+    SEPARATOR_CHOICES = [("\t", "Tab"), (" ", "Space"), (",", "Comma (,)"), (";", "Semicolon (;)"), ("|", "Pipe (|)"),
+                         ("", "Other:")]
+    TERMINATOR_DEFAULT = "LF"
+    TERMINATOR_CHOICES = [("LF", "Linux (LF)"), ("CRLF", "Windows (CRLF)"), ("CR", "Mac (CR)"), ("", "Other:")]
+    TERMINATOR_CHARACTER_MAP = {
+        "LF": "\n",
+        "CRLF": "\r\n",
+        "CR": "\r"
+    }
+
+    separator = CharField(max_length=1,
+                          widget=ComboTextInput(choices=SEPARATOR_CHOICES, default=SEPARATOR_DEFAULT),
+                          help_text="Used to separate fields in a record.")
+    comment = CharField(max_length=1, required=False,
+                        widget=ComboTextInput(choices=COMMENT_CHOICES, default=COMMENT_DEFAULT),
+                        help_text="Used to mark a line as a comment.")
+    quote = CharField(max_length=1, required=False,
+                      widget=ComboTextInput(choices=QUOTE_CHOICES, default=QUOTE_DEFAULT),
+                      help_text="If fields may contain special characters, select the character used to quote those"
+                                " values.")
+    escape = CharField(max_length=1, required=False,
+                       widget=ComboTextInput(choices=ESCAPE_CHOICES, default=ESCAPE_DEFAULT),
+                       help_text="If quotes are not used, select the character used to escape special characters. If"
+                                 " quotes are used and no escape character is chosen, embedded quotes are doubled (for"
+                                 " example, \"It's a test!\" would be saved as 'It''s a test!' when using single"
+                                 " quotes).")
+    line_terminator = CharField(widget=ComboTextInput(choices=TERMINATOR_CHOICES, default=TERMINATOR_DEFAULT),
+                                help_text="Used to separate records.")
+
+    @property
+    def cleaned_metadata(self):
+        """Validated options for exporting simple formatted data."""
+        if not self.is_valid():
+            raise AttributeError("'{:s}' object has no attribute 'cleaned_metadata'".format(self.__class__.__name__))
+        metadata = {key: value for key, value in self.cleaned_data.items() if key not in ["name"]}
+        if metadata["line_terminator"] in self.TERMINATOR_CHARACTER_MAP:
+            metadata["line_terminator"] = self.TERMINATOR_CHARACTER_MAP[metadata["line_terminator"]]
+        return metadata
+
+
+class DrugBank43FieldSelectionForm(Form):
 
     ELEMENTS = (
         ('drug@created', 'Record created'),
