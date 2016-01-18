@@ -4,6 +4,7 @@ out-of-date with respect to their remote data source.
 """
 
 from django.core.management.base import NoArgsCommand
+from django.utils import log
 
 from ...models import Dataset
 
@@ -49,5 +50,12 @@ class Command(NoArgsCommand):
         :param options: Command-line arguments for this command.
         :type options: dict of str
         """
+        from ...utils.transports import TransportError
+        logger = log.getLogger('bdr.management.commands.updatedatasets')
         for dataset in Dataset.objects.all():
-            dataset.update()
+            try:
+                dataset.update()
+            except TransportError:
+                logger.exception('An error occurred while retrieving remote data: dataset %s', dataset)
+            except IOError:
+                logger.exception('An error occurred while processing data: dataset %s', dataset)

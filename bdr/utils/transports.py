@@ -14,16 +14,16 @@ settings list.
 
 from datetime import datetime
 import ftplib
-import httplib
 import importlib
 import os.path
 import re
+import shutil
 import socket
 import tempfile
 import urlparse
 
 from django.utils.http import parse_http_date_safe
-import httplib2
+import requests
 
 from .. import app_settings
 from . import utc
@@ -50,7 +50,7 @@ __license__ = """
     """
 
 
-class TransportError(IOError):
+class TransportError(Exception):
     """Base class for all transport-related errors."""
     pass
 
@@ -68,6 +68,13 @@ class ConnectionError(TransportError):
 class NotFoundError(TransportError):
     """The requested resource could not be found remotely."""
     pass
+
+
+class UnrecognisedSchemaError(TransportError):
+    """
+    The schema of the given URL is unrecognised and no transport handler is not
+    available.
+    """
 
 
 class Transport(object):
@@ -318,8 +325,6 @@ class HttpTransport(Transport):
         :type  password: str
         """
         super(HttpTransport, self).__init__(*args, **kwargs)
-        self._client = httplib2.Http()
-        self._client.add_credentials(self._user, self._password)
         self._metadata = None
         self._modification_date = None
         self._size = -1
@@ -353,15 +358,14 @@ class HttpTransport(Transport):
 
     def _get_metadata(self):
         if self._metadata is None:
-            self._metadata, _ = self._do_request("HEAD")
+            response = self._do_request("HEAD")
+            self._metadata = response.headers
         return self._metadata
 
     def _do_request(self, method="GET"):
         try:
-            response, content = self._client.request(self._url, method)
-        except httplib2.ServerNotFoundError as error:
-            raise NotFoundError(error)
-        except (httplib.HTTPException, httplib2.HttpLib2Error, socket.error) as error:
+            response = requests.request(method, self._url, auth=(self._user, self._password), stream=True)
+        except requests.RequestException as error:
             raise ConnectionError(error)
 
         if response == 401:
@@ -371,10 +375,10 @@ class HttpTransport(Transport):
         elif 500 >= response:
             raise ConnectionError()
 
-        return response, content
+        return response
 
     def _do_get_content(self):
-        response, content = self._do_request()
-        if response.status != 200:
+        response = self._do_request()
+        if response.status_code != 200:
             raise TransportError(response.reason)
-        self._content.write(content)
+        shutil.copyfileobj(response.raw, self._content)

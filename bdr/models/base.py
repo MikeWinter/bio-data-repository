@@ -323,9 +323,10 @@ class Dataset(Model):
         files.
         """
         for source in [src for src in self.sources.all() if src.has_update_elapsed()]:
-            with atomic():
-                if source.has_changed():
-                    file_list, size, modification_date = source.files()
+            if source.has_changed():
+                file_list, size, modification_date = source.files()
+
+                with atomic():
                     update = self.updates.create(source=source, size=size,
                                                  modified_at=modification_date)
                     for source_file in file_list:
