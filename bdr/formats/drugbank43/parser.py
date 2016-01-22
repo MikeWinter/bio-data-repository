@@ -1,5 +1,5 @@
 import collections
-import itertools
+import operator
 from xml.dom import Node, pulldom
 
 from .. import Converter as BaseConverter, Reader as BaseReader, Record as BaseRecord
@@ -81,90 +81,71 @@ class Converter(BaseConverter):
 
 
 class Reader(BaseReader):
-
-    MULTIPLES = {
-        'drug/drugbank-id',
-        'drug/groups/group',
-        'drug/classification',
-        'drug/classification/alternative-parent',
-        'drug/classification/substituent',
-        'drug/salts/salt',
-        'drug/salts/salt/drugbank-id',
-        'drug/synonyms/synonym',
-        'drug/products/product',
-        'drug/international-brands/international-brand',
-        'drug/mixtures/mixture',
-        'drug/packagers/packager',
-        'drug/manufacturers/manufacturer',
-        'drug/prices/price',
-        'drug/categories/category',
-        'drug/affected-organisms/affected-organism',
-        'drug/dosages/dosage',
-        'drug/atc-codes/atc-code',
-        'drug/atc-codes/atc-code/level',
-        'drug/ahfs-codes/ahfs-code',
-        'drug/patents/patent',
-        'drug/food-interactions/food-interaction',
-        'drug/drug-interactions/drug-interaction',
-        'drug/sequences/sequence',
-        'drug/calculated-properties/property',
-        'drug/experimental-properties/property',
-        'drug/external-identifiers/external-identifier',
-        'drug/external-links/external-link',
-        'drug/pathways/pathway',
-        'drug/pathways/pathway/drug',
-        'drug/pathways/pathway/enzymes',
-        'drug/pathways/pathway/enxymes/uniprot-id',
-        'drug/reactions/reaction',
-        'drug/reactions/reaction/left-element',
-        'drug/reactions/reaction/right-element',
-        'drug/reactions/reaction/enzymes/enzyme',
-        'drug/snp-effects/effect',
-        # 'drug/snp-effects/effect/protein-name',
-        # 'drug/snp-effects/effect/gene-symbol',
-        # 'drug/snp-effects/effect/uniprot-id',
-        # 'drug/snp-effects/effect/rs-id',
-        # 'drug/snp-effects/effect/allele',
-        # 'drug/snp-effects/effect/defining-change',
-        # 'drug/snp-effects/effect/description',
-        # 'drug/snp-effects/effect/pubmed-id',
-        'drug/snp-adverse-drug-reactions/reaction',
-        # 'drug/snp-adverse-drug-reactions/reaction/protein-name',
-        # 'drug/snp-adverse-drug-reactions/reaction/gene-symbol',
-        # 'drug/snp-adverse-drug-reactions/reaction/uniprot-id',
-        # 'drug/snp-adverse-drug-reactions/reaction/rs-id',
-        # 'drug/snp-adverse-drug-reactions/reaction/allele',
-        # 'drug/snp-adverse-drug-reactions/reaction/defining-change',
-        # 'drug/snp-adverse-drug-reactions/reaction/description',
-        # 'drug/snp-adverse-drug-reactions/reaction/pubmed-id',
-        'drug/targets/target',
-        'drug/targets/target/actions/action',
-        'drug/targets/target/polypeptide',
-        'drug/targets/target/polypeptide/external-identifiers/external-identifier',
-        'drug/targets/target/polypeptide/synonyms/synonym',
-        'drug/targets/target/polypeptide/pfams/pfam',
-        'drug/targets/target/polypeptide/go-classifiers/go-classifier',
-        'drug/enzymes/enzyme/',
-        'drug/enzymes/enzyme/actions/action',
-        'drug/enzymes/enzyme/polypeptide',
-        'drug/enzymes/enzyme/polypeptide/external-identifiers/external-identifier',
-        'drug/enzymes/enzyme/polypeptide/synonyms/synonym',
-        'drug/enzymes/enzyme/polypeptide/pfams/pfam',
-        'drug/enzymes/enzyme/polypeptide/go-classifiers/go-classifier',
-        'drug/carriers/carrier',
-        'drug/carriers/carrier/actions/action',
-        'drug/carriers/carrier/polypeptide',
-        'drug/carriers/carrier/polypeptide/external-identifiers/external-identifier',
-        'drug/carriers/carrier/polypeptide/synonyms/synonym',
-        'drug/carriers/carrier/polypeptide/pfams/pfam',
-        'drug/carriers/carrier/polypeptide/go-classifiers/go-classifier',
-        'drug/transporters/transporter',
-        'drug/transporters/transporter/actions/action',
-        'drug/transporters/transporter/polypeptide',
-        'drug/transporters/transporter/polypeptide/external-identifiers/external-identifier',
-        'drug/transporters/transporter/polypeptide/synonyms/synonym',
-        'drug/transporters/transporter/polypeptide/pfams/pfam',
-        'drug/transporters/transporter/polypeptide/go-classifiers/go-classifier',
+    REPEATED_ELEMENTS = {
+        u'drug/drugbank-id',
+        u'drug/groups/group',
+        u'drug/classification',
+        u'drug/classification/alternative-parent',
+        u'drug/classification/substituent',
+        u'drug/salts/salt',
+        u'drug/salts/salt/drugbank-id',
+        u'drug/synonyms/synonym',
+        u'drug/products/product',
+        u'drug/international-brands/international-brand',
+        u'drug/mixtures/mixture',
+        u'drug/packagers/packager',
+        u'drug/manufacturers/manufacturer',
+        u'drug/prices/price',
+        u'drug/categories/category',
+        u'drug/affected-organisms/affected-organism',
+        u'drug/dosages/dosage',
+        u'drug/atc-codes/atc-code',
+        u'drug/atc-codes/atc-code/level',
+        u'drug/ahfs-codes/ahfs-code',
+        u'drug/patents/patent',
+        u'drug/food-interactions/food-interaction',
+        u'drug/drug-interactions/drug-interaction',
+        u'drug/sequences/sequence',
+        u'drug/calculated-properties/property',
+        u'drug/experimental-properties/property',
+        u'drug/external-identifiers/external-identifier',
+        u'drug/external-links/external-link',
+        u'drug/pathways/pathway/drugs/drug',
+        u'drug/pathways/pathway/enzymes/uniprot-id',
+        u'drug/reactions/reaction',
+        u'drug/reactions/reaction/left-element',
+        u'drug/reactions/reaction/right-element',
+        u'drug/reactions/reaction/enzymes/enzyme',
+        u'drug/snp-effects/effect',
+        u'drug/snp-adverse-drug-reactions/reaction',
+        u'drug/targets/target',
+        u'drug/targets/target/actions/action',
+        u'drug/targets/target/polypeptide',
+        u'drug/targets/target/polypeptide/external-identifiers/external-identifier',
+        u'drug/targets/target/polypeptide/synonyms/synonym',
+        u'drug/targets/target/polypeptide/pfams/pfam',
+        u'drug/targets/target/polypeptide/go-classifiers/go-classifier',
+        u'drug/enzymes/enzyme/',
+        u'drug/enzymes/enzyme/actions/action',
+        u'drug/enzymes/enzyme/polypeptide',
+        u'drug/enzymes/enzyme/polypeptide/external-identifiers/external-identifier',
+        u'drug/enzymes/enzyme/polypeptide/synonyms/synonym',
+        u'drug/enzymes/enzyme/polypeptide/pfams/pfam',
+        u'drug/enzymes/enzyme/polypeptide/go-classifiers/go-classifier',
+        u'drug/carriers/carrier',
+        u'drug/carriers/carrier/actions/action',
+        u'drug/carriers/carrier/polypeptide',
+        u'drug/carriers/carrier/polypeptide/external-identifiers/external-identifier',
+        u'drug/carriers/carrier/polypeptide/synonyms/synonym',
+        u'drug/carriers/carrier/polypeptide/pfams/pfam',
+        u'drug/carriers/carrier/polypeptide/go-classifiers/go-classifier',
+        u'drug/transporters/transporter',
+        u'drug/transporters/transporter/actions/action',
+        u'drug/transporters/transporter/polypeptide',
+        u'drug/transporters/transporter/polypeptide/external-identifiers/external-identifier',
+        u'drug/transporters/transporter/polypeptide/synonyms/synonym',
+        u'drug/transporters/transporter/polypeptide/pfams/pfam',
+        u'drug/transporters/transporter/polypeptide/go-classifiers/go-classifier',
     }
     """
     A set of XPath expressions (relative to the drugbank element) to elements
@@ -172,97 +153,81 @@ class Reader(BaseReader):
 
     :type: set of str
     """
+    SEQUENCES = {
+        u'drug/snp-effects/effect': [(u'protein-name', u'pubmed-id')],
+        u'drug/snp-adverse-drug-reactions/reaction': [(u'protein-name', u'pubmed-id')],
+    }
+    """
+    A dictionary declaring elements that contain repeating element sequences,
+    and a list of tag names pairs that occur at the start and end of those sequences.
+
+    :type: dict of list
+    """
 
     def __iter__(self):
         document = pulldom.parse(self._stream)
         for event, node in document:
-            if event == pulldom.START_ELEMENT and node.nodeName == 'drug':
+            if event == pulldom.START_ELEMENT and node.nodeName == u'drug':
                 document.expandNode(node)
 
-                for record in self._parse_drug(node):
+                for record in self._process_node(node, ()):
                     yield record
 
                 node.unlink()
 
-    def _parse_drug(self, element):
+    def _process_node(self, node, context):
         record_set = RecordSet()
-
-        child = element.firstChild
+        name = node.nodeName
+        sequences = []
+        content = u''
+        repeated = {}
+        child = node.firstChild
         while child:
             if self._is_element(child):
-                if child.nodeName not in {'snp-effects', 'snp-adverse-drug-reactions'}:
-                    name = child.nodeName
-                    print 'drugs', name, self._element_repeats(name, ('drug',))
-                    if not self._element_repeats(name, ('drug',)):
-                        new_records = self._process_element(child, ('drug',))
-                    else:
-                        new_records = RecordSet()
-                        while child and child.nodeName == name:
-                            new_records |= self._process_element(child, ('drug',))
-                            child = child.nextSibling
-                            while child and not self._is_element(child):
-                                child = child.nextSibling
-                        child = child.previousSibling
-                    record_set *= new_records
+                child_records = self._process_node(child, context + (name,))
+                if not self._element_repeats(child.nodeName, context + (name,)):
+                    record_set *= child_records
                 else:
-                    sequences = RecordSet()
-                    for sequence in itertools.ifilter(self._is_element, child.childNodes):
-                        sequences |= self._process_sequence(sequence, ('drug', child.nodeName), 'pubmed-id')
-                    record_set *= sequences
+                    repeated.setdefault(child.nodeName, []).append(child_records)
+            elif self._is_text(child):
+                content += child.nodeValue
+
+            if self._is_sequence_end(child, context + (name,)):
+                for values in repeated.values():
+                    record_set *= reduce(operator.or_, values, RecordSet())
+                sequences.append(record_set)
+                record_set = RecordSet()
+                repeated = {}
+
             child = child.nextSibling
+
+        record_set = reduce(operator.or_, sequences, RecordSet())
+        if self._is_element_selected(name, context):
+            record_set *= Record({self._build_xpath(name, context): content})
+        for attribute, value in node.attributes.items():
+            if self._is_attribute_selected(attribute, name, context):
+                record_set *= Record({self._build_xpath(name, context, attribute): value})
         return record_set
 
-    def _process_element(self, element, context):
-        records = RecordSet()
-        for i in range(element.attributes.length):
-            attribute = element.attributes.item(i)
-            if self._is_attribute_selected(attribute.name, element.nodeName, context):
-                records *= Record({self._build_xpath(element.nodeName, context, attribute.name): attribute.value})
+    @classmethod
+    def _is_sequence_end(cls, node, context):
+        next_element = cls._next_element(node)
+        if next_element is None:
+            return True
 
-        selected = self._is_element_selected(element.nodeName, context)
-        if selected:
-            element.normalize()
-        node = element.firstChild
-        while node:
-            if self._is_element(node):
-                name = node.nodeName
-                if not self._element_repeats(name, context):
-                    new_records = self._process_element(node, context + (element.nodeName,))
-                else:
-                    new_records = RecordSet()
-                    while node and node.nodeName == name:
-                        if self._is_element(node):
-                            new_records |= self._process_element(node, context + (element.nodeName,))
-                        node = node.nextSibling
-                records *= new_records
-            elif selected and self._is_text(node):
-                records *= Record({self._build_xpath(element.nodeName, context): node.nodeValue})
+        xpath = cls._build_xpath(context[-1], context[:-1])
+        delimiters = cls.SEQUENCES.get(xpath, [])
+        for start, end in delimiters:
+            if node.nodeName == end and next_element.nodeName == start:
+                return True
+        return False
+
+    @classmethod
+    def _next_element(cls, node):
+        node = node.nextSibling
+        while node is not None and not cls._is_element(node):
             node = node.nextSibling
-        return records
-
-    def _process_sequence(self, parent, context, sentinel):
-        records = RecordSet()
-        node = parent.firstChild
-        while node:
-            if self._is_element(node):
-                if not self._element_repeats(node.nodeName, context + (parent.nodeName,)):
-                    new_records = self._process_element(node, context + (parent.nodeName,))
-                else:
-                    new_records = RecordSet()
-                    name = node.nodeName
-                    while node and node.nodeName == name:
-                        if self._is_element(node):
-                            new_records |= self._process_element(node, context + (parent.nodeName,))
-                        node = node.nextSibling
-                records *= new_records
-            elif self._is_element_selected(parent.nodeName, context) and self._is_text(node):
-                records *= Record({self._build_xpath(parent.nodeName, context): node.nodeValue})
-            node = node.nextSibling
-        return records
-
-    def _has_selected_descendant(self, context):
-        xpath = self._build_xpath(context[-1], context[:-1])
-        return any(itertools.ifilter(lambda name: name.startsWith(xpath), self._options['selected']))
+        return node
 
     def _is_attribute_selected(self, name, element, context):
         xpath = self._build_xpath(element, context, name)
@@ -274,15 +239,15 @@ class Reader(BaseReader):
 
     @staticmethod
     def _build_xpath(element, context, attribute=None):
-        path = '/'.join(context + (element,))
+        path = u'/'.join(context + (element,))
         if attribute is not None:
-            path += '@' + attribute
+            path += u'@' + attribute
         return path
 
     @classmethod
     def _element_repeats(cls, name, context):
         xpath = cls._build_xpath(name, context)
-        return xpath in cls.MULTIPLES
+        return xpath in cls.REPEATED_ELEMENTS
 
     @staticmethod
     def _is_element(node):
