@@ -67,6 +67,6 @@ class RawRevisionExportView(SingleObjectMixin, View):
         :param kwargs: The keyword argument extracted from the route.
         """
         revision = self.get_object()
-        response = StreamingHttpResponse(revision.data, content_type="application/octet-stream")
+        response = StreamingHttpResponse(revision.data.chunks(), content_type="application/octet-stream")
         response["Content-Disposition"] = "attachment; filename={:s}".format(os.path.basename(revision.file.name))
         return response
