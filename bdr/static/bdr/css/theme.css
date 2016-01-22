@@ -49,3 +49,14 @@ h1 .tag.label {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.element-tree,
+.element-tree ul {
+    list-style: none;
+}
+
+.element-tree div>.glyphicon-folder-close,
+.element-tree .glyphicon-font {
+    font-size: 13px;
+    padding: 1px 7px;
+}

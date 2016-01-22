@@ -6,5 +6,13 @@
       "name": "Raw",
       "entry_point_name": "raw"
     }
+  },
+  {
+    "model": "bdr.format",
+    "pk": 2,
+    "fields": {
+      "name": "Drugbank 4.3",
+      "entry_point_name": "drugbank43"
+    }
   }
 ]
