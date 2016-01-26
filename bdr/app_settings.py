@@ -63,3 +63,5 @@ REMOTE_TRANSPORTS = getattr(settings, 'BDR_REMOTE_TRANSPORTS', {})
 REMOTE_TRANSPORTS.update({'ftp': 'bdr.utils.transports.FtpTransport',
                           'http': 'bdr.utils.transports.HttpTransport',
                           'https': 'bdr.utils.transports.HttpTransport'})
+
+XDELTA_BIN = getattr(settings, 'BDR_XDELTA_BIN')

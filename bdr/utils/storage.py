@@ -3,17 +3,19 @@ Storage handling for models based on delta-compression.
 """
 
 from hashlib import sha1 as hash_algorithm
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 import errno
 import fnmatch
 import io
 import os.path
 import shutil
+import subprocess
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from locket import lock_file
-from xdelta import DeltaFile
+
+from .. import app_settings
 
 __all__ = ["delta_storage", "upload_path"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -103,64 +105,54 @@ class DeltaFileSystemStorage(FileSystemStorage):
             base = None
             for current in self._get_related_files(name):
                 full_path = self.path(os.path.join(path, current))
-                delta = DeltaFile(io.open(full_path, "rb"))
-                delta.source = base
+                # Decode the current file based on the prior chain member, if
+                # any, and remove the intermediary file
+                decoded_path = self._decode(full_path, base, unlink_base=True)
 
                 if current == filename:
-                    return delta
+                    # Reopen the decoded file and make it self-deleting again
+                    return FileDeletionWrapper(io.open(decoded_path, "rb"))
 
-                with delta:
-                    base = TemporaryFile()
-                    shutil.copyfileobj(delta, base)
-                base.seek(0)
+                # Use the decoded file for the next one in the chain
+                base = decoded_path
 
         raise FileNotFoundError(name)  # This should not be possible here.
 
     def _save(self, name, content):
         full_path = self.path(name)
 
-        directory = os.path.dirname(full_path)
-        if not os.path.exists(directory):
-            try:
-                os.makedirs(directory)
-            except OSError as error:
-                if error.errno != errno.EEXIST:
-                    raise
-        if not os.path.isdir(directory):
-            raise IOError("{0:s} exists and is not a directory.".format(directory))
-
-        if not hasattr(content, "seekable") or not content.seekable():
-            copy = TemporaryFile()
+        with NamedTemporaryFile(delete=False) as copy:
             shutil.copyfileobj(content, copy)
-            copy.seek(0)
-            content = copy
 
         with Lock(full_path):
-            files = self._get_related_files(name)
-            if files:
-                head = os.path.join(directory, files[0])
-                with DeltaFile(io.open(head, "rb")) as delta:
-                    copy = TemporaryFile()
-                    shutil.copyfileobj(delta, copy)
+            try:
+                directory = os.path.dirname(full_path)
+                if not os.path.exists(directory):
+                    try:
+                        os.makedirs(directory)
+                    except OSError as error:
+                        if error.errno != errno.EEXIST:
+                            raise
+                if not os.path.isdir(directory):
+                    raise IOError("{0:s} exists and is not a directory.".format(directory))
 
-                copy.seek(0)
-                with DeltaFile(io.open(head, "wb")) as delta:
-                    delta.source = content
-                    shutil.copyfileobj(copy, delta)
+                files = self._get_related_files(name)
+                if files:
+                    head = os.path.join(directory, files[0])
+                    # Decode head into a temporary file
+                    temp = self._decode(head)
 
-            content.seek(0)
-            with DeltaFile(io.open(full_path, "wb")) as delta:
-                shutil.copyfileobj(content, delta)
+                    self._encode(temp, head, base=copy.name, unlink_source=True)
+
+                # Encode the added file
+                self._encode(copy.name, full_path)
+            finally:
+                # Remove the on-disk copy of content
+                os.unlink(copy.name)
 
         if settings.FILE_UPLOAD_PERMISSIONS is not None:
             os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
         return name
-
-    def _get_related_files(self, name):
-        path, filename = os.path.split(name)
-        root = os.path.splitext(filename)[0]
-        related_files = fnmatch.filter(self.listdir(path)[1], ".".join((root, "??????")))
-        return sorted(related_files, reverse=True)
 
     def delete(self, name):
         """
@@ -178,50 +170,46 @@ class DeltaFileSystemStorage(FileSystemStorage):
             if self.exists(name):
                 files = self._get_related_files(name)
                 index = files.index(filename)
+                # If the target file is not the last member of the chain, the
+                # file that follows it will need to be recoded using the file
+                # that precedes the target in the chain.
                 if index != len(files) - 1:
+                    # Decode chain members up to the target file discarding
+                    # temporary files along the way.
                     base = None
                     for current in files[:index]:
                         current_path = self.path(os.path.join(path, current))
-                        delta = DeltaFile(io.open(current_path, "rb"))
-                        delta.source = base
-
-                        with delta:
-                            base = TemporaryFile()
-                            shutil.copyfileobj(delta, base)
-                        base.seek(0)
+                        base = self._decode(current_path, base, unlink_base=True)
                     prior = base
 
-                    with DeltaFile(io.open(full_path, "rb")) as delta:
-                        delta.source = prior
-                        temp = TemporaryFile()
-                        shutil.copyfileobj(delta, temp)
+                    try:
+                        # Decode the target file using its predecessor (if
+                        # applicable).
+                        target = self._decode(full_path, base=prior)
 
-                    after = self.path(os.path.join(path, files[index + 1]))
-                    temp.seek(0)
-                    with DeltaFile(io.open(after, "rb")) as delta:
-                        delta.source = temp
-                        copy = TemporaryFile()
-                        shutil.copyfileobj(delta, copy)
+                        after = self.path(os.path.join(path, files[index + 1]))
+                        # Decode the trailing file deleting the decoded version
+                        # of the target
+                        copy = self._decode(after, base=target, unlink_base=True)
 
-                    if prior:
-                        prior.seek(0)
-                    copy.seek(0)
-                    with DeltaFile(io.open(after, "wb")) as delta:
-                        delta.source = prior
-                        shutil.copyfileobj(copy, delta)
+                        # Recode the trailing file deleting its intermediary
+                        self._encode(copy, after, base=prior, unlink_source=True)
+                    finally:
+                        if prior:
+                            os.unlink(prior)
 
                 super(DeltaFileSystemStorage, self).delete(name)
 
-        path = os.path.dirname(full_path)
-        try:
-            os.rmdir(path)
-        except OSError as error:
-            # Failing to delete a directory that still contains files is not
-            # considered an error. This approach avoids a race condition where
-            # a file may be created between finding the directory empty and
-            # deleting it.
-            if error.errno != errno.ENOTEMPTY:
-                raise
+            path = os.path.dirname(full_path)
+            try:
+                os.rmdir(path)
+            except OSError as error:
+                # Failing to delete a directory that still contains files is not
+                # considered an error. This approach avoids a race condition where
+                # a file may be created between finding the directory empty and
+                # deleting it.
+                if error.errno != errno.ENOTEMPTY:
+                    raise
 
     def url(self, name):
         """
@@ -235,6 +223,42 @@ class DeltaFileSystemStorage(FileSystemStorage):
         :raises NotImplementedError: when called.
         """
         raise NotImplementedError("URL access is forbidden for delta-encoded files.")
+
+    @staticmethod
+    def _decode(source, base=None, unlink_base=False):
+        output = NamedTemporaryFile(delete=False)
+        output.close()
+
+        args = [app_settings.XDELTA_BIN, "-fdS", "djw", source, output.name]
+        if base:
+            args[3:3] = ("-s", base)
+        try:
+            subprocess.check_call(args)
+        except subprocess.CalledProcessError:
+            os.unlink(output.name)
+            raise
+        finally:
+            if unlink_base and base:
+                os.unlink(base)
+
+        return output.name
+
+    @staticmethod
+    def _encode(source, destination, base=None, unlink_source=False):
+        args = [app_settings.XDELTA_BIN, "-feS", "djw", source, destination]
+        if base:
+            args[3:3] = ("-s", base)
+        try:
+            subprocess.check_call(args)
+        finally:
+            if unlink_source:
+                os.unlink(source)
+
+    def _get_related_files(self, name):
+        path, filename = os.path.split(name)
+        root = os.path.splitext(filename)[0]
+        related_files = fnmatch.filter(self.listdir(path)[1], ".".join((root, "??????")))
+        return sorted(related_files, reverse=True)
 
 
 class Lock(object):
@@ -268,6 +292,40 @@ class Lock(object):
             # Ignore deletion failure on Windows
             if err.errno not in (errno.EACCES, errno.ENOENT):
                 raise
+
+
+class FileDeletionWrapper(object):
+    """
+    Wraps a :py:class:`file`-like object in such a way that garbage collecting
+    or closing the wrapper closes and deletes the underlying file.
+    """
+
+    # noinspection PyShadowingBuiltins
+    def __init__(self, file):
+        self._file = file
+        self._closed = False
+
+    def __del__(self):
+        self.close()
+
+    def __getattr__(self, item):
+        # Delegate attribute lookups to the underlying file
+        return getattr(self._file, item)
+
+    def __enter__(self):
+        self._file.__enter__()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        suppress = self._file.__exit__(exc_type, exc_val, exc_tb)
+        self.close()
+        return suppress
+
+    def close(self):
+        if not self._closed:
+            self._closed = True
+            self._file.close()
+            os.unlink(self._file.name)
 
 
 class FileNotFoundError(IOError):
