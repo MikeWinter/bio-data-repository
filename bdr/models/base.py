@@ -30,17 +30,19 @@ import re
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.db import DatabaseError
 from django.db.transaction import atomic
 from django.db.models import Model, fields, SET_DEFAULT
 from django.db.models.fields import files, related
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils.log import getLogger
 from django.utils.text import slugify
 
 from ..utils import utc, RemoteFile
 from ..utils.archives import Archive
 from ..utils.storage import delta_storage, upload_path
-from ..utils.transports import Transport
+from ..utils.transports import Transport, TransportError
 
 __all__ = ["Category", "Dataset", "File", "Filter", "Revision", "Source", "Tag", "Update"]
 __author__ = "Michael Winter (mail@michael-winter.me.uk)"
@@ -68,6 +70,8 @@ BACK_REFERENCE = re.compile(r"\\(\d{1,2})")
 r"""
 Matches back-references used in regular expression substitutions (e.g. \1).
 """
+
+_log = getLogger('bdr.models.base')
 
 
 def validate_regex(value):
@@ -322,17 +326,30 @@ class Dataset(Model):
         Query the sources for this dataset and add revisions for any modified
         files.
         """
-        for source in [src for src in self.sources.all() if src.has_update_elapsed()]:
-            if source.has_changed():
-                file_list, size, modification_date = source.files()
 
+        def _is_due(src):
+            due = False
+            try:
                 with atomic():
-                    update = self.updates.create(source=source, size=size,
-                                                 modified_at=modification_date)
-                    for source_file in file_list:
-                        self.add_file(source_file, update)
+                    if src.has_update_elapsed():
+                        src.checked()
+                        due = src.has_changed()
+            except DatabaseError:
+                _log.exception('An exception occurred while the "%s" dataset with the source at %s', src.dataset, src)
+            except TransportError:
+                _log.exception('An exception occurred while querying the source at %s', src)
+            finally:
+                return due
 
-                source.checked()
+        for source in filter(_is_due, self.sources.all()):
+            try:
+                file_list, size, modification_date = source.files()
+            except (TransportError, IOError):
+                _log.exception('An exception occurred while retrieving data from %s', source)
+            else:
+                update = self.updates.create(source=source, size=size, modified_at=modification_date)
+                for source_file in file_list:
+                    self.add_file(source_file, update)
 
     # noinspection PyShadowingBuiltins
     def add_file(self, file, update, format=None):
@@ -352,9 +369,10 @@ class Dataset(Model):
         :type format: Format | None
         """
         file_defaults = {"default_format": Format.default() if format is None else format}
-        instance = self.files.get_or_create(name=file.name, defaults=file_defaults)[0]
-        instance.revisions.create(data=file, size=file.size, modified_at=file.modified_time, update=update,
-                                  format=format)
+        with atomic():
+            instance = self.files.get_or_create(name=file.name, defaults=file_defaults)[0]
+            instance.revisions.create(data=file, size=file.size, modified_at=file.modified_time, update=update,
+                                      format=format)
 
     def get_absolute_url(self):
         """

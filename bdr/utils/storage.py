@@ -98,7 +98,8 @@ class DeltaFileSystemStorage(FileSystemStorage):
         :raises FileNotFoundError: if ``name`` does not exist.
         """
         path, filename = os.path.split(name)
-        with Lock(self.path(name)):
+
+        with Lock(self.path(path + filename)):
             if not self.exists(name):
                 raise FileNotFoundError(name)
 
@@ -119,13 +120,14 @@ class DeltaFileSystemStorage(FileSystemStorage):
         raise FileNotFoundError(name)  # This should not be possible here.
 
     def _save(self, name, content):
+        path, filename = os.path.split(name)
         full_path = self.path(name)
 
         with NamedTemporaryFile(delete=False) as copy:
             shutil.copyfileobj(content, copy)
 
-        with Lock(full_path):
-            try:
+        try:
+            with Lock(self.path(path + filename)):
                 directory = os.path.dirname(full_path)
                 if not os.path.exists(directory):
                     try:
@@ -146,9 +148,9 @@ class DeltaFileSystemStorage(FileSystemStorage):
 
                 # Encode the added file
                 self._encode(copy.name, full_path)
-            finally:
-                # Remove the on-disk copy of content
-                os.unlink(copy.name)
+        finally:
+            # Remove the on-disk copy of content
+            os.unlink(copy.name)
 
         if settings.FILE_UPLOAD_PERMISSIONS is not None:
             os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
@@ -166,7 +168,8 @@ class DeltaFileSystemStorage(FileSystemStorage):
         """
         path, filename = os.path.split(name)
         full_path = self.path(name)
-        with Lock(full_path):
+
+        with Lock(self.path(path + filename)):
             if self.exists(name):
                 files = self._get_related_files(name)
                 index = files.index(filename)
