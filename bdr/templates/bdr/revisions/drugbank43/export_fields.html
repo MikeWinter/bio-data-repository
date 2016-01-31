@@ -4,10 +4,15 @@
 {% block form %}
     <fieldset>
         <legend>Fields</legend>
+        <p>Select the elements to export. Items annotated with <small>{% bootstrap_icon "font" %}</small> are attributes
+            of the parent element in the tree. Those with <small>{% bootstrap_icon "folder-close" %}</small> contain
+            selectable descendants; clicking the icon will expand the tree.</p>
+
         {% bootstrap_form wizard.management_form %}
         {% bootstrap_form_errors wizard.form %}
 
         {{ wizard.form.selected.errors }}
+        {% spaceless %}
         <ul class="element-tree">
             <li>
                 <div class="checkbox">
@@ -60,21 +65,18 @@
                     <li>
                         <div class="checkbox">
                             <input id="name-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/name" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="name-element">name <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="description-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/description" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="description-element">description <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="cas-number-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/cas-number" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="cas-number-element">cas-number <small>[1]</small></label>
                         </div>
                     </li>
@@ -85,14 +87,13 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="groups-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>groups <small>[1]</small></label>
+                            <span>groups <small>[1]</small></span>
                         </div>
                         <ul id="groups-children" class="collapse">
                             <li>
                                 <div class="checkbox">
                                     <input id="group-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/groups/group" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="group-element">group <small>[1&hellip;6]</small></label>
                                 </div>
                             </li>
@@ -102,7 +103,6 @@
                         <div class="checkbox">
                             <input id="general-reference-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/general-reference" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="general-reference-element">general-reference <small>[1]</small></label>
                         </div>
                     </li>
@@ -110,14 +110,12 @@
                         <div class="checkbox">
                             <input id="synthesis-reference-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/synthesis-reference" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="synthesis-reference-element">synthesis-reference <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="indication-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/indication" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="indication-element">indication <small>[1]</small></label>
                         </div>
                     </li>
@@ -125,7 +123,6 @@
                         <div class="checkbox">
                             <input id="pharmacodynamics-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/pharmacodynamics" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="pharmacodynamics-element">pharmacodynamics <small>[1]</small></label>
                         </div>
                     </li>
@@ -133,35 +130,30 @@
                         <div class="checkbox">
                             <input id="mechanism-of-action-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/mechanism-of-action" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="mechanism-of-action-element">mechanism-of-action <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="toxicity-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/toxicity" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="toxicity-element">toxicity <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="metabolism-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/metabolism" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="metabolism-element">metabolism <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="absorption-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/absorption" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="absorption-element">absorption <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="half-life-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/half-life" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="half-life-element">half-life <small>[1]</small></label>
                         </div>
                     </li>
@@ -169,7 +161,6 @@
                         <div class="checkbox">
                             <input id="protein-binding-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/protein-binding" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="protein-binding-element">protein-binding <small>[1]</small></label>
                         </div>
                     </li>
@@ -177,7 +168,6 @@
                         <div class="checkbox">
                             <input id="route-of-elimination-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/route-of-elimination" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="route-of-elimination-element">route-of-elimination <small>[1]</small></label>
                         </div>
                     </li>
@@ -185,14 +175,12 @@
                         <div class="checkbox">
                             <input id="volume-of-distribution-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                    value="drug/volume-of-distribution" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="volume-of-distribution-element">volume-of-distribution <small>[1]</small></label>
                         </div>
                     </li>
                     <li>
                         <div class="checkbox">
                             <input id="clearance-element" type="checkbox" name="{{ wizard.form.prefix }}-selected" value="drug/clearance" />
-                            {% bootstrap_icon "folder-close" %}
                             <label for="clearance-element">clearance <small>[1]</small></label>
                         </div>
                     </li>
@@ -203,14 +191,13 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="classification-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>classification <small>[0&hellip;1]</small></label>
+                            <span>classification <small>[0&hellip;1]</small></span>
                         </div>
                         <ul id="classification-children" class="collapse">
                             <li>
                                 <div class="checkbox">
                                     <input id="classification-description-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/description" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="classification-description-element">description <small>[1]</small></label>
                                 </div>
                             </li>
@@ -218,7 +205,6 @@
                                 <div class="checkbox">
                                     <input id="classification-direct-parent-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/direct-parent" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="classification-direct-parent-element">direct-parent <small>[1]</small></label>
                                 </div>
                             </li>
@@ -226,7 +212,6 @@
                                 <div class="checkbox">
                                     <input id="kingdom-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/kingdom" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="kingdom-element">kingdom <small>[1]</small></label>
                                 </div>
                             </li>
@@ -234,7 +219,6 @@
                                 <div class="checkbox">
                                     <input id="superclass-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/superclass" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="superclass-element">superclass <small>[1]</small></label>
                                 </div>
                             </li>
@@ -242,7 +226,6 @@
                                 <div class="checkbox">
                                     <input id="class-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/class" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="class-element">class <small>[1]</small></label>
                                 </div>
                             </li>
@@ -250,7 +233,6 @@
                                 <div class="checkbox">
                                     <input id="subclass-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/subclass" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="subclass-element">subclass <small>[1]</small></label>
                                 </div>
                             </li>
@@ -258,7 +240,6 @@
                                 <div class="checkbox">
                                     <input id="alternative-parent-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/alternative-parent" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="alternative-parent-element">alternative-parent <small>[0&hellip;*]</small></label>
                                 </div>
                             </li>
@@ -266,7 +247,6 @@
                                 <div class="checkbox">
                                     <input id="substituent-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/classification/substituent" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="substituent-element">substituent <small>[0&hellip;*]</small></label>
                                 </div>
                             </li>
@@ -279,7 +259,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="salts-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>salts <small>[1]</small></label>
+                            <span>salts <small>[1]</small></span>
                         </div>
                         <ul id="salts-children" class="collapse">
                             <li>
@@ -289,7 +269,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="salt-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>salt <small>[0&hellip;*]</small></label>
+                                    <span>salt <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="salt-children" class="collapse">
                                     <li>
@@ -317,7 +297,6 @@
                                         <div class="checkbox">
                                             <input id="salts-salt-name-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/salts/salt/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="salts-salt-name-element">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -325,7 +304,6 @@
                                         <div class="checkbox">
                                             <input id="salts-salt-cas-number-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/salts/salt/cas-number" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="salts-salt-cas-number-element">cas-number <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -333,7 +311,6 @@
                                         <div class="checkbox">
                                             <input id="salts-salt-inchikey-element" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/salts/salt/inchikey" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="salts-salt-inchikey-element">InChIKey <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -348,7 +325,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="synonyms-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>synonyms <small>[1]</small></label>
+                            <span>synonyms <small>[1]</small></span>
                         </div>
                         <ul id="synonyms-children" class="collapse">
                             <li>
@@ -389,7 +366,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="products-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>products <small>[1]</small></label>
+                            <span>products <small>[1]</small></span>
                         </div>
                         <ul id="products-children" class="collapse">
                             <li>
@@ -399,14 +376,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="product-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>product <small>[0&hellip;*]</small></label>
+                                    <span>product <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="product-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="product-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -414,7 +390,6 @@
                                         <div class="checkbox">
                                             <input id="product-ndc-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/ndc-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-ndc-id">ndc-id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -422,7 +397,6 @@
                                         <div class="checkbox">
                                             <input id="product-ndc-product-code" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/ndc-product-code" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-ndc-product-code">ndc-product-code <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -430,7 +404,6 @@
                                         <div class="checkbox">
                                             <input id="product-dpd-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/dpd-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-dpd-id">dpd-id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -438,7 +411,6 @@
                                         <div class="checkbox">
                                             <input id="product-started-marketing-on" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/started-marketing-on" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-started-marketing-on">started-marketing-on <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -446,7 +418,6 @@
                                         <div class="checkbox">
                                             <input id="product-ended-marketing-on" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/ended-marketing-on" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-ended-marketing-on">ended-marketing-on <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -454,7 +425,6 @@
                                         <div class="checkbox">
                                             <input id="product-dosage-form" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/dosage-form" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-dosage-form">dosage-form <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -462,7 +432,6 @@
                                         <div class="checkbox">
                                             <input id="product-strength" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/strength" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-strength">strength <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -470,7 +439,6 @@
                                         <div class="checkbox">
                                             <input id="product-route" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/route" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-route">route <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -478,7 +446,6 @@
                                         <div class="checkbox">
                                             <input id="product-fda-application-number" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/fda-application-number" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-fda-application-number">fda-application-number <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -486,7 +453,6 @@
                                         <div class="checkbox">
                                             <input id="product-generic" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/generic" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-generic">generic <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -494,7 +460,6 @@
                                         <div class="checkbox">
                                             <input id="product-over-the-counter" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/over-the-counter" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-over-the-counter">over-the-counter <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -502,7 +467,6 @@
                                         <div class="checkbox">
                                             <input id="product-approved" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/approved" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-approved">approved <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -510,7 +474,6 @@
                                         <div class="checkbox">
                                             <input id="product-country" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/country" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-country">country <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -518,7 +481,6 @@
                                         <div class="checkbox">
                                             <input id="product-source" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/products/product/source" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="product-source">source <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -533,7 +495,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="international-brands-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>international-brands <small>[1]</small></label>
+                            <span>international-brands <small>[1]</small></span>
                         </div>
                         <ul id="international-brands-children" class="collapse">
                             <li>
@@ -543,14 +505,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="international-brand-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>international-brand <small>[0&hellip;*]</small></label>
+                                    <span>international-brand <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="international-brand-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="international-brand-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/international-brands/international-brand/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="international-brand-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -558,7 +519,6 @@
                                         <div class="checkbox">
                                             <input id="international-brand-company" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/international-brands/international-brand/company" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="international-brand-company">company <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -573,7 +533,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="mixtures-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>mixtures <small>[1]</small></label>
+                            <span>mixtures <small>[1]</small></span>
                         </div>
                         <ul id="mixtures-children" class="collapse">
                             <li>
@@ -583,14 +543,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="mixture-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>mixture <small>[0&hellip;*]</small></label>
+                                    <span>mixture <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="mixture-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="mixture-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/mixtures/mixture/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="mixture-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -598,7 +557,6 @@
                                         <div class="checkbox">
                                             <input id="mixture-ingredients" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/mixtures/mixture/ingredients" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="mixture-ingredients">ingredients <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -613,7 +571,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="packagers-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>packagers <small>[1]</small></label>
+                            <span>packagers <small>[1]</small></span>
                         </div>
                         <ul id="packagers-children" class="collapse">
                             <li>
@@ -623,14 +581,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="packager-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>packager <small>[0&hellip;*]</small></label>
+                                    <span>packager <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="packager-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="packager-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/packagers/packager/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="packager-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -638,7 +595,6 @@
                                         <div class="checkbox">
                                             <input id="packager-url" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/packagers/packager/url" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="packager-url">url <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -653,7 +609,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="manufacturers-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>manufacturers <small>[1]</small></label>
+                            <span>manufacturers <small>[1]</small></span>
                         </div>
                         <ul id="manufacturers-children" class="collapse">
                             <li>
@@ -686,7 +642,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="prices-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>prices <small>[1]</small></label>
+                            <span>prices <small>[1]</small></span>
                         </div>
                         <ul id="prices-children" class="collapse">
                             <li>
@@ -696,14 +652,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="price-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>price <small>[0&hellip;*]</small></label>
+                                    <span>price <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="price-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="price-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/prices/price/description" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="price-description">description <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -732,7 +687,6 @@
                                         <div class="checkbox">
                                             <input id="price-unit" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/prices/price/unit" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="price-unit">unit <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -747,7 +701,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="categories-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>categories <small>[1]</small></label>
+                            <span>categories <small>[1]</small></span>
                         </div>
                         <ul id="categories-children" class="collapse">
                             <li>
@@ -757,14 +711,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="category-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>category <small>[0&hellip;*]</small></label>
+                                    <span>category <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="category-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="category-category" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/categories/category/category" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="category-category">category <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -772,7 +725,6 @@
                                         <div class="checkbox">
                                             <input id="category-mesh-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/categories/category/mesh-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="category-mesh-id">mesh-id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -787,14 +739,13 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="affected-organisms-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>affected-organisms <small>[1]</small></label>
+                            <span>affected-organisms <small>[1]</small></span>
                         </div>
                         <ul id="affected-organisms-children" class="collapse">
                             <li>
                                 <div class="checkbox">
                                     <input id="affected-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/affected-organisms/affected-organism" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="affected-organism">affected-organism <small>[0&hellip;*]</small></label>
                                 </div>
                             </li>
@@ -807,7 +758,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="dosages-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>dosages <small>[1]</small></label>
+                            <span>dosages <small>[1]</small></span>
                         </div>
                         <ul id="dosages-children" class="collapse">
                             <li>
@@ -817,14 +768,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="dosage-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>dosage <small>[0&hellip;*]</small></label>
+                                    <span>dosage <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="dosage-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="dosage-form" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/dosages/dosage/form" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="dosage-form">form <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -832,7 +782,6 @@
                                         <div class="checkbox">
                                             <input id="dosage-route" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/dosages/dosage/route" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="dosage-route">route <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -840,7 +789,6 @@
                                         <div class="checkbox">
                                             <input id="strength-form" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/dosages/dosage/strength" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="strength-form">strength <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -855,7 +803,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="atc-codes-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>atc-codes <small>[1]</small></label>
+                            <span>atc-codes <small>[1]</small></span>
                         </div>
                         <ul id="atc-codes-children" class="collapse">
                             <li>
@@ -865,7 +813,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="atc-code-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>atc-code <small>[0&hellip;*]</small></label>
+                                    <span>atc-code <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="atc-code-children" class="collapse">
                                     <li>
@@ -908,14 +856,13 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="ahfs-codes-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>ahfs-codes <small>[1]</small></label>
+                            <span>ahfs-codes <small>[1]</small></span>
                         </div>
                         <ul id="ahfs-codes-children" class="collapse">
                             <li>
                                 <div class="checkbox">
                                     <input id="ahfs-code" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/ahfs-codes/ahfs-code" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="ahfs-code">ahfs-code <small>[0&hellip;*]</small></label>
                                 </div>
                             </li>
@@ -928,7 +875,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="patents-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>patents <small>[1]</small></label>
+                            <span>patents <small>[1]</small></span>
                         </div>
                         <ul id="patents-children" class="collapse">
                             <li>
@@ -938,14 +885,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="patent-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>patent <small>[0&hellip;*]</small></label>
+                                    <span>patent <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="patent-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="patent-number" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/patents/patent/number" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="patent-number">number <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -953,7 +899,6 @@
                                         <div class="checkbox">
                                             <input id="patent-country" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/patents/patent/country" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="patent-country">country <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -961,7 +906,6 @@
                                         <div class="checkbox">
                                             <input id="patent-approved" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/patents/patent/approved" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="patent-approved">approved <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -969,7 +913,6 @@
                                         <div class="checkbox">
                                             <input id="patent-expires" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/patents/patent/expires" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="patent-expires">expires <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -984,14 +927,13 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="food-interactions-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>food-interactions <small>[1]</small></label>
+                            <span>food-interactions <small>[1]</small></span>
                         </div>
                         <ul id="food-interactions-children" class="collapse">
                             <li>
                                 <div class="checkbox">
                                     <input id="food-interaction" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                            value="drug/food-interactions/food-interaction" />
-                                    {% bootstrap_icon "folder-close" %}
                                     <label for="food-interaction">food-interaction <small>[0&hellip;*]</small></label>
                                 </div>
                             </li>
@@ -1004,7 +946,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="drug-interactions-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>drug-interactions <small>[1]</small></label>
+                            <span>drug-interactions <small>[1]</small></span>
                         </div>
                         <ul id="drug-interactions-children" class="collapse">
                             <li>
@@ -1014,7 +956,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="drug-interaction-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>drug-interaction <small>[0&hellip;*]</small></label>
+                                    <span>drug-interaction <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="drug-interaction-children" class="collapse">
                                     <li>
@@ -1042,7 +984,6 @@
                                         <div class="checkbox">
                                             <input id="drug-interaction-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/drug-interactions/drug-interaction/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="drug-interaction-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1050,7 +991,6 @@
                                         <div class="checkbox">
                                             <input id="drug-interaction-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/drug-interactions/drug-interaction/description" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="drug-interaction-description">description <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1065,7 +1005,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="sequences-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>sequences <small>[0&hellip;1]</small></label>
+                            <span>sequences <small>[0&hellip;1]</small></span>
                         </div>
                         <ul id="sequences-children" class="collapse">
                             <li>
@@ -1098,7 +1038,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="calculated-properties-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>calculated-properties <small>[0&hellip;1]</small></label>
+                            <span>calculated-properties <small>[0&hellip;1]</small></span>
                         </div>
                         <ul id="calculated-properties-children" class="collapse">
                             <li>
@@ -1108,14 +1048,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="calculated-properties-property-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>property <small>[0&hellip;*]</small></label>
+                                    <span>property <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="calculated-properties-property-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="calculated-properties-property-kind" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/calculated-properties/property/kind" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="calculated-properties-property-kind">kind <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1123,7 +1062,6 @@
                                         <div class="checkbox">
                                             <input id="calculated-properties-property-value" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/calculated-properties/property/value" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="calculated-properties-property-value">value <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1131,7 +1069,6 @@
                                         <div class="checkbox">
                                             <input id="calculated-properties-property-source" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/calculated-properties/property/source" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="calculated-properties-property-source">source <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1146,7 +1083,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="experimental-properties-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>experimental-properties <small>[1]</small></label>
+                            <span>experimental-properties <small>[1]</small></span>
                         </div>
                         <ul id="experimental-properties-children" class="collapse">
                             <li>
@@ -1156,14 +1093,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="experimental-properties-property-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>property <small>[0&hellip;*]</small></label>
+                                    <span>property <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="experimental-properties-property-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="experimental-properties-property-kind" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/experimental-properties/property/kind" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="experimental-properties-property-kind">kind <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1171,7 +1107,6 @@
                                         <div class="checkbox">
                                             <input id="experimental-properties-property-value" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/experimental-properties/property/value" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="experimental-properties-property-value">value <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1179,7 +1114,6 @@
                                         <div class="checkbox">
                                             <input id="experimental-properties-property-source" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/experimental-properties/property/source" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="experimental-properties-property-source">source <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1194,7 +1128,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="external-identifiers-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>external-identifiers <small>[1]</small></label>
+                            <span>external-identifiers <small>[1]</small></span>
                         </div>
                         <ul id="external-identifiers-children" class="collapse">
                             <li>
@@ -1204,14 +1138,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="external-identifier-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>external-identifier <small>[0&hellip;*]</small></label>
+                                    <span>external-identifier <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="external-identifier-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="external-identifier-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/external-identifiers/external-identifier/resource" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="external-identifier-resource">resource <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1219,7 +1152,6 @@
                                         <div class="checkbox">
                                             <input id="external-identifier-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/external-identifiers/external-identifier/identifier" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="external-identifier-identifier">identifier <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1234,7 +1166,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="external-links-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>external-links <small>[1]</small></label>
+                            <span>external-links <small>[1]</small></span>
                         </div>
                         <ul id="external-links-children" class="collapse">
                             <li>
@@ -1244,14 +1176,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="external-link-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>external-link <small>[0&hellip;*]</small></label>
+                                    <span>external-link <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="external-link-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="external-link-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/external-links/external-link/resource" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="external-link-resource">resource <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1259,7 +1190,6 @@
                                         <div class="checkbox">
                                             <input id="external-link-url" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/external-links/external-link/url" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="external-link-url">url <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1274,7 +1204,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="pathways-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>pathways <small>[1]</small></label>
+                            <span>pathways <small>[1]</small></span>
                         </div>
                         <ul id="pathways-children" class="collapse">
                             <li>
@@ -1284,14 +1214,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="pathway-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>pathway <small>[0&hellip;*]</small></label>
+                                    <span>pathway <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="pathway-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="pathway-smpdb-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/pathways/pathway/smpdb-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="pathway-smpdb-id">smpdb-id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1299,7 +1228,6 @@
                                         <div class="checkbox">
                                             <input id="pathway-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/pathways/pathway/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="pathway-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1310,9 +1238,9 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="pathway-drugs-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>drugs <small>[1]</small></label>
+                                            <span>drugs <small>[1]</small></span>
                                         </div>
-                                        <ul id="pathway-drugs-children">
+                                        <ul id="pathway-drugs-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <span class="form-control-static"></span>
@@ -1320,7 +1248,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="pathway-drug-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>drug <small>[1&hellip;*]</small></label>
+                                                    <span>drug <small>[1&hellip;*]</small></span>
                                                 </div>
                                                 <ul id="pathway-drug-children" class="collapse">
                                                     <li>
@@ -1333,7 +1261,7 @@
                                                             </a>
                                                             <label for="pathway-drug-drugbank-id">drugbank-id <small>[1]</small></label>
                                                         </div>
-                                                        <ul id="pathway-drug-drugbank-id-children">
+                                                        <ul id="pathway-drug-drugbank-id-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="pathway-drug-drugbank-id-primary" type="checkbox" name="{{ wizard.form.prefix }}-selected"
@@ -1348,7 +1276,6 @@
                                                         <div class="checkbox">
                                                             <input id="pathway-drug-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/pathways/pathway/drug/name" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="pathway-drug-name">name <small>[1]</small></label>
                                                         </div>
                                                     </li>
@@ -1363,14 +1290,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="pathway-enzymes-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>enzymes <small>[1]</small></label>
+                                            <span>enzymes <small>[1]</small></span>
                                         </div>
                                         <ul id="pathway-enzymes-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="pathway-enzymes-uniprot-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/pathways/pathway/enzymes/uniprot-id" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="pathway-enzymes-uniprot-id">uniprot-id <small>[0&hellip;*]</small></label>
                                                 </div>
                                             </li>
@@ -1387,7 +1313,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="reactions-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>reactions <small>[1]</small></label>
+                            <span>reactions <small>[1]</small></span>
                         </div>
                         <ul id="reactions-children" class="collapse">
                             <li>
@@ -1397,14 +1323,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="reaction-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>reaction <small>[0&hellip;*]</small></label>
+                                    <span>reaction <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="reaction-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="reaction-sequence" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/reactions/reaction/sequence" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="reaction-sequence">sequence <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1415,14 +1340,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="reaction-left-element-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>left-element <small>[1]</small></label>
+                                            <span>left-element <small>[1]</small></span>
                                         </div>
                                         <ul id="reaction-left-element-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="reaction-left-element-drugbank-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/reactions/reaction/left-element/drugbank-id" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="reaction-left-element-drugbank-id">drugbank-id <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1430,7 +1354,6 @@
                                                 <div class="checkbox">
                                                     <input id="reaction-left-element-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/reactions/reaction/left-element/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="reaction-left-element-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1443,14 +1366,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="reaction-right-element-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>right-element <small>[1]</small></label>
+                                            <span>right-element <small>[1]</small></span>
                                         </div>
                                         <ul id="reaction-right-element-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="reaction-right-element-drugbank-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/reactions/reaction/right-element/drugbank-id" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="reaction-right-element-drugbank-id">drugbank-id <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1458,7 +1380,6 @@
                                                 <div class="checkbox">
                                                     <input id="reaction-right-element-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/reactions/reaction/right-element/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="reaction-right-element-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1471,7 +1392,7 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="reaction-enzymes-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>enzymes <small>[1]</small></label>
+                                            <span>enzymes <small>[1]</small></span>
                                         </div>
                                         <ul id="reaction-enzymes-children" class="collapse">
                                             <li>
@@ -1481,14 +1402,13 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="reaction-enzyme-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>enzyme <small>[0&hellip;*]</small></label>
+                                                    <span>enzyme <small>[0&hellip;*]</small></span>
                                                 </div>
                                                 <ul id="reaction-enzyme-children" class="collapse">
                                                     <li>
                                                         <div class="checkbox">
                                                             <input id="reaction-enzyme-drugbank-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/reactions/reaction/enzymes/enzyme/drugbank-id" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="reaction-enzyme-drugbank-id">drugbank-id <small>[1]</small></label>
                                                         </div>
                                                     </li>
@@ -1496,7 +1416,6 @@
                                                         <div class="checkbox">
                                                             <input id="reaction-enzyme-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/reactions/reaction/enzymes/enzyme/name" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="reaction-enzyme-name">name <small>[1]</small></label>
                                                         </div>
                                                     </li>
@@ -1504,7 +1423,6 @@
                                                         <div class="checkbox">
                                                             <input id="reaction-enzyme-uniprot-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/reactions/reaction/enzymes/enzyme/uniprot-id" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="reaction-enzyme-uniprot-id">uniprot-id <small>[1]</small></label>
                                                         </div>
                                                     </li>
@@ -1523,7 +1441,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="snp-effects-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>snp-effects <small>[1]</small></label>
+                            <span>snp-effects <small>[1]</small></span>
                         </div>
                         <ul id="snp-effects-children" class="collapse">
                             <li>
@@ -1533,14 +1451,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="snp-effects-effect-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>effect <small>[0&hellip;*]</small></label>
+                                    <span>effect <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="snp-effects-effect-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-protein-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/protein-name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-protein-name">protein-name <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1548,7 +1465,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-gene-symbol" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/gene-symbol" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-gene-symbol">gene-symbol <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1556,7 +1472,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-uniprot-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/uniprot-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-uniprot-id">uniprot-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1564,7 +1479,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-rs-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/rs-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-rs-id">rs-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1572,7 +1486,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-allele" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/allele" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-allele">allele <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1580,7 +1493,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-defining-change" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/defining-change" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-defining-change">defining-change <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1588,7 +1500,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/description" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-description">description <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1596,7 +1507,6 @@
                                         <div class="checkbox">
                                             <input id="snp-effects-effect-pubmed-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-effects/effect/pubmed-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-effects-effect-pubmed-id">pubmed-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1611,7 +1521,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="snp-adverse-drug-reactions-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>snp-adverse-drug-reactions <small>[1]</small></label>
+                            <span>snp-adverse-drug-reactions <small>[1]</small></span>
                         </div>
                         <ul id="snp-adverse-drug-reactions-children" class="collapse">
                             <li>
@@ -1621,14 +1531,13 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="snp-adverse-drug-reactions-reaction-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>reaction <small>[0&hellip;*]</small></label>
+                                    <span>reaction <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="snp-adverse-drug-reactions-reaction-children" class="collapse">
                                     <li>
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-protein-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/protein-name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-protein-name">protein-name <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1636,7 +1545,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-gene-symbol" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/gene-symbol" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-gene-symbol">gene-symbol <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1644,7 +1552,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-uniprot-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/uniprot-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-uniprot-id">uniprot-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1652,7 +1559,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-rs-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/rs-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-rs-id">rs-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1660,7 +1566,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-allele" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/allele" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-allele">allele <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1668,7 +1573,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-adverse-reaction" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/adverse-reaction" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-adverse-reaction">adverse-reaction <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1676,7 +1580,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/description" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-description">description <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1684,7 +1587,6 @@
                                         <div class="checkbox">
                                             <input id="snp-adverse-drug-reactions-reaction-pubmed-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/snp-adverse-drug-reactions/reaction/pubmed-id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="snp-adverse-drug-reactions-reaction-pubmed-id">pubmed-id <small>[0&hellip;*]</small></label>
                                         </div>
                                     </li>
@@ -1699,7 +1601,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>targets <small>[1]</small></label>
+                            <span>targets <small>[1]</small></span>
                         </div>
                         <ul id="targets-children" class="collapse">
                             <li>
@@ -1709,7 +1611,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>target <small>[0&hellip;*]</small></label>
+                                    <span>target <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="targets-target-children" class="collapse">
                                     <li>
@@ -1724,7 +1626,6 @@
                                         <div class="checkbox">
                                             <input id="targets-target-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/targets/target/id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="targets-target-id">id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1732,7 +1633,6 @@
                                         <div class="checkbox">
                                             <input id="targets-target-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/targets/target/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="targets-target-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1740,7 +1640,6 @@
                                         <div class="checkbox">
                                             <input id="targets-target-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/targets/target/organism" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="targets-target-organism">organism <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1751,14 +1650,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-actions-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>actions <small>[1]</small></label>
+                                            <span>actions <small>[1]</small></span>
                                         </div>
                                         <ul id="targets-target-actions-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="targets-target-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/action" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label>action <small>[0&hellip;*]</small></label>
                                                 </div>
                                             </li>
@@ -1768,7 +1666,6 @@
                                         <div class="checkbox">
                                             <input id="targets-target-references" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/targets/target/references" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="targets-target-references">references <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1776,7 +1673,6 @@
                                         <div class="checkbox">
                                             <input id="targets-target-known-action" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/targets/target/known-action" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="targets-target-known-action">known-action <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -1787,7 +1683,7 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>polypeptide <small>[0&hellip;*]</small></label>
+                                            <span>polypeptide <small>[0&hellip;*]</small></span>
                                         </div>
                                         <ul id="targets-target-polypeptide-children" class="collapse">
                                             <li>
@@ -1810,7 +1706,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1818,7 +1713,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-general-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/general-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-general-function">general-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1826,7 +1720,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-specific-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/specific-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-specific-function">specific-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1834,7 +1727,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-gene-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/gene-name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-gene-name">gene-name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1842,7 +1734,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-locus" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/locus" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-locus">locus <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1850,7 +1741,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-cellular-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/cellular-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-cellular-location">cellular-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1858,7 +1748,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-transmembrane-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/transmembrane-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-transmembrane-regions">transmembrane-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1866,7 +1755,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-signal-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/signal-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-signal-regions">signal-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1874,7 +1762,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-theoretical-pi" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/theoretical-pi" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-theoretical-pi">theoretical-pi <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1882,7 +1769,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-molecular-weight" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/molecular-weight" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-molecular-weight">molecular-weight <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1890,7 +1776,6 @@
                                                 <div class="checkbox">
                                                     <input id="targets-target-polypeptide-chromosome-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/targets/target/polypeptide/chromosome-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="targets-target-polypeptide-chromosome-location">chromosome-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -1922,7 +1807,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-external-identifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>external-identifiers <small>[1]</small></label>
+                                                    <span>external-identifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="targets-target-polypeptide-external-identifiers-children" class="collapse">
                                                     <li>
@@ -1932,14 +1817,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-external-identifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>external-identifier <small>[0&hellip;*]</small></label>
+                                                            <span>external-identifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="targets-target-polypeptide-external-identifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-external-identifier-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/external-identifiers/external-identifier/resource" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-external-identifier-resource">resource <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -1947,7 +1831,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-external-identifier-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/external-identifiers/external-identifier/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-external-identifier-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -1962,14 +1845,13 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-synonyms-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>synonyms <small>[1]</small></label>
+                                                    <span>synonyms <small>[1]</small></span>
                                                 </div>
                                                 <ul id="targets-target-polypeptide-synonyms-children" class="collapse">
                                                     <li>
                                                         <div class="checkbox">
                                                             <input id="targets-target-polypeptide-synonym" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/targets/target/polypeptide/synonyms/synonym" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="targets-target-polypeptide-synonym">synonym <small>[0&hellip;*]</small></label>
                                                         </div>
                                                     </li>
@@ -2024,7 +1906,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-pfams-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label for="targets-target-polypeptide-pfams">pfams <small>[1]</small></label>
+                                                    <span>pfams <small>[1]</small></span>
                                                 </div>
                                                 <ul id="targets-target-polypeptide-pfams-children" class="collapse">
                                                     <li>
@@ -2034,14 +1916,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-pfam-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>pfam [0&hellip;*]</label>
+                                                            <span>pfam [0&hellip;*]</span>
                                                         </div>
                                                         <ul id="targets-target-polypeptide-pfam-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-pfam-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/pfams/pfam/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-pfam-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2049,7 +1930,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-pfam-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/pfams/pfam/name" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-pfam-name">name <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2064,7 +1944,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-go-classifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>go-classifiers <small>[1]</small></label>
+                                                    <span>go-classifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="targets-target-polypeptide-go-classifiers-children" class="collapse">
                                                     <li>
@@ -2074,14 +1954,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="targets-target-polypeptide-go-classifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>go-classifier <small>[0&hellip;*]</small></label>
+                                                            <span>go-classifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="targets-target-polypeptide-go-classifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-go-classifier-category" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/go-classifiers/go-classifier/category" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-go-classifier-category">category <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2089,7 +1968,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="targets-target-polypeptide-go-classifier-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/targets/target/polypeptide/go-classifiers/go-classifier/description" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="targets-target-polypeptide-go-classifier-description">description <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2110,7 +1988,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>enzymes <small>[1]</small></label>
+                            <span>enzymes <small>[1]</small></span>
                         </div>
                         <ul id="enzymes-children" class="collapse">
                             <li>
@@ -2120,7 +1998,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>enzyme <small>[0&hellip;*]</small></label>
+                                    <span>enzyme <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="enzymes-enzyme-children" class="collapse">
                                     <li>
@@ -2135,7 +2013,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-id">id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2143,7 +2020,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2151,7 +2027,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/organism" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-organism">organism <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2162,14 +2037,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-actions-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>actions <small>[1]</small></label>
+                                            <span>actions <small>[1]</small></span>
                                         </div>
                                         <ul id="enzymes-enzyme-actions-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/actions/action" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label>action <small>[0&hellip;*]</small></label>
                                                 </div>
                                             </li>
@@ -2179,7 +2053,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-references" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/references" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-references">references <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2187,7 +2060,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-known-action" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/known-action" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-known-action">known-action <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2198,7 +2070,7 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>polypeptide <small>[0&hellip;*]</small></label>
+                                            <span>polypeptide <small>[0&hellip;*]</small></span>
                                         </div>
                                         <ul id="enzymes-enzyme-polypeptide-children" class="collapse">
                                             <li>
@@ -2221,7 +2093,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2229,7 +2100,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-general-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/general-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-general-function">general-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2237,7 +2107,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-specific-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/specific-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-specific-function">specific-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2245,7 +2114,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-gene-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/gene-name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-gene-name">gene-name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2253,7 +2121,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-locus" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/locus" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-locus">locus <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2261,7 +2128,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-cellular-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/cellular-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-cellular-location">cellular-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2269,7 +2135,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-transmembrane-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/transmembrane-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-transmembrane-regions">transmembrane-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2277,7 +2142,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-signal-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/signal-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-signal-regions">signal-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2285,7 +2149,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-theoretical-pi" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/theoretical-pi" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-theoretical-pi">theoretical-pi <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2293,7 +2156,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-molecular-weight" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/molecular-weight" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-molecular-weight">molecular-weight <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2301,7 +2163,6 @@
                                                 <div class="checkbox">
                                                     <input id="enzymes-enzyme-polypeptide-chromosome-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/enzymes/enzyme/polypeptide/chromosome-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="enzymes-enzyme-polypeptide-chromosome-location">chromosome-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2333,7 +2194,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-external-identifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>external-identifiers <small>[1]</small></label>
+                                                    <span>external-identifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="enzymes-enzyme-polypeptide-external-identifiers-children" class="collapse">
                                                     <li>
@@ -2343,14 +2204,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-external-identifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>external-identifier <small>[0&hellip;*]</small></label>
+                                                            <span>external-identifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="enzymes-enzyme-polypeptide-external-identifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-external-identifier-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/external-identifiers/external-identifier/resource" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-external-identifier-resource">resource <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2358,7 +2218,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-external-identifier-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/external-identifiers/external-identifier/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-external-identifier-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2373,14 +2232,13 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-synonyms-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>synonyms <small>[1]</small></label>
+                                                    <span>synonyms <small>[1]</small></span>
                                                 </div>
                                                 <ul id="enzymes-enzyme-polypeptide-synonyms-children" class="collapse">
                                                     <li>
                                                         <div class="checkbox">
                                                             <input id="enzymes-enzyme-polypeptide-synonym" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/enzymes/enzyme/polypeptide/synonyms/synonym" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="enzymes-enzyme-polypeptide-synonym">synonym <small>[0&hellip;*]</small></label>
                                                         </div>
                                                     </li>
@@ -2435,7 +2293,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-pfams-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label for="enzymes-enzyme-polypeptide-pfams">pfams <small>[1]</small></label>
+                                                    <span>pfams <small>[1]</small></span>
                                                 </div>
                                                 <ul id="enzymes-enzyme-polypeptide-pfams-children" class="collapse">
                                                     <li>
@@ -2445,14 +2303,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-pfam-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>pfam [0&hellip;*]</label>
+                                                            <span>pfam [0&hellip;*]</span>
                                                         </div>
                                                         <ul id="enzymes-enzyme-polypeptide-pfam-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-pfam-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/pfams/pfam/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-pfam-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2460,7 +2317,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-pfam-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/pfams/pfam/name" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-pfam-name">name <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2475,7 +2331,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-go-classifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>go-classifiers <small>[1]</small></label>
+                                                    <span>go-classifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="enzymes-enzyme-polypeptide-go-classifiers-children" class="collapse">
                                                     <li>
@@ -2485,14 +2341,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="enzymes-enzyme-polypeptide-go-classifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>go-classifier <small>[0&hellip;*]</small></label>
+                                                            <span>go-classifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="enzymes-enzyme-polypeptide-go-classifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-go-classifier-category" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/go-classifiers/go-classifier/category" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-go-classifier-category">category <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2500,7 +2355,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="enzymes-enzyme-polypeptide-go-classifier-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/enzymes/enzyme/polypeptide/go-classifiers/go-classifier/description" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="enzymes-enzyme-polypeptide-go-classifier-description">description <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2514,7 +2368,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-inhibition-strength" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/inhibition-strength" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-inhibition-strength">inhibition-strength <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2522,7 +2375,6 @@
                                         <div class="checkbox">
                                             <input id="enzymes-enzyme-induction-strength" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/enzymes/enzyme/induction-strength" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="enzymes-enzyme-induction-strength">induction-strength <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2537,7 +2389,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>carriers <small>[1]</small></label>
+                            <span>carriers <small>[1]</small></span>
                         </div>
                         <ul id="carriers-children" class="collapse">
                             <li>
@@ -2547,7 +2399,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>carrier <small>[0&hellip;*]</small></label>
+                                    <span>carrier <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="carriers-carrier-children" class="collapse">
                                     <li>
@@ -2562,7 +2414,6 @@
                                         <div class="checkbox">
                                             <input id="carriers-carrier-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/carriers/carrier/id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="carriers-carrier-id">id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2570,7 +2421,6 @@
                                         <div class="checkbox">
                                             <input id="carriers-carrier-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/carriers/carrier/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="carriers-carrier-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2578,7 +2428,6 @@
                                         <div class="checkbox">
                                             <input id="carriers-carrier-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/carriers/carrier/organism" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="carriers-carrier-organism">organism <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2589,14 +2438,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-actions-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>actions <small>[1]</small></label>
+                                            <span>actions <small>[1]</small></span>
                                         </div>
                                         <ul id="carriers-carrier-actions-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/actions/action" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label>action <small>[0&hellip;*]</small></label>
                                                 </div>
                                             </li>
@@ -2606,7 +2454,6 @@
                                         <div class="checkbox">
                                             <input id="carriers-carrier-references" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/carriers/carrier/references" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="carriers-carrier-references">references <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2614,7 +2461,6 @@
                                         <div class="checkbox">
                                             <input id="carriers-carrier-known-action" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/carriers/carrier/known-action" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="carriers-carrier-known-action">known-action <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2625,7 +2471,7 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>polypeptide <small>[0&hellip;*]</small></label>
+                                            <span>polypeptide <small>[0&hellip;*]</small></span>
                                         </div>
                                         <ul id="carriers-carrier-polypeptide-children" class="collapse">
                                             <li>
@@ -2648,7 +2494,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2656,7 +2501,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-general-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/general-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-general-function">general-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2664,7 +2508,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-specific-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/specific-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-specific-function">specific-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2672,7 +2515,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-gene-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/gene-name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-gene-name">gene-name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2680,7 +2522,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-locus" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/locus" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-locus">locus <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2688,7 +2529,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-cellular-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/cellular-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-cellular-location">cellular-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2696,7 +2536,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-transmembrane-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/transmembrane-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-transmembrane-regions">transmembrane-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2704,7 +2543,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-signal-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/signal-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-signal-regions">signal-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2712,7 +2550,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-theoretical-pi" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/theoretical-pi" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-theoretical-pi">theoretical-pi <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2720,7 +2557,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-molecular-weight" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/molecular-weight" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-molecular-weight">molecular-weight <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2728,7 +2564,6 @@
                                                 <div class="checkbox">
                                                     <input id="carriers-carrier-polypeptide-chromosome-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/carriers/carrier/polypeptide/chromosome-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="carriers-carrier-polypeptide-chromosome-location">chromosome-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -2760,7 +2595,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-external-identifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>external-identifiers <small>[1]</small></label>
+                                                    <span>external-identifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="carriers-carrier-polypeptide-external-identifiers-children" class="collapse">
                                                     <li>
@@ -2770,14 +2605,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-external-identifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>external-identifier <small>[0&hellip;*]</small></label>
+                                                            <span>external-identifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="carriers-carrier-polypeptide-external-identifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-external-identifier-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/external-identifiers/external-identifier/resource" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-external-identifier-resource">resource <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2785,7 +2619,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-external-identifier-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/external-identifiers/external-identifier/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-external-identifier-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2800,14 +2633,13 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-synonyms-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>synonyms <small>[1]</small></label>
+                                                    <span>synonyms <small>[1]</small></span>
                                                 </div>
                                                 <ul id="carriers-carrier-polypeptide-synonyms-children" class="collapse">
                                                     <li>
                                                         <div class="checkbox">
                                                             <input id="carriers-carrier-polypeptide-synonym" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/carriers/carrier/polypeptide/synonyms/synonym" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="carriers-carrier-polypeptide-synonym">synonym <small>[0&hellip;*]</small></label>
                                                         </div>
                                                     </li>
@@ -2862,7 +2694,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-pfams-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label for="carriers-carrier-polypeptide-pfams">pfams <small>[1]</small></label>
+                                                    <span>pfams <small>[1]</small></span>
                                                 </div>
                                                 <ul id="carriers-carrier-polypeptide-pfams-children" class="collapse">
                                                     <li>
@@ -2872,14 +2704,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-pfam-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>pfam [0&hellip;*]</label>
+                                                            <span>pfam [0&hellip;*]</span>
                                                         </div>
                                                         <ul id="carriers-carrier-polypeptide-pfam-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-pfam-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/pfams/pfam/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-pfam-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2887,7 +2718,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-pfam-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/pfams/pfam/name" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-pfam-name">name <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2902,7 +2732,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-go-classifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>go-classifiers <small>[1]</small></label>
+                                                    <span>go-classifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="carriers-carrier-polypeptide-go-classifiers-children" class="collapse">
                                                     <li>
@@ -2912,14 +2742,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="carriers-carrier-polypeptide-go-classifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>go-classifier <small>[0&hellip;*]</small></label>
+                                                            <span>go-classifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="carriers-carrier-polypeptide-go-classifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-go-classifier-category" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/go-classifiers/go-classifier/category" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-go-classifier-category">category <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2927,7 +2756,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="carriers-carrier-polypeptide-go-classifier-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/carriers/carrier/polypeptide/go-classifiers/go-classifier/description" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="carriers-carrier-polypeptide-go-classifier-description">description <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -2948,7 +2776,7 @@
                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-children">
                                 {% bootstrap_icon "folder-close" %}
                             </a>
-                            <label>transporters <small>[1]</small></label>
+                            <span>transporters <small>[1]</small></span>
                         </div>
                         <ul id="transporters-children" class="collapse">
                             <li>
@@ -2958,7 +2786,7 @@
                                        data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-children">
                                         {% bootstrap_icon "folder-close" %}
                                     </a>
-                                    <label>transporter <small>[0&hellip;*]</small></label>
+                                    <span>transporter <small>[0&hellip;*]</small></span>
                                 </div>
                                 <ul id="transporters-transporter-children" class="collapse">
                                     <li>
@@ -2973,7 +2801,6 @@
                                         <div class="checkbox">
                                             <input id="transporters-transporter-id" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/transporters/transporter/id" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="transporters-transporter-id">id <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2981,7 +2808,6 @@
                                         <div class="checkbox">
                                             <input id="transporters-transporter-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/transporters/transporter/name" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="transporters-transporter-name">name <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -2989,7 +2815,6 @@
                                         <div class="checkbox">
                                             <input id="transporters-transporter-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/transporters/transporter/organism" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="transporters-transporter-organism">organism <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -3000,14 +2825,13 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-actions-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>actions <small>[1]</small></label>
+                                            <span>actions <small>[1]</small></span>
                                         </div>
                                         <ul id="transporters-transporter-actions-children" class="collapse">
                                             <li>
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-organism" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/actions/action" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label>action <small>[0&hellip;*]</small></label>
                                                 </div>
                                             </li>
@@ -3017,7 +2841,6 @@
                                         <div class="checkbox">
                                             <input id="transporters-transporter-references" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/transporters/transporter/references" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="transporters-transporter-references">references <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -3025,7 +2848,6 @@
                                         <div class="checkbox">
                                             <input id="transporters-transporter-known-action" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                    value="drug/transporters/transporter/known-action" />
-                                            {% bootstrap_icon "folder-close" %}
                                             <label for="transporters-transporter-known-action">known-action <small>[1]</small></label>
                                         </div>
                                     </li>
@@ -3036,7 +2858,7 @@
                                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-children">
                                                 {% bootstrap_icon "folder-close" %}
                                             </a>
-                                            <label>polypeptide <small>[0&hellip;*]</small></label>
+                                            <span>polypeptide <small>[0&hellip;*]</small></span>
                                         </div>
                                         <ul id="transporters-transporter-polypeptide-children" class="collapse">
                                             <li>
@@ -3059,7 +2881,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-name">name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3067,7 +2888,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-general-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/general-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-general-function">general-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3075,7 +2895,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-specific-function" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/specific-function" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-specific-function">specific-function <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3083,7 +2902,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-gene-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/gene-name" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-gene-name">gene-name <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3091,7 +2909,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-locus" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/locus" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-locus">locus <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3099,7 +2916,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-cellular-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/cellular-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-cellular-location">cellular-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3107,7 +2923,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-transmembrane-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/transmembrane-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-transmembrane-regions">transmembrane-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3115,7 +2930,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-signal-regions" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/signal-regions" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-signal-regions">signal-regions <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3123,7 +2937,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-theoretical-pi" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/theoretical-pi" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-theoretical-pi">theoretical-pi <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3131,7 +2944,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-molecular-weight" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/molecular-weight" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-molecular-weight">molecular-weight <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3139,7 +2951,6 @@
                                                 <div class="checkbox">
                                                     <input id="transporters-transporter-polypeptide-chromosome-location" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                            value="drug/transporters/transporter/polypeptide/chromosome-location" />
-                                                    {% bootstrap_icon "folder-close" %}
                                                     <label for="transporters-transporter-polypeptide-chromosome-location">chromosome-location <small>[1]</small></label>
                                                 </div>
                                             </li>
@@ -3171,7 +2982,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-external-identifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>external-identifiers <small>[1]</small></label>
+                                                    <span>external-identifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="transporters-transporter-polypeptide-external-identifiers-children" class="collapse">
                                                     <li>
@@ -3181,14 +2992,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-external-identifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>external-identifier <small>[0&hellip;*]</small></label>
+                                                            <span>external-identifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="transporters-transporter-polypeptide-external-identifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-external-identifier-resource" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/external-identifiers/external-identifier/resource" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-external-identifier-resource">resource <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3196,7 +3006,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-external-identifier-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/external-identifiers/external-identifier/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-external-identifier-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3211,14 +3020,13 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-synonyms-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>synonyms <small>[1]</small></label>
+                                                    <span>synonyms <small>[1]</small></span>
                                                 </div>
                                                 <ul id="transporters-transporter-polypeptide-synonyms-children" class="collapse">
                                                     <li>
                                                         <div class="checkbox">
                                                             <input id="transporters-transporter-polypeptide-synonym" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                    value="drug/transporters/transporter/polypeptide/synonyms/synonym" />
-                                                            {% bootstrap_icon "folder-close" %}
                                                             <label for="transporters-transporter-polypeptide-synonym">synonym <small>[0&hellip;*]</small></label>
                                                         </div>
                                                     </li>
@@ -3273,7 +3081,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-pfams-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label for="transporters-transporter-polypeptide-pfams">pfams <small>[1]</small></label>
+                                                    <span>pfams <small>[1]</small></span>
                                                 </div>
                                                 <ul id="transporters-transporter-polypeptide-pfams-children" class="collapse">
                                                     <li>
@@ -3283,14 +3091,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-pfam-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>pfam [0&hellip;*]</label>
+                                                            <span>pfam [0&hellip;*]</span>
                                                         </div>
                                                         <ul id="transporters-transporter-polypeptide-pfam-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-pfam-identifier" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/pfams/pfam/identifier" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-pfam-identifier">identifier <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3298,7 +3105,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-pfam-name" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/pfams/pfam/name" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-pfam-name">name <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3313,7 +3119,7 @@
                                                        data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-go-classifiers-children">
                                                         {% bootstrap_icon "folder-close" %}
                                                     </a>
-                                                    <label>go-classifiers <small>[1]</small></label>
+                                                    <span>go-classifiers <small>[1]</small></span>
                                                 </div>
                                                 <ul id="transporters-transporter-polypeptide-go-classifiers-children" class="collapse">
                                                     <li>
@@ -3323,14 +3129,13 @@
                                                                data-toggle="collapse" aria-expanded="false" aria-controls="transporters-transporter-polypeptide-go-classifier-children">
                                                                 {% bootstrap_icon "folder-close" %}
                                                             </a>
-                                                            <label>go-classifier <small>[0&hellip;*]</small></label>
+                                                            <span>go-classifier <small>[0&hellip;*]</small></span>
                                                         </div>
                                                         <ul id="transporters-transporter-polypeptide-go-classifier-children" class="collapse">
                                                             <li>
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-go-classifier-category" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/go-classifiers/go-classifier/category" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-go-classifier-category">category <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3338,7 +3143,6 @@
                                                                 <div class="checkbox">
                                                                     <input id="transporters-transporter-polypeptide-go-classifier-description" type="checkbox" name="{{ wizard.form.prefix }}-selected"
                                                                            value="drug/transporters/transporter/polypeptide/go-classifiers/go-classifier/description" />
-                                                                    {% bootstrap_icon "folder-close" %}
                                                                     <label for="transporters-transporter-polypeptide-go-classifier-description">description <small>[1]</small></label>
                                                                 </div>
                                                             </li>
@@ -3355,6 +3159,7 @@
                 </ul>
             </li>
         </ul>
+        {% endspaceless %}
     </fieldset>
 
     <script type="text/javascript">
