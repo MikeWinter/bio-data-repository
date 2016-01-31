@@ -60,3 +60,13 @@ h1 .tag.label {
     font-size: 13px;
     padding: 1px 7px;
 }
+
+.element-tree a+label,
+.element-tree span+label,
+.element-tree a+span {
+    padding-left: 10px;
+}
+
+.element-tree input+label {
+    padding-left: 37px;
+}
